@@ -1,0 +1,4 @@
+struct park_vec{
+    float d;
+    float q;
+};

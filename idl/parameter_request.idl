@@ -1,0 +1,14 @@
+#include "parameter_request_type.idl"
+
+@doc('Запрос параметра устройства')
+struct parameter_request
+{
+    @doc('Тип запроса')
+    parameter_request_type type;
+    @doc('ID запрашиваемого параметра')
+    @alias('PRM_ID_FROM_SPEC')
+    unsigned long id;
+    @doc('Новое значение параметра')
+    @alias('FROM_PRM_SPEC')
+    char val[32];
+};

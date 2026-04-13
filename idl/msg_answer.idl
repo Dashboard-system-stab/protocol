@@ -1,0 +1,12 @@
+#include "msg_state.idl"
+@doc('Ответ на запрос отправки сообщения')
+struct msg_answer
+{
+    @doc('ID запрошенного сообщения')
+    @alias('MSG_ID_FROM_SPEC')
+    unsigned short id;
+    @doc('Счетчик запроса сообщения, на которое отправлен ответ')
+    unsigned long cnt;
+    @doc('Код состояния отправки')
+    msg_state state;
+};

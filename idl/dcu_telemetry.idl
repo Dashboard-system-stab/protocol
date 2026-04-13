@@ -1,0 +1,163 @@
+#include "drv_ctrl_mode.idl"
+#include "drv_ctrl_error.idl"
+#include "relay_signal_state.idl"
+#include "rotor_ang_sens_state.idl"
+#include "load_ang_sens_state.idl"
+#include "inverter_status.idl"
+#include "dcu_status.idl"
+#include "park_vec.idl"
+#include "rotor_brake_state.idl"
+
+@doc('Теелеметрия модуля управления приводом БУП')
+struct dcu_telemetry
+{
+    @doc('Способ управления приводом')
+    @alias('drv_ctrl_mode')
+    int8 mode;
+
+    @doc('Состояние')
+    @alias('dcu_status')
+    int8 status;
+
+    @doc('Код ошибки смены способа управления')
+    @alias('drv_ctrl_error')
+    int8 err;
+
+    @doc('Состояние датчика углового положения нагрузки')
+    @alias('load_ang_sens_status')
+    int8 load_sens_state;
+
+    @doc('Данные от датчика углового положения нагрузки, рад +-pi')
+    float load_sens_angle;
+
+    @doc('Угловая скорость датчика положения нагрузки, рад/с')
+    float load_sens_speed;
+
+    @doc('Напряжение питания силовых цепей, В')
+    float power_vdc;
+
+    @doc('Трехфазный ток, A')
+    three_phase_val current;
+
+    @doc('Коэффициент заполнения ШИМ')
+    three_phase_val pwm;
+
+    @doc('Ток фаз в СК Парка-Горева, A')
+    park_vec park_current;
+
+    @doc('Напряжение на фазах в СК Парка-Горева, В')
+    park_vec park_voltage;
+
+    @doc('Температра статора, C')
+    float stator_temp;
+
+    @doc('Состояние тормоза')
+    @alias('rotor_brake_state')
+    int8 brake_state;
+
+    @doc('Ток тормоза')
+    float ibrk;
+
+    @doc('Напряжение питания модуля, В')
+    float power_voltage;
+
+    @doc('Ток id, А')
+    float id;
+
+    @doc('Ток iq, А')
+    float iq;
+
+    @doc('Мощность, положителная - потребляем, отрицательная - генерируем в сеть, ВА')
+    float electrical_power;
+
+
+    @doc('Ошибка ПИД регулятора угла')
+    float ang_pid_err;
+
+    @doc('Входное значение ПИД регулятора угла')
+    float ang_pid_in;
+
+    @doc('Выходное значение ПИД регулятора угла')
+    float ang_pid_out;
+
+    @doc('Значение регулятора ПИД регулятора угла')
+    float ang_pid_intgr;
+
+
+    @doc('Ошибка ПИД регулятора скорости ротора')
+    float rotor_spd_pid_err;
+
+    @doc('Входное значение ПИД регулятора скорости ротора')
+    float rotor_spd_pid_in;
+
+    @doc('Выходное значение ПИД регулятора скорости ротора')
+    float rotor_spd_pid_out;
+
+    @doc('Значение регулятора ПИД регулятора скорости ротора')
+    float rotor_spd_pid_intgr;
+
+
+    @doc('Ошибка ПИД регулятора скорости нагрузки')
+    float load_spd_pid_err;
+
+    @doc('Входное значение ПИД регулятора скорости нагрузки')
+    float load_spd_pid_in;
+
+    @doc('Выходное значение ПИД регулятора скорости нагрузки')
+    float load_spd_pid_out;
+
+    @doc('Значение регулятора ПИД регулятора скорости нагрузки')
+    float load_spd_pid_intgr;
+
+
+    @doc('Ошибка ПИД регулятора тока')
+    float curr_pid_err;
+
+    @doc('Входное значение ПИД регулятора тока')
+    float curr_pid_in;
+
+    @doc('Выходное значение ПИД регулятора тока')
+    float curr_pid_out;
+
+    @doc('Значение регулятора ПИД регулятора тока')
+    float curr_pid_intgr;
+
+
+    @doc('Состояние датчика углового положения ротора')
+    @alias('rotor_ang_sens_status')
+    int8 rotor_sens_state;
+
+    @doc('Данные от датчика углового положения ротора, рад +-pi')
+    float rotor_sens_angle;
+
+    @doc('Угловая скорость датчика положения ротора, рад/с')
+    float rotor_sens_speed;
+
+    @doc('Состояние дискретного сигнала ON')
+    @alias('relay_signal_state')
+    int8 on;
+
+    @doc('Состояние дискретного сигнала MANUAL')
+    @alias('relay_signal_state')
+    int8 manual;
+    
+    @doc('Состояние дискретного сигнала BLOCK')
+    @alias('relay_signal_state')
+    int8 block;
+
+    @doc('Состояние дискретного сигнала SYNC')
+    @alias('relay_signal_state')
+    int8 sync;
+
+    @doc("Перегрузка по току или перегрев преобразователя. Активный уровень - low")
+    @alias('relay_signal_state')
+    int8 inv_octw;
+
+    @doc("Отказ. Активный уровень - low")
+    @alias('relay_signal_state')
+    int8 inv_fault;
+
+    @doc('Включение драйвера затворов')
+    @alias('relay_signal_state')
+    int8 en_gate;
+};

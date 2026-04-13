@@ -1,0 +1,9 @@
+@doc('Состояние привода')
+struct driver_state
+{
+    float Ia;
+    float Ib;
+    float Ic;
+    float r_angle;
+    float Vdc;
+};

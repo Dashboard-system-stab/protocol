@@ -1,0 +1,7 @@
+@doc('Тип запроса параметра')
+enum parameter_request_type{
+	@doc("Чтение")
+	@value(0) READ,
+	@doc("Запись")
+	WRITE
+};

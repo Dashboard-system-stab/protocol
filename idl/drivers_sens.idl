@@ -1,0 +1,10 @@
+@doc('Показания датчиков модели приводов')
+struct drivers_sens
+{
+    @doc('Ток, А')
+    float currents_gn[3];
+    @doc('Угол ротора, рад')
+    float rotor_angle_gn;
+    @doc('Номинальное напряжение привода, В')
+    float v_nom;    
+};

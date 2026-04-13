@@ -1,0 +1,15 @@
+@doc('Состояние тормоза')
+enum rotor_brake_state 
+{
+    @doc('Неизвестно')
+    UNKNOWN,
+
+    @doc('Застопорен')
+    CLOSE,
+
+    @doc('Расстопорен')
+    RELEASE,
+
+    @doc('Ошибка')
+    FAIL
+};

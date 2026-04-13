@@ -1,0 +1,7 @@
+#include "command_type.idl"
+
+@doc("Запрос комманды на исполнение")
+struct command_request
+{
+    command_type type;
+};

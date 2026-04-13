@@ -1,0 +1,17 @@
+@doc("Состояние исполнения комманды")
+enum command_state{
+	@doc("Принято")
+	ACCEPT,
+	@doc("Исполняется")
+	INPROGRESS,
+	@doc("Исполненно")
+	DONE,
+	@doc("Неизвестная комманда")
+	UNKNOW,
+	@doc("Исполнение запрещено")
+	FORBITTEN,
+	@doc("Не реализовано")
+	@value(-4) NOT_IMPLEMENTED,
+	@doc("Произошла ошибка при исполненни комманды")
+	@value(-5) ERROR
+};

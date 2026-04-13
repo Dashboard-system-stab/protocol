@@ -1,0 +1,187 @@
+#ifndef _SPEC_H
+#define _SPEC_H
+
+#include "microjet.h"
+#include "mjtypes.h"
+
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
+/** Specification version: bro30 1.11.5.1.1.0 */
+/** Library created: 10-04-26 */
+/**    gen. version: 11.5 */
+static const char mj_bro30_spec_ver[] = { 0x62,0x72,0x6f,0x33,0x30,0x20,0x31,0x2e,0x31,0x31,0x2e,0x35,0x2e,0x31,0x2e,0x31,0x2e,0x30,0x00 };
+static const char mj_bro30_gen_date[] = { 0x31,0x30,0x2d,0x30,0x34,0x2d,0x32,0x36,0x00 };
+
+#ifndef SRV_MCAST_REQ_IP
+#define SRV_MCAST_REQ_IP (0x1c8c8ef) // srv_mcast_req 239.200.200.1
+#endif
+#ifndef SRV_MCAST_ANS_IP
+#define SRV_MCAST_ANS_IP (0x1c8c8ef) // srv_mcast_ans 239.200.200.1
+#endif
+#ifndef BRO_BUP_CTRL_MCAST_IP
+#define BRO_BUP_CTRL_MCAST_IP (0x10ac8ef) // bro_bup_ctrl_mcast 239.200.10.1
+#endif
+#ifndef BRO_BUP_DATA_MCAST_IP
+#define BRO_BUP_DATA_MCAST_IP (0x10ac8ef) // bro_bup_data_mcast 239.200.10.1
+#endif
+#ifndef BRO_BUP_SRV_MCAST_IP
+#define BRO_BUP_SRV_MCAST_IP (0x164c8ef) // bro_bup_srv_mcast 239.200.100.1
+#endif
+#ifndef IM_BRO_DRIVE_MCAST_IP
+#define IM_BRO_DRIVE_MCAST_IP (0x15ac8ef) // im_bro_drive_mcast 239.200.90.1
+#endif
+#ifndef IM_BRO_DRIVE_CTRL_MCAST_IP
+#define IM_BRO_DRIVE_CTRL_MCAST_IP (0x15ac8ef) // im_bro_drive_ctrl_mcast 239.200.90.1
+#endif
+#ifndef AUFD_IP
+#define AUFD_IP (0x100680a) // 10.104.0.1
+#endif
+#ifndef BUP_DCU_LFD_IP
+#define BUP_DCU_LFD_IP (0x200660a) // 10.102.0.2
+#endif
+#ifndef BUP_DCU_RFD_IP
+#define BUP_DCU_RFD_IP (0x300660a) // 10.102.0.3
+#endif
+#ifndef BUP_DCU_LRD_IP
+#define BUP_DCU_LRD_IP (0x400660a) // 10.102.0.4
+#endif
+#ifndef BUP_DCU_RRD_IP
+#define BUP_DCU_RRD_IP (0x500660a) // 10.102.0.5
+#endif
+#ifndef BUP_DCU_LST_IP
+#define BUP_DCU_LST_IP (0x600660a) // 10.102.0.6
+#endif
+#ifndef BUP_DCU_RST_IP
+#define BUP_DCU_RST_IP (0x700660a) // 10.102.0.7
+#endif
+#ifndef MON_IP
+#define MON_IP (0x100bf0a) // 10.191.0.1
+#endif
+#ifndef IM_BRO_IP
+#define IM_BRO_IP (0x200c00a) // 10.192.0.2
+#endif
+
+
+typedef enum bro30_dev_id
+{
+	BRO30_AUFD = 0xF5B6,
+	BRO30_DCU = 0xB8FE,
+	BRO30_BUP_DCU_LFD = 0xFA82,
+	BRO30_BUP_DCU_RFD = 0xD334,
+	BRO30_BUP_DCU_LRD = 0x57F6,
+	BRO30_BUP_DCU_RRD = 0x7E40,
+	BRO30_BUP_DCU_LST = 0x7659,
+	BRO30_BUP_DCU_RST = 0x5FEF,
+	BRO30_MON = 0x6C99,
+	BRO30_IM_BRO = 0x1D4C,
+    BRO30_ALL = 0xFFFF,
+    BRO30_NONE = 0x0000,
+} bro30_dev_id_k;
+
+typedef enum bro30_msg_id
+{
+	ID_PRM_REQ = 0xB4E1,
+	ID_PRM_ANS = 0xFCC8,
+	ID_CMD_REQ = 0x7E7A,
+	ID_CMD_ANS = 0xFB98,
+	ID_MSG_REQ = 0xD801,
+	ID_MSG_ANS = 0xD80F,
+	ID_DBG = 0x3894,
+	ID_DCU_TEL = 0x7DEC,
+	ID_BUP_STATE = 0x824,
+	ID_BUP_CTRL = 0xD994,
+	ID_BUP_MULTI_CONTROL = 0x76A9,
+	ID_BUP_SRV_CTRL = 0x47CF,
+	ID_IM_BRO_DRIVE_CTRL = 0x83E1,
+	ID_IM_BRO_DRIVERS_SENS = 0xEB19,
+	ID_PTP_STATE = 0xD950,
+	ID_FORMULAR = 0x10AD,
+    ID_MJPRINT = 0x9682,
+} bro30_msg_id_k;
+
+typedef enum bro30_prm_id
+{
+     PRM_BOOL_SERVICE_MODE = ((int)0x311FD2BA),
+     PRM_BOOL_DBG_MODE = ((int)0x84A7BB67),
+     PRM_BOOL_PTP_STAT = ((int)0xC17D8050),
+     PRM_FLOAT_VDC = ((int)0x7F45547),
+     PRM_FLOAT_VDC_SCALE = ((int)0xF366F564),
+     PRM_FLOAT_VDC_MIN = ((int)0x800F3056),
+     PRM_FLOAT_OCP_LVL = ((int)0x4A0AB355),
+     PRM_FLOAT_CUR_LIM = ((int)0x55DA9773),
+     PRM_FLOAT_DRV_LIMIT_UP = ((int)0x5C57D2B7),
+     PRM_FLOAT_DRV_LIMIT_DOWN = ((int)0x501D05A4),
+     PRM_BOOL_DRV_ANG_REVERSE = ((int)0x54F313B1),
+     PRM_BOOL_DRV_CURRENT_REVERSE = ((int)0xFC9F76B6),
+     PRM_BOOL_DRV_VOLTAGE_REVERSE = ((int)0x310908E7),
+     PRM_FLOAT_DRV_ZERO = ((int)0x74C112A),
+     PRM_FLOAT_OHP_LVL = ((int)0x12DB50AA),
+     PRM_FLOAT_EL_ZERO = ((int)0xA57FD22E),
+     PRM_INT_POLE_PAIRS = ((int)0x393E0A69),
+     PRM_FLOAT_PH_RESISTANCE = ((int)0xD478FE43),
+     PRM_FLOAT_PH_INDUCTANCE = ((int)0x5B351473),
+     PRM_FLOAT_BRAKE_UNLOCK_VOLTAGE = ((int)0x920D8F3B),
+     PRM_INT_BRAKE_UNLOCK_TIME = ((int)0xD31E0ACB),
+     PRM_FLOAT_BRAKE_HOLD_VOLTAGE = ((int)0x64399A99),
+     PRM_INT_BRAKE_LOCK_TIME = ((int)0x955BB624),
+     PRM_FLOAT_CURR_KP = ((int)0x323FC775),
+     PRM_FLOAT_CURR_KI = ((int)0x16A9255D),
+     PRM_FLOAT_CURR_KB = ((int)0x80056521),
+     PRM_FLOAT_CURR_KT = ((int)0xAD5D6E6E),
+     PRM_FLOAT_CURR_KF = ((int)0x1F67CC3A),
+     PRM_FLOAT_CURR_FC = ((int)0x9841D378),
+     PRM_FLOAT_CURR_ERR_LIM = ((int)0xCAF1DD24),
+     PRM_FLOAT_CURR_OUT_LIM = ((int)0x8D2D0B70),
+     PRM_FLOAT_CURR_OUT_RATE_LIM = ((int)0x41824DD2),
+     PRM_FLOAT_CURR_ERR_RATE_LIM = ((int)0x6EFAD7A0),
+     PRM_FLOAT_LOAD_SPEED_KP = ((int)0x44EE1601),
+     PRM_FLOAT_LOAD_SPEED_KI = ((int)0x6078F429),
+     PRM_FLOAT_LOAD_SPEED_KD = ((int)0xA6070C18),
+     PRM_FLOAT_LOAD_SPEED_KT = ((int)0xDB8CBF1A),
+     PRM_FLOAT_LOAD_SPEED_KF = ((int)0x69B61D4E),
+     PRM_FLOAT_LOAD_SPEED_ERR_LIM = ((int)0xDA07EA66),
+     PRM_FLOAT_LOAD_SPEED_OUT_LIM = ((int)0x9DDB3C32),
+     PRM_FLOAT_LOAD_SPEED_OUT_RATE_LIM = ((int)0x4608CFD6),
+     PRM_FLOAT_LOAD_SPEED_ERR_RATE_LIM = ((int)0x697055A4),
+     PRM_FLOAT_ROTOR_SPEED_KP = ((int)0x53930154),
+     PRM_FLOAT_ROTOR_SPEED_KI = ((int)0x7705E37C),
+     PRM_FLOAT_ROTOR_SPEED_KD = ((int)0xB17A1B4D),
+     PRM_FLOAT_ROTOR_SPEED_KT = ((int)0xCCF1A84F),
+     PRM_FLOAT_ROTOR_SPEED_KF = ((int)0x7ECB0A1B),
+     PRM_FLOAT_ROTOR_SPEED_ERR_LIM = ((int)0xA2564CDF),
+     PRM_FLOAT_ROTOR_SPEED_OUT_LIM = ((int)0xE58A9A8B),
+     PRM_FLOAT_ROTOR_SPEED_OUT_RATE_LIM = ((int)0x86EE36E2),
+     PRM_FLOAT_ROTOR_SPEED_ERR_RATE_LIM = ((int)0xA996AC90),
+     PRM_FLOAT_ROTOR_ANG_KP = ((int)0xBF7D3892),
+     PRM_FLOAT_ROTOR_ANG_KI = ((int)0x9BEBDABA),
+     PRM_FLOAT_ROTOR_ANG_KD = ((int)0x5D94228B),
+     PRM_FLOAT_ROTOR_ANG_KT = ((int)0x201F9189),
+     PRM_FLOAT_ROTOR_ANG_KF = ((int)0x922533DD),
+     PRM_FLOAT_ROTOR_ANG_ERR_LIM = ((int)0x74081F2D),
+     PRM_FLOAT_ROTOR_ANG_OUT_LIM = ((int)0x33D4C979),
+     PRM_FLOAT_ROTOR_ANG_OUT_RATE_LIM = ((int)0x28CABE88),
+     PRM_FLOAT_ROTOR_ANG_ERR_RATE_LIM = ((int)0x7B224FA),
+     PRM_BOOL_IM_MODE = ((int)0xE54327C5),
+     PRM_FLOAT_PTP_KP = ((int)0x70B25BB3),
+     PRM_FLOAT_PTP_KI = ((int)0x5424B99B),
+     PRM_FLOAT_PTP_KD = ((int)0x925B41AA),
+     PRM_STRING_FACTORY_DATE = ((int)0xA92645D2),
+     PRM_STRING_FACTORY_NUMBER = ((int)0xC8EE09D4),
+     PRM_STRING_DESCRIPTION = ((int)0x4D7787A8),
+     PRM_STRING_COM_IF_SRV_MCAST_REQ = ((int)0x4DDDD1EE),
+     PRM_STRING_COM_IF_SRV_MCAST_ANS = ((int)0x52F653D2),
+     PRM_STRING_COM_IF_BRO_BUP_CTRL_MCAST = ((int)0xDDFE2DA4),
+     PRM_STRING_COM_IF_BRO_BUP_DATA_MCAST = ((int)0x6F0DA7DD),
+     PRM_STRING_COM_IF_BRO_BUP_SRV_MCAST = ((int)0x6F720C87),
+     PRM_STRING_COM_IF_IM_BRO_DRIVE_MCAST = ((int)0x64B26340),
+     PRM_STRING_COM_IF_IM_BRO_DRIVE_CTRL_MCAST = ((int)0x3C3707BD),
+     PRM_INT_DEV_ID = ((int)0x17EAC676) 
+}bro30_prm_id_k;
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* BRO30_SPEC_H */

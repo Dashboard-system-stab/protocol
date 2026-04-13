@@ -1,0 +1,7 @@
+@doc('Запрос сообщения')
+struct msg_request
+{
+    @doc('ID запрашиваемого сообщения')
+    @alias('MSG_ID_FROM_SPEC')
+    unsigned short id;
+};

@@ -1,0 +1,17 @@
+#include "command_type.idl"
+#include "command_state.idl"
+
+@doc("Отчет о ходе выполнения комманды")
+struct command_answer
+{
+    @doc('Запрошенная комманда')
+    command_type command;
+    @doc('Код состояния исполнения комманды')
+    command_state state;
+    @doc('Счетчик запроса комманды, на которое отправлен ответ')
+    unsigned long cnt;
+    @doc("Дополнительная информация о выполнении комманды.
+    Формат определяется разработчиком СЧ
+    Кодировка CP866")
+    char info[32];
+};

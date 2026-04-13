@@ -1,0 +1,8 @@
+#include "drv_ctrl_sp.idl"
+
+@doc('Управление приводами БУП')
+struct bup_drv_control
+{
+    @doc('Управленние приводом')
+    drv_ctrl_sp dr;
+};

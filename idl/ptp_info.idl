@@ -1,0 +1,11 @@
+@doc('Информационное сообщение о состоянии временной синхронизации')
+
+#include "sync_state.idl"
+
+struct ptp_info{
+    boolean is_master;
+    long path_delay;
+    long offset_ns;
+    long mean_offset_ns;
+    sync_state state;
+};

@@ -1,0 +1,10 @@
+#include "load_ang_sens_status.idl"
+
+@doc('Данные от датчика углового положения нагрузки')
+struct load_ang_sens_state
+{
+  @doc("Угол [-pi..pi], рад")
+  float angle;
+  @doc("Состояние датчика")
+  load_ang_sens_status status;
+};

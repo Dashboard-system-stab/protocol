@@ -1,0 +1,22 @@
+#include "relay_signal_state.idl"
+#include "inverter_mode.idl"
+#include "three_phase_val.idl"
+
+@doc("Статус трехфазного инвертора")
+struct inverter_status
+{
+  @doc("Режим работы")
+  inverter_mode mode;
+  @doc("Перегрузка по току или перегрев преобразователя. Активный уровень - low")
+  relay_signal_state nOCTW;
+  @doc("Отказ. Активный уровень - low")
+  relay_signal_state nFAULT;
+  @doc('Включение драйвера затворов')
+  relay_signal_state EN_GATE;
+  @doc('Ток, A')
+  three_phase_val current;
+  @doc('Коэффициент заполнения ШИМ')
+  three_phase_val pwm;
+  @doc('Напряжение питания, В')
+  float vdc;
+};

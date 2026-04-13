@@ -1,0 +1,16 @@
+
+@doc("Состояние датчика угла ротора")
+enum rotor_ang_sens_status{
+	@doc("Состояние неизвестно")
+	@value(0) UNKNOW,
+	@doc("Подготовка")
+	PREPARE,
+    @doc("Отсутствует")
+	UNCONNECTED,
+	@doc("Штатное функционирование")
+	NORMAL,
+    @doc("Ограничено исправен")
+	WARNING,
+	@doc("Неисправен")
+	@value(-1) FAULT
+};

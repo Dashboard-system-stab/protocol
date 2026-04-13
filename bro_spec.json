@@ -1,0 +1,483 @@
+{
+    "name":"BRO30",
+    "print_name":"Пылесос",
+    "ver":"1",
+    "mver":"0",
+    "interfaces":
+    {
+        "srv_mcast_req":
+        {
+            "IP":"239.200.200.1",
+            "port":49001
+        },
+        "srv_mcast_ans":
+        {
+            "IP":"239.200.200.1",
+            "port":49002
+        },
+        "bro_bup_ctrl_mcast":
+        {
+            "IP":"239.200.10.1",
+            "port":49001
+        },
+        "bro_bup_data_mcast":
+        {
+            "IP":"239.200.10.1",
+            "port":49002
+        },
+        "bro_bup_srv_mcast":
+        {
+            "IP":"239.200.100.1",
+            "port":49001
+        },
+
+        "im_bro_drive_mcast":
+        {
+            "IP":"239.200.90.1",
+            "port":49001
+        },
+        "im_bro_drive_ctrl_mcast":
+        {
+            "IP":"239.200.90.1",
+            "port":49001
+        }
+    },
+    "msg":
+    {
+        "prm_req":
+        {
+            "transport":"srv_mcast_req",
+            "type": "parameter_request",
+            "des": "Запрос чтения или записи параметра",
+            "period": 0,
+            "priority": 8
+        },
+        "prm_ans":
+        {
+            "transport":"srv_mcast_ans",
+            "type": "parameter_answer",
+            "des": "Ответ на запрос чтения или записи параметра",
+            "period": 0,
+            "priority": 8
+        },
+        "cmd_req":
+        {
+            "transport":"srv_mcast_req",
+            "type": "command_request",
+            "des": "Запрос на исполнение комманды",
+            "period": 0
+        },
+        "cmd_ans":
+        {
+            "transport":"srv_mcast_ans",
+            "type": "command_answer",
+            "des": "Отчет об исполненнии комманды",
+            "period": 0
+        },
+        "msg_req":
+        {
+            "transport":"srv_mcast_req",
+            "type": "msg_request",
+            "des": "Запрос отправки сообщения",
+            "period": 0,
+            "priority": 8
+        },
+        "msg_ans":
+        {
+            "transport":"srv_mcast_ans",
+            "type": "msg_answer",
+            "des": "Ответ на запрос отправки сообщения",
+            "period": 0,
+            "priority": 8
+        },
+        "dbg":
+        {
+            "transport":"bro_bup_srv_mcast",
+            "type": "dbg_data",
+            "des": "Отладочные сигналы",
+            "flag":["ext_proto"],
+            "period": 1000
+        },
+        "dcu_tel":
+        {
+            "transport":"bro_bup_srv_mcast",
+            "type": "dcu_telemetry",
+            "des": "Телеметрия модуля управления приводом БУП",
+            "period": 250
+        },
+        "bup_state":
+        {
+            "transport":"bro_bup_data_mcast",
+            "type": "bup_drv_state",
+            "des": "Состояние привода БУП",
+            "period": 0
+        },
+        "bup_ctrl":
+        {
+            "transport":"bro_bup_ctrl_mcast",
+            "type": "bup_drv_control",
+            "des": "Управление одним приводом БУП",
+            "period": 0,
+            "timeout":100000
+        },
+        "bup_multi_control":
+        {
+            "transport":"bro_bup_ctrl_mcast",
+            "type": "bup_drv_multi_control",
+            "des": "Управление несколькими приводами БУП одним пакетом",
+            "period": 0,
+            "timeout":100000
+        },
+        "bup_srv_ctrl":
+        {
+            "transport":"bro_bup_srv_mcast",
+            "type": "bup_drv_control",
+            "des": "Управление приводами БУП в сервисном режиме",
+            "period": 20000
+        },
+        "im_bro_drive_ctrl":
+        {
+            "transport":"im_bro_drive_ctrl_mcast",
+            "type": "im_bro_drive_ctrl",
+            "des": "Управление приводом имитатора BRO 3.0",
+            "flag":["ext_proto"],
+            "period": 250
+        },
+        "im_bro_drivers_sens":
+        {
+            "transport":"im_bro_drive_mcast",
+            "type": "drivers_sens",
+            "des": "Показания датчиков модели приводов",
+            "flag":["ext_proto"],
+            "period": 250
+        },
+        "ptp_state":
+        {
+            "transport":"bro_bup_srv_mcast",
+            "type": "ptp_info",
+            "des": "Статистика временной синхронизации",
+            "period": 500000
+        },
+        "formular":
+        {
+            "transport":"srv_mcast_ans",
+            "type": "formular_info",
+            "des": "Электронный формуляр изделия",
+            "period": 0
+        }
+    },
+    "parameters":
+    {
+        "service_mode":{"type":"bool","unit":"-"},
+        "dbg_mode":{"type":"bool","unit":"-"},
+        "ptp_stat":{"type":"bool","unit":"-"},
+
+        "Vdc":{"type":"float","unit":"V"},
+        "vdc_scale":{"type":"float","unit":"-"},
+        "vdc_min":{"type":"float","unit":"V"},
+        "ocp_lvl":{"type":"float","unit":"A"},
+        "cur_lim":{"type":"float","unit":"A"},
+
+        "drv_limit_up":{"type":"float","unit":"rad"},
+        "drv_limit_down":{"type":"float","unit":"rad"},
+        "drv_ang_reverse":{"type":"bool","unit":"-"},
+        "drv_current_reverse":{"type":"bool","unit":"-"},
+        "drv_voltage_reverse":{"type":"bool","unit":"-"},
+        "drv_zero":{"type":"float","unit":"rad"},
+
+        "ohp_lvl":{"type":"float","unit":"C"},
+        "el_zero":{"type":"float","unit":"rad"},
+        "pole_pairs":{"type":"int","unit":"-"},
+        "ph_resistance":{"type":"float","unit":"-"},
+        "ph_inductance":{"type":"float","unit":"-"},
+
+        "brake_unlock_voltage":{"type":"float","unit":"V"},
+        "brake_unlock_time":{"type":"int","unit":"ms"},
+        "brake_hold_voltage":{"type":"float","unit":"V"},
+        "brake_lock_time":{"type":"int","unit":"ms"},
+
+        "curr_kp":{"type":"float","unit":"-"},
+        "curr_ki":{"type":"float","unit":"-"},
+        "curr_kb":{"type":"float","unit":"-"},
+        "curr_kt":{"type":"float","unit":"-"},
+        "curr_kf":{"type":"float","unit":"-"},
+        "curr_fc":{"type":"float","unit":"-"},
+        "curr_err_lim":{"type":"float","unit":"-"},
+        "curr_out_lim":{"type":"float","unit":"-"},
+        "curr_out_rate_lim":{"type":"float","unit":"-"},
+        "curr_err_rate_lim":{"type":"float","unit":"-"},
+
+        "load_speed_kp":{"type":"float","unit":"-"},
+        "load_speed_ki":{"type":"float","unit":"-"},
+        "load_speed_kd":{"type":"float","unit":"-"},
+        "load_speed_kt":{"type":"float","unit":"-"},
+        "load_speed_kf":{"type":"float","unit":"-"},
+        "load_speed_err_lim":{"type":"float","unit":"-"},
+        "load_speed_out_lim":{"type":"float","unit":"-"},
+        "load_speed_out_rate_lim":{"type":"float","unit":"-"},
+        "load_speed_err_rate_lim":{"type":"float","unit":"-"},
+
+        "rotor_speed_kp":{"type":"float","unit":"-"},
+        "rotor_speed_ki":{"type":"float","unit":"-"},
+        "rotor_speed_kd":{"type":"float","unit":"-"},
+        "rotor_speed_kt":{"type":"float","unit":"-"},
+        "rotor_speed_kf":{"type":"float","unit":"-"},
+        "rotor_speed_err_lim":{"type":"float","unit":"-"},
+        "rotor_speed_out_lim":{"type":"float","unit":"-"},
+        "rotor_speed_out_rate_lim":{"type":"float","unit":"-"},
+        "rotor_speed_err_rate_lim":{"type":"float","unit":"-"},
+
+        "rotor_ang_kp":{"type":"float","unit":"-"},
+        "rotor_ang_ki":{"type":"float","unit":"-"},
+        "rotor_ang_kd":{"type":"float","unit":"-"},
+        "rotor_ang_kt":{"type":"float","unit":"-"},
+        "rotor_ang_kf":{"type":"float","unit":"-"},
+        "rotor_ang_err_lim":{"type":"float","unit":"-"},
+        "rotor_ang_out_lim":{"type":"float","unit":"-"},
+        "rotor_ang_out_rate_lim":{"type":"float","unit":"-"},
+        "rotor_ang_err_rate_lim":{"type":"float","unit":"-"},
+
+        "im_mode":{"type":"bool","unit":"-"},
+
+        "ptp_kp":{"type":"float","unit":"-"},
+        "ptp_ki":{"type":"float","unit":"-"},
+        "ptp_kd":{"type":"float","unit":"-"},
+        
+        "factory_date":{"type":"string","unit":"-"},
+        "factory_number":{"type":"string","unit":"-"},
+        "description":{"type":"string","unit":"-"}
+    },
+    "devices":
+    {
+        "aufd":
+        {
+            "parent":"",
+            "shortname": "АУФД",
+            "des": "Автомат управления функциями движения",
+            "IP":"10.104.0.1",
+            "MAC":"02:00:00:00:00:01",
+            "parameters":{
+                "service_mode":0,
+
+                "factory_date":"НЕТ ИНФОРМАЦИИ!",
+                "factory_number":"НЕТ ИНФОРМАЦИИ!",
+                "description":"НЕТ ИНФОРМАЦИИ!"
+            },
+            "out":
+            {
+                "bup_ctrl":{},
+                "bup_multi_control":{},
+                "prm_req":{},
+                "prm_ans":{},
+                "cmd_req":{},
+                "cmd_ans":{},
+                "msg_ans":{},
+                "msg_req":{},
+                "formular":{}
+            },
+            "in":
+            {
+                "bup_state":{},
+                "msg_req":{}
+            }
+        },
+        "dcu":
+        {
+            "flag":["ext_proto", "no_lib"],
+            "shortname": "МУП",
+            "des": "Модуль управления приводом",
+            "IP":"10.102.0.1",
+            "MAC":"02:00:00:00:00:01",
+            "parameters":{
+                "service_mode":0,
+                "dbg_mode":0,
+                "ptp_stat":0,
+                "vdc_scale":0.017724609,
+
+                "ocp_lvl":115,
+                "cur_lim":95,
+
+                "drv_ang_reverse":0,
+                "drv_current_reverse":0,
+                "drv_voltage_reverse":0,
+    
+                "drv_zero":0,
+                "vdc_min":10,
+                "im_mode":0,
+
+                "ptp_kp": 0.0,
+                "ptp_ki": 0.0,
+                "ptp_kd": 0.0,
+
+                "ohp_lvl": 0.0,
+                "el_zero": 0.0,
+                "pole_pairs": 0,
+                "ph_resistance": 0.0,
+                "ph_inductance": 0.0,
+                "brake_unlock_voltage": 0.0,
+                "brake_unlock_time": 0,
+                "brake_hold_voltage": 0.0,
+                "brake_lock_time": 0,
+
+                "curr_kp": 0.0,
+                "curr_ki": 0.0,
+                "curr_kb": 0.0,
+                "curr_kt": 0.0,
+                "curr_kf": 0.0,
+                "curr_fc": 0.0,
+                "curr_err_lim": 0.0,
+                "curr_out_lim": 0.0,
+                "curr_out_rate_lim": 0.0,
+                "curr_err_rate_lim": 0.0,
+
+                "load_speed_kp": 0.0,
+                "load_speed_ki": 0.0,
+                "load_speed_kd": 0.0,
+                "load_speed_kt": 0.0,
+                "load_speed_kf": 0.0,
+                "load_speed_err_lim": 0.0,
+                "load_speed_out_lim": 0.0,
+                "load_speed_out_rate_lim": 0.0,
+                "load_speed_err_rate_lim": 0.0,
+
+                "rotor_speed_kp": 0.0,
+                "rotor_speed_ki": 0.0,
+                "rotor_speed_kd": 0.0,
+                "rotor_speed_kt": 0.0,
+                "rotor_speed_kf": 0.0,
+                "rotor_speed_err_lim": 0.0,
+                "rotor_speed_out_lim": 0.0,
+                "rotor_speed_out_rate_lim": 0.0,
+                "rotor_speed_err_rate_lim": 0.0,
+
+                "rotor_ang_kp": 0.0,
+                "rotor_ang_ki": 0.0,
+                "rotor_ang_kd": 0.0,
+                "rotor_ang_kt": 0.0,
+                "rotor_ang_kf": 0.0,
+                "rotor_ang_err_lim": 0.0,
+                "rotor_ang_out_lim": 0.0,
+                "rotor_ang_out_rate_lim": 0.0,
+                "rotor_ang_err_rate_lim": 0.0,
+
+                "factory_date":"НЕТ ИНФОРМАЦИИ!",
+                "factory_number":"НЕТ ИНФОРМАЦИИ!",
+                "description":"НЕТ ИНФОРМАЦИИ!"
+            },
+            "out":
+            {
+                "dcu_tel":{},
+                "bup_state":{},
+                "im_bro_drive_ctrl":{},
+                "prm_ans":{},
+                "cmd_ans":{},
+                "msg_ans":{},
+                "dbg":{},
+                "ptp_state":{},
+                "formular":{}
+            },
+            "in":
+            {
+                "prm_req":{},
+                "msg_req":{},
+                "cmd_req":{},
+                "bup_ctrl":{},
+                "bup_srv_ctrl":{},                
+                "im_bro_drivers_sens":{}
+            }
+        },
+        "bup_dcu_lfd":{
+            "parent":"dcu",
+            "IP":"10.102.0.2",
+            "MAC":"02:00:00:00:00:01",
+            "shortname": "МУП.ТЛП",
+            "des": "Модуль управления левым передним тяговым приводом"
+        },
+        "bup_dcu_rfd":{
+            "parent":"dcu",
+            "IP":"10.102.0.3",
+            "MAC":"02:00:00:00:00:01",
+            "shortname": "МУП.ТПП",
+            "des": "Модуль управления правым передним тяговым приводом"            
+        },
+        "bup_dcu_lrd":{
+            "parent":"dcu",
+            "IP":"10.102.0.4",
+            "MAC":"02:00:00:00:00:01",
+            "shortname": "МУП.ТЛЗ",
+            "des": "Модуль управления левым задним тяговым приводом"
+        },
+        "bup_dcu_rrd":{
+            "parent":"dcu",
+            "IP":"10.102.0.5",
+            "MAC":"02:00:00:00:00:01",
+            "shortname": "МУП.ТПЗ",
+            "des": "Модуль управления правым задним тяговым приводом"
+        },
+        "bup_dcu_lst":{
+            "parent":"dcu",
+            "IP":"10.102.0.6",
+            "MAC":"02:00:00:00:00:01",
+            "shortname": "МУП.РЛ",
+            "des": "Модуль управления левым рулевым приводом"
+        },
+        "bup_dcu_rst":{
+            "parent":"dcu",
+            "IP":"10.102.0.7",
+            "MAC":"02:00:00:00:00:01",
+            "shortname": "МУП.РП",
+            "des": "Модуль управления правым рулевым приводом"
+        },
+        "mon":{
+            "shortname": "СПО",
+            "des": "Сервисное програмное обеспечение",
+            "IP":"10.191.0.1",
+            "MAC":"02:00:00:00:00:08",
+            "parameters":{
+                "service_mode":0
+            },
+            "out":
+            {
+                "prm_req":{},
+                "msg_req":{},
+                "cmd_req":{},
+                "bup_srv_ctrl":{}
+            },
+            "in":
+            {
+                "dcu_tel":{},
+                "bup_state":{},
+                "im_bro_drive_ctrl":{},
+                "cmd_ans":{},
+                "dbg":{},
+                "ptp_state":{},
+                "formular":{},
+                "prm_ans":{},
+                "msg_ans":{},
+                "im_bro_drivers_sens":{}
+            }
+        },
+        "im_bro":{
+            "shortname": "И.ПЫЛ",
+            "des": "Имитатор пылесоса",
+            "flag":["ext_proto"],
+            "parent":"",
+            "IP":"10.192.0.2",
+            "MAC":"02:00:00:00:00:09",
+            "parameters":{
+                "service_mode":0,
+                "Vdc":48
+            },
+            "out":
+            {
+                "prm_ans":{},
+                "im_bro_drivers_sens":{}
+            },
+            "in":
+            {
+                "prm_req":{},
+                "im_bro_drive_ctrl":{}
+            }
+        }
+    } 
+}

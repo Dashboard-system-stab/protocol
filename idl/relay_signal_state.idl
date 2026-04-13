@@ -1,0 +1,15 @@
+@doc("Состояние релейного сигнала")
+enum relay_signal_state{
+	@doc("Неизвестно")
+	@value(0) UNKNOWN,
+    @doc("ВКЛ")
+	@value(5) HIGH,
+	@doc("ВЫКЛ")
+	@value(1) LOW,
+	@doc("Разрыв")
+	@value(3) GAP,
+	@doc("Защита по току")
+	@value(-1) OCP,
+	@doc("Отказ")
+	@value(-2) FAIL
+};

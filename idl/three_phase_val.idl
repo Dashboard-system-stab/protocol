@@ -1,0 +1,5 @@
+struct three_phase_val{
+    float a;
+    float b;
+    float c;
+};
