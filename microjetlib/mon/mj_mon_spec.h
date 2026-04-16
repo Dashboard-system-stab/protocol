@@ -164,20 +164,6 @@ typedef struct mj_mon
                     uint32_t ts_s;
                     uint32_t ts_ns;
                } formular;
-               /** im_bro_drive_ctrl from bup_dcu_lfd*/
-               struct
-               {
-                    im_bro_drive_ctrl_msg_t *msg;
-                    void (*copy)(void *dst);
-                    void (*upd_cb)(void);
-                    void (*irq)(void *);
-                    mj_msg_state_t (*lock)(mj_msg_state_t state);
-                    mj_msg_state_t state;
-                    uint32_t *total;
-                    uint32_t *miss;
-                    uint32_t ts_s;
-                    uint32_t ts_ns;
-               } im_bro_drive_ctrl;
                /** msg_ans from bup_dcu_lfd*/
                struct
                {
@@ -293,20 +279,6 @@ typedef struct mj_mon
                     uint32_t ts_s;
                     uint32_t ts_ns;
                } formular;
-               /** im_bro_drive_ctrl from bup_dcu_lrd*/
-               struct
-               {
-                    im_bro_drive_ctrl_msg_t *msg;
-                    void (*copy)(void *dst);
-                    void (*upd_cb)(void);
-                    void (*irq)(void *);
-                    mj_msg_state_t (*lock)(mj_msg_state_t state);
-                    mj_msg_state_t state;
-                    uint32_t *total;
-                    uint32_t *miss;
-                    uint32_t ts_s;
-                    uint32_t ts_ns;
-               } im_bro_drive_ctrl;
                /** msg_ans from bup_dcu_lrd*/
                struct
                {
@@ -422,20 +394,6 @@ typedef struct mj_mon
                     uint32_t ts_s;
                     uint32_t ts_ns;
                } formular;
-               /** im_bro_drive_ctrl from bup_dcu_lst*/
-               struct
-               {
-                    im_bro_drive_ctrl_msg_t *msg;
-                    void (*copy)(void *dst);
-                    void (*upd_cb)(void);
-                    void (*irq)(void *);
-                    mj_msg_state_t (*lock)(mj_msg_state_t state);
-                    mj_msg_state_t state;
-                    uint32_t *total;
-                    uint32_t *miss;
-                    uint32_t ts_s;
-                    uint32_t ts_ns;
-               } im_bro_drive_ctrl;
                /** msg_ans from bup_dcu_lst*/
                struct
                {
@@ -551,20 +509,6 @@ typedef struct mj_mon
                     uint32_t ts_s;
                     uint32_t ts_ns;
                } formular;
-               /** im_bro_drive_ctrl from bup_dcu_rfd*/
-               struct
-               {
-                    im_bro_drive_ctrl_msg_t *msg;
-                    void (*copy)(void *dst);
-                    void (*upd_cb)(void);
-                    void (*irq)(void *);
-                    mj_msg_state_t (*lock)(mj_msg_state_t state);
-                    mj_msg_state_t state;
-                    uint32_t *total;
-                    uint32_t *miss;
-                    uint32_t ts_s;
-                    uint32_t ts_ns;
-               } im_bro_drive_ctrl;
                /** msg_ans from bup_dcu_rfd*/
                struct
                {
@@ -680,20 +624,6 @@ typedef struct mj_mon
                     uint32_t ts_s;
                     uint32_t ts_ns;
                } formular;
-               /** im_bro_drive_ctrl from bup_dcu_rrd*/
-               struct
-               {
-                    im_bro_drive_ctrl_msg_t *msg;
-                    void (*copy)(void *dst);
-                    void (*upd_cb)(void);
-                    void (*irq)(void *);
-                    mj_msg_state_t (*lock)(mj_msg_state_t state);
-                    mj_msg_state_t state;
-                    uint32_t *total;
-                    uint32_t *miss;
-                    uint32_t ts_s;
-                    uint32_t ts_ns;
-               } im_bro_drive_ctrl;
                /** msg_ans from bup_dcu_rrd*/
                struct
                {
@@ -809,20 +739,6 @@ typedef struct mj_mon
                     uint32_t ts_s;
                     uint32_t ts_ns;
                } formular;
-               /** im_bro_drive_ctrl from bup_dcu_rst*/
-               struct
-               {
-                    im_bro_drive_ctrl_msg_t *msg;
-                    void (*copy)(void *dst);
-                    void (*upd_cb)(void);
-                    void (*irq)(void *);
-                    mj_msg_state_t (*lock)(mj_msg_state_t state);
-                    mj_msg_state_t state;
-                    uint32_t *total;
-                    uint32_t *miss;
-                    uint32_t ts_s;
-                    uint32_t ts_ns;
-               } im_bro_drive_ctrl;
                /** msg_ans from bup_dcu_rst*/
                struct
                {
@@ -938,20 +854,6 @@ typedef struct mj_mon
                     uint32_t ts_s;
                     uint32_t ts_ns;
                } formular;
-               /** im_bro_drive_ctrl from dcu*/
-               struct
-               {
-                    im_bro_drive_ctrl_msg_t *msg;
-                    void (*copy)(void *dst);
-                    void (*upd_cb)(void);
-                    void (*irq)(void *);
-                    mj_msg_state_t (*lock)(mj_msg_state_t state);
-                    mj_msg_state_t state;
-                    uint32_t *total;
-                    uint32_t *miss;
-                    uint32_t ts_s;
-                    uint32_t ts_ns;
-               } im_bro_drive_ctrl;
                /** msg_ans from dcu*/
                struct
                {

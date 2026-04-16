@@ -418,51 +418,6 @@ static void in_bup_dcu_lfd_formular_copy_fcn(void *dst)
     in_bup_dcu_lfd_formular_lock_fcn(MJ_MSG_UNLOCK);
 }
 
-static uint32_t bup_dcu_lfd_im_bro_drive_ctrl_rx_tick = UINT32_MAX - 4.0;
-static uint8_t  in_bup_dcu_lfd_im_bro_drive_ctrl_lock_cnt = 0;
-static im_bro_drive_ctrl_msg_t* in_bup_dcu_lfd_im_bro_drive_ctrl_delayed_ptr = NULL;
-static uint32_t bup_dcu_lfd_im_bro_drive_ctrl_delayed_ts_s = 0;
-static uint32_t bup_dcu_lfd_im_bro_drive_ctrl_delayed_ts_ns = 0;
-static uint8_t  in_bup_dcu_lfd_im_bro_drive_ctrl_updated = 0;
-static uint32_t  in_bup_dcu_lfd_im_bro_drive_ctrl_total = 0;
-static uint32_t  in_bup_dcu_lfd_im_bro_drive_ctrl_miss = 0;
-static uint16_t  in_bup_dcu_lfd_im_bro_drive_ctrl_last_cnt = 0;
-static mj_msg_state_t in_bup_dcu_lfd_im_bro_drive_ctrl_lock_fcn(mj_msg_state_t state)
-{
-    if (state == MJ_MSG_LOCK)
-    {
-        if (in_bup_dcu_lfd_im_bro_drive_ctrl_lock_cnt < 255)
-        {
-            in_bup_dcu_lfd_im_bro_drive_ctrl_lock_cnt++;
-        }
-    }else{
-        if (in_bup_dcu_lfd_im_bro_drive_ctrl_lock_cnt > 0)
-        {
-            if ((in_bup_dcu_lfd_im_bro_drive_ctrl_lock_cnt == 1) && (in_bup_dcu_lfd_im_bro_drive_ctrl_delayed_ptr))
-            {
-                uint8_t* old_buff = (uint8_t*)(mj_handle.in.bup_dcu_lfd.im_bro_drive_ctrl.msg);
-                mj_handle.in.bup_dcu_lfd.im_bro_drive_ctrl.msg = (im_bro_drive_ctrl_msg_t*)(in_bup_dcu_lfd_im_bro_drive_ctrl_delayed_ptr);
-                mj_handle.in.bup_dcu_lfd.im_bro_drive_ctrl.ts_s = bup_dcu_lfd_im_bro_drive_ctrl_delayed_ts_s;
-                mj_handle.in.bup_dcu_lfd.im_bro_drive_ctrl.ts_ns = bup_dcu_lfd_im_bro_drive_ctrl_delayed_ts_ns;
-                bup_dcu_lfd_im_bro_drive_ctrl_rx_tick = ticks;
-                mj_handle.in.bup_dcu_lfd.im_bro_drive_ctrl.state = MJ_MSG_ACTUAL;
-                in_bup_dcu_lfd_im_bro_drive_ctrl_updated = 1;
-                p_drv->udp4.free(old_buff);
-                in_bup_dcu_lfd_im_bro_drive_ctrl_delayed_ptr = NULL;
-            }
-            in_bup_dcu_lfd_im_bro_drive_ctrl_lock_cnt--;
-        }
-    }
-    return in_bup_dcu_lfd_im_bro_drive_ctrl_lock_cnt > 0 ? MJ_MSG_LOCK : MJ_MSG_UNLOCK;
-}
-
-static void in_bup_dcu_lfd_im_bro_drive_ctrl_copy_fcn(void *dst)
-{
-    in_bup_dcu_lfd_im_bro_drive_ctrl_lock_fcn(MJ_MSG_LOCK);
-    memcpy(dst, (void *)(mj_handle.in.bup_dcu_lfd.im_bro_drive_ctrl.msg), sizeof(im_bro_drive_ctrl_msg_t));
-    in_bup_dcu_lfd_im_bro_drive_ctrl_lock_fcn(MJ_MSG_UNLOCK);
-}
-
 static uint32_t bup_dcu_lfd_msg_ans_rx_tick = UINT32_MAX - 1.0;
 static uint8_t  in_bup_dcu_lfd_msg_ans_lock_cnt = 0;
 static msg_answer_msg_t* in_bup_dcu_lfd_msg_ans_delayed_ptr = NULL;
@@ -821,51 +776,6 @@ static void in_bup_dcu_lrd_formular_copy_fcn(void *dst)
     in_bup_dcu_lrd_formular_lock_fcn(MJ_MSG_LOCK);
     memcpy(dst, (void *)(mj_handle.in.bup_dcu_lrd.formular.msg), sizeof(formular_info_msg_t));
     in_bup_dcu_lrd_formular_lock_fcn(MJ_MSG_UNLOCK);
-}
-
-static uint32_t bup_dcu_lrd_im_bro_drive_ctrl_rx_tick = UINT32_MAX - 4.0;
-static uint8_t  in_bup_dcu_lrd_im_bro_drive_ctrl_lock_cnt = 0;
-static im_bro_drive_ctrl_msg_t* in_bup_dcu_lrd_im_bro_drive_ctrl_delayed_ptr = NULL;
-static uint32_t bup_dcu_lrd_im_bro_drive_ctrl_delayed_ts_s = 0;
-static uint32_t bup_dcu_lrd_im_bro_drive_ctrl_delayed_ts_ns = 0;
-static uint8_t  in_bup_dcu_lrd_im_bro_drive_ctrl_updated = 0;
-static uint32_t  in_bup_dcu_lrd_im_bro_drive_ctrl_total = 0;
-static uint32_t  in_bup_dcu_lrd_im_bro_drive_ctrl_miss = 0;
-static uint16_t  in_bup_dcu_lrd_im_bro_drive_ctrl_last_cnt = 0;
-static mj_msg_state_t in_bup_dcu_lrd_im_bro_drive_ctrl_lock_fcn(mj_msg_state_t state)
-{
-    if (state == MJ_MSG_LOCK)
-    {
-        if (in_bup_dcu_lrd_im_bro_drive_ctrl_lock_cnt < 255)
-        {
-            in_bup_dcu_lrd_im_bro_drive_ctrl_lock_cnt++;
-        }
-    }else{
-        if (in_bup_dcu_lrd_im_bro_drive_ctrl_lock_cnt > 0)
-        {
-            if ((in_bup_dcu_lrd_im_bro_drive_ctrl_lock_cnt == 1) && (in_bup_dcu_lrd_im_bro_drive_ctrl_delayed_ptr))
-            {
-                uint8_t* old_buff = (uint8_t*)(mj_handle.in.bup_dcu_lrd.im_bro_drive_ctrl.msg);
-                mj_handle.in.bup_dcu_lrd.im_bro_drive_ctrl.msg = (im_bro_drive_ctrl_msg_t*)(in_bup_dcu_lrd_im_bro_drive_ctrl_delayed_ptr);
-                mj_handle.in.bup_dcu_lrd.im_bro_drive_ctrl.ts_s = bup_dcu_lrd_im_bro_drive_ctrl_delayed_ts_s;
-                mj_handle.in.bup_dcu_lrd.im_bro_drive_ctrl.ts_ns = bup_dcu_lrd_im_bro_drive_ctrl_delayed_ts_ns;
-                bup_dcu_lrd_im_bro_drive_ctrl_rx_tick = ticks;
-                mj_handle.in.bup_dcu_lrd.im_bro_drive_ctrl.state = MJ_MSG_ACTUAL;
-                in_bup_dcu_lrd_im_bro_drive_ctrl_updated = 1;
-                p_drv->udp4.free(old_buff);
-                in_bup_dcu_lrd_im_bro_drive_ctrl_delayed_ptr = NULL;
-            }
-            in_bup_dcu_lrd_im_bro_drive_ctrl_lock_cnt--;
-        }
-    }
-    return in_bup_dcu_lrd_im_bro_drive_ctrl_lock_cnt > 0 ? MJ_MSG_LOCK : MJ_MSG_UNLOCK;
-}
-
-static void in_bup_dcu_lrd_im_bro_drive_ctrl_copy_fcn(void *dst)
-{
-    in_bup_dcu_lrd_im_bro_drive_ctrl_lock_fcn(MJ_MSG_LOCK);
-    memcpy(dst, (void *)(mj_handle.in.bup_dcu_lrd.im_bro_drive_ctrl.msg), sizeof(im_bro_drive_ctrl_msg_t));
-    in_bup_dcu_lrd_im_bro_drive_ctrl_lock_fcn(MJ_MSG_UNLOCK);
 }
 
 static uint32_t bup_dcu_lrd_msg_ans_rx_tick = UINT32_MAX - 1.0;
@@ -1228,51 +1138,6 @@ static void in_bup_dcu_lst_formular_copy_fcn(void *dst)
     in_bup_dcu_lst_formular_lock_fcn(MJ_MSG_UNLOCK);
 }
 
-static uint32_t bup_dcu_lst_im_bro_drive_ctrl_rx_tick = UINT32_MAX - 4.0;
-static uint8_t  in_bup_dcu_lst_im_bro_drive_ctrl_lock_cnt = 0;
-static im_bro_drive_ctrl_msg_t* in_bup_dcu_lst_im_bro_drive_ctrl_delayed_ptr = NULL;
-static uint32_t bup_dcu_lst_im_bro_drive_ctrl_delayed_ts_s = 0;
-static uint32_t bup_dcu_lst_im_bro_drive_ctrl_delayed_ts_ns = 0;
-static uint8_t  in_bup_dcu_lst_im_bro_drive_ctrl_updated = 0;
-static uint32_t  in_bup_dcu_lst_im_bro_drive_ctrl_total = 0;
-static uint32_t  in_bup_dcu_lst_im_bro_drive_ctrl_miss = 0;
-static uint16_t  in_bup_dcu_lst_im_bro_drive_ctrl_last_cnt = 0;
-static mj_msg_state_t in_bup_dcu_lst_im_bro_drive_ctrl_lock_fcn(mj_msg_state_t state)
-{
-    if (state == MJ_MSG_LOCK)
-    {
-        if (in_bup_dcu_lst_im_bro_drive_ctrl_lock_cnt < 255)
-        {
-            in_bup_dcu_lst_im_bro_drive_ctrl_lock_cnt++;
-        }
-    }else{
-        if (in_bup_dcu_lst_im_bro_drive_ctrl_lock_cnt > 0)
-        {
-            if ((in_bup_dcu_lst_im_bro_drive_ctrl_lock_cnt == 1) && (in_bup_dcu_lst_im_bro_drive_ctrl_delayed_ptr))
-            {
-                uint8_t* old_buff = (uint8_t*)(mj_handle.in.bup_dcu_lst.im_bro_drive_ctrl.msg);
-                mj_handle.in.bup_dcu_lst.im_bro_drive_ctrl.msg = (im_bro_drive_ctrl_msg_t*)(in_bup_dcu_lst_im_bro_drive_ctrl_delayed_ptr);
-                mj_handle.in.bup_dcu_lst.im_bro_drive_ctrl.ts_s = bup_dcu_lst_im_bro_drive_ctrl_delayed_ts_s;
-                mj_handle.in.bup_dcu_lst.im_bro_drive_ctrl.ts_ns = bup_dcu_lst_im_bro_drive_ctrl_delayed_ts_ns;
-                bup_dcu_lst_im_bro_drive_ctrl_rx_tick = ticks;
-                mj_handle.in.bup_dcu_lst.im_bro_drive_ctrl.state = MJ_MSG_ACTUAL;
-                in_bup_dcu_lst_im_bro_drive_ctrl_updated = 1;
-                p_drv->udp4.free(old_buff);
-                in_bup_dcu_lst_im_bro_drive_ctrl_delayed_ptr = NULL;
-            }
-            in_bup_dcu_lst_im_bro_drive_ctrl_lock_cnt--;
-        }
-    }
-    return in_bup_dcu_lst_im_bro_drive_ctrl_lock_cnt > 0 ? MJ_MSG_LOCK : MJ_MSG_UNLOCK;
-}
-
-static void in_bup_dcu_lst_im_bro_drive_ctrl_copy_fcn(void *dst)
-{
-    in_bup_dcu_lst_im_bro_drive_ctrl_lock_fcn(MJ_MSG_LOCK);
-    memcpy(dst, (void *)(mj_handle.in.bup_dcu_lst.im_bro_drive_ctrl.msg), sizeof(im_bro_drive_ctrl_msg_t));
-    in_bup_dcu_lst_im_bro_drive_ctrl_lock_fcn(MJ_MSG_UNLOCK);
-}
-
 static uint32_t bup_dcu_lst_msg_ans_rx_tick = UINT32_MAX - 1.0;
 static uint8_t  in_bup_dcu_lst_msg_ans_lock_cnt = 0;
 static msg_answer_msg_t* in_bup_dcu_lst_msg_ans_delayed_ptr = NULL;
@@ -1631,51 +1496,6 @@ static void in_bup_dcu_rfd_formular_copy_fcn(void *dst)
     in_bup_dcu_rfd_formular_lock_fcn(MJ_MSG_LOCK);
     memcpy(dst, (void *)(mj_handle.in.bup_dcu_rfd.formular.msg), sizeof(formular_info_msg_t));
     in_bup_dcu_rfd_formular_lock_fcn(MJ_MSG_UNLOCK);
-}
-
-static uint32_t bup_dcu_rfd_im_bro_drive_ctrl_rx_tick = UINT32_MAX - 4.0;
-static uint8_t  in_bup_dcu_rfd_im_bro_drive_ctrl_lock_cnt = 0;
-static im_bro_drive_ctrl_msg_t* in_bup_dcu_rfd_im_bro_drive_ctrl_delayed_ptr = NULL;
-static uint32_t bup_dcu_rfd_im_bro_drive_ctrl_delayed_ts_s = 0;
-static uint32_t bup_dcu_rfd_im_bro_drive_ctrl_delayed_ts_ns = 0;
-static uint8_t  in_bup_dcu_rfd_im_bro_drive_ctrl_updated = 0;
-static uint32_t  in_bup_dcu_rfd_im_bro_drive_ctrl_total = 0;
-static uint32_t  in_bup_dcu_rfd_im_bro_drive_ctrl_miss = 0;
-static uint16_t  in_bup_dcu_rfd_im_bro_drive_ctrl_last_cnt = 0;
-static mj_msg_state_t in_bup_dcu_rfd_im_bro_drive_ctrl_lock_fcn(mj_msg_state_t state)
-{
-    if (state == MJ_MSG_LOCK)
-    {
-        if (in_bup_dcu_rfd_im_bro_drive_ctrl_lock_cnt < 255)
-        {
-            in_bup_dcu_rfd_im_bro_drive_ctrl_lock_cnt++;
-        }
-    }else{
-        if (in_bup_dcu_rfd_im_bro_drive_ctrl_lock_cnt > 0)
-        {
-            if ((in_bup_dcu_rfd_im_bro_drive_ctrl_lock_cnt == 1) && (in_bup_dcu_rfd_im_bro_drive_ctrl_delayed_ptr))
-            {
-                uint8_t* old_buff = (uint8_t*)(mj_handle.in.bup_dcu_rfd.im_bro_drive_ctrl.msg);
-                mj_handle.in.bup_dcu_rfd.im_bro_drive_ctrl.msg = (im_bro_drive_ctrl_msg_t*)(in_bup_dcu_rfd_im_bro_drive_ctrl_delayed_ptr);
-                mj_handle.in.bup_dcu_rfd.im_bro_drive_ctrl.ts_s = bup_dcu_rfd_im_bro_drive_ctrl_delayed_ts_s;
-                mj_handle.in.bup_dcu_rfd.im_bro_drive_ctrl.ts_ns = bup_dcu_rfd_im_bro_drive_ctrl_delayed_ts_ns;
-                bup_dcu_rfd_im_bro_drive_ctrl_rx_tick = ticks;
-                mj_handle.in.bup_dcu_rfd.im_bro_drive_ctrl.state = MJ_MSG_ACTUAL;
-                in_bup_dcu_rfd_im_bro_drive_ctrl_updated = 1;
-                p_drv->udp4.free(old_buff);
-                in_bup_dcu_rfd_im_bro_drive_ctrl_delayed_ptr = NULL;
-            }
-            in_bup_dcu_rfd_im_bro_drive_ctrl_lock_cnt--;
-        }
-    }
-    return in_bup_dcu_rfd_im_bro_drive_ctrl_lock_cnt > 0 ? MJ_MSG_LOCK : MJ_MSG_UNLOCK;
-}
-
-static void in_bup_dcu_rfd_im_bro_drive_ctrl_copy_fcn(void *dst)
-{
-    in_bup_dcu_rfd_im_bro_drive_ctrl_lock_fcn(MJ_MSG_LOCK);
-    memcpy(dst, (void *)(mj_handle.in.bup_dcu_rfd.im_bro_drive_ctrl.msg), sizeof(im_bro_drive_ctrl_msg_t));
-    in_bup_dcu_rfd_im_bro_drive_ctrl_lock_fcn(MJ_MSG_UNLOCK);
 }
 
 static uint32_t bup_dcu_rfd_msg_ans_rx_tick = UINT32_MAX - 1.0;
@@ -2038,51 +1858,6 @@ static void in_bup_dcu_rrd_formular_copy_fcn(void *dst)
     in_bup_dcu_rrd_formular_lock_fcn(MJ_MSG_UNLOCK);
 }
 
-static uint32_t bup_dcu_rrd_im_bro_drive_ctrl_rx_tick = UINT32_MAX - 4.0;
-static uint8_t  in_bup_dcu_rrd_im_bro_drive_ctrl_lock_cnt = 0;
-static im_bro_drive_ctrl_msg_t* in_bup_dcu_rrd_im_bro_drive_ctrl_delayed_ptr = NULL;
-static uint32_t bup_dcu_rrd_im_bro_drive_ctrl_delayed_ts_s = 0;
-static uint32_t bup_dcu_rrd_im_bro_drive_ctrl_delayed_ts_ns = 0;
-static uint8_t  in_bup_dcu_rrd_im_bro_drive_ctrl_updated = 0;
-static uint32_t  in_bup_dcu_rrd_im_bro_drive_ctrl_total = 0;
-static uint32_t  in_bup_dcu_rrd_im_bro_drive_ctrl_miss = 0;
-static uint16_t  in_bup_dcu_rrd_im_bro_drive_ctrl_last_cnt = 0;
-static mj_msg_state_t in_bup_dcu_rrd_im_bro_drive_ctrl_lock_fcn(mj_msg_state_t state)
-{
-    if (state == MJ_MSG_LOCK)
-    {
-        if (in_bup_dcu_rrd_im_bro_drive_ctrl_lock_cnt < 255)
-        {
-            in_bup_dcu_rrd_im_bro_drive_ctrl_lock_cnt++;
-        }
-    }else{
-        if (in_bup_dcu_rrd_im_bro_drive_ctrl_lock_cnt > 0)
-        {
-            if ((in_bup_dcu_rrd_im_bro_drive_ctrl_lock_cnt == 1) && (in_bup_dcu_rrd_im_bro_drive_ctrl_delayed_ptr))
-            {
-                uint8_t* old_buff = (uint8_t*)(mj_handle.in.bup_dcu_rrd.im_bro_drive_ctrl.msg);
-                mj_handle.in.bup_dcu_rrd.im_bro_drive_ctrl.msg = (im_bro_drive_ctrl_msg_t*)(in_bup_dcu_rrd_im_bro_drive_ctrl_delayed_ptr);
-                mj_handle.in.bup_dcu_rrd.im_bro_drive_ctrl.ts_s = bup_dcu_rrd_im_bro_drive_ctrl_delayed_ts_s;
-                mj_handle.in.bup_dcu_rrd.im_bro_drive_ctrl.ts_ns = bup_dcu_rrd_im_bro_drive_ctrl_delayed_ts_ns;
-                bup_dcu_rrd_im_bro_drive_ctrl_rx_tick = ticks;
-                mj_handle.in.bup_dcu_rrd.im_bro_drive_ctrl.state = MJ_MSG_ACTUAL;
-                in_bup_dcu_rrd_im_bro_drive_ctrl_updated = 1;
-                p_drv->udp4.free(old_buff);
-                in_bup_dcu_rrd_im_bro_drive_ctrl_delayed_ptr = NULL;
-            }
-            in_bup_dcu_rrd_im_bro_drive_ctrl_lock_cnt--;
-        }
-    }
-    return in_bup_dcu_rrd_im_bro_drive_ctrl_lock_cnt > 0 ? MJ_MSG_LOCK : MJ_MSG_UNLOCK;
-}
-
-static void in_bup_dcu_rrd_im_bro_drive_ctrl_copy_fcn(void *dst)
-{
-    in_bup_dcu_rrd_im_bro_drive_ctrl_lock_fcn(MJ_MSG_LOCK);
-    memcpy(dst, (void *)(mj_handle.in.bup_dcu_rrd.im_bro_drive_ctrl.msg), sizeof(im_bro_drive_ctrl_msg_t));
-    in_bup_dcu_rrd_im_bro_drive_ctrl_lock_fcn(MJ_MSG_UNLOCK);
-}
-
 static uint32_t bup_dcu_rrd_msg_ans_rx_tick = UINT32_MAX - 1.0;
 static uint8_t  in_bup_dcu_rrd_msg_ans_lock_cnt = 0;
 static msg_answer_msg_t* in_bup_dcu_rrd_msg_ans_delayed_ptr = NULL;
@@ -2443,51 +2218,6 @@ static void in_bup_dcu_rst_formular_copy_fcn(void *dst)
     in_bup_dcu_rst_formular_lock_fcn(MJ_MSG_UNLOCK);
 }
 
-static uint32_t bup_dcu_rst_im_bro_drive_ctrl_rx_tick = UINT32_MAX - 4.0;
-static uint8_t  in_bup_dcu_rst_im_bro_drive_ctrl_lock_cnt = 0;
-static im_bro_drive_ctrl_msg_t* in_bup_dcu_rst_im_bro_drive_ctrl_delayed_ptr = NULL;
-static uint32_t bup_dcu_rst_im_bro_drive_ctrl_delayed_ts_s = 0;
-static uint32_t bup_dcu_rst_im_bro_drive_ctrl_delayed_ts_ns = 0;
-static uint8_t  in_bup_dcu_rst_im_bro_drive_ctrl_updated = 0;
-static uint32_t  in_bup_dcu_rst_im_bro_drive_ctrl_total = 0;
-static uint32_t  in_bup_dcu_rst_im_bro_drive_ctrl_miss = 0;
-static uint16_t  in_bup_dcu_rst_im_bro_drive_ctrl_last_cnt = 0;
-static mj_msg_state_t in_bup_dcu_rst_im_bro_drive_ctrl_lock_fcn(mj_msg_state_t state)
-{
-    if (state == MJ_MSG_LOCK)
-    {
-        if (in_bup_dcu_rst_im_bro_drive_ctrl_lock_cnt < 255)
-        {
-            in_bup_dcu_rst_im_bro_drive_ctrl_lock_cnt++;
-        }
-    }else{
-        if (in_bup_dcu_rst_im_bro_drive_ctrl_lock_cnt > 0)
-        {
-            if ((in_bup_dcu_rst_im_bro_drive_ctrl_lock_cnt == 1) && (in_bup_dcu_rst_im_bro_drive_ctrl_delayed_ptr))
-            {
-                uint8_t* old_buff = (uint8_t*)(mj_handle.in.bup_dcu_rst.im_bro_drive_ctrl.msg);
-                mj_handle.in.bup_dcu_rst.im_bro_drive_ctrl.msg = (im_bro_drive_ctrl_msg_t*)(in_bup_dcu_rst_im_bro_drive_ctrl_delayed_ptr);
-                mj_handle.in.bup_dcu_rst.im_bro_drive_ctrl.ts_s = bup_dcu_rst_im_bro_drive_ctrl_delayed_ts_s;
-                mj_handle.in.bup_dcu_rst.im_bro_drive_ctrl.ts_ns = bup_dcu_rst_im_bro_drive_ctrl_delayed_ts_ns;
-                bup_dcu_rst_im_bro_drive_ctrl_rx_tick = ticks;
-                mj_handle.in.bup_dcu_rst.im_bro_drive_ctrl.state = MJ_MSG_ACTUAL;
-                in_bup_dcu_rst_im_bro_drive_ctrl_updated = 1;
-                p_drv->udp4.free(old_buff);
-                in_bup_dcu_rst_im_bro_drive_ctrl_delayed_ptr = NULL;
-            }
-            in_bup_dcu_rst_im_bro_drive_ctrl_lock_cnt--;
-        }
-    }
-    return in_bup_dcu_rst_im_bro_drive_ctrl_lock_cnt > 0 ? MJ_MSG_LOCK : MJ_MSG_UNLOCK;
-}
-
-static void in_bup_dcu_rst_im_bro_drive_ctrl_copy_fcn(void *dst)
-{
-    in_bup_dcu_rst_im_bro_drive_ctrl_lock_fcn(MJ_MSG_LOCK);
-    memcpy(dst, (void *)(mj_handle.in.bup_dcu_rst.im_bro_drive_ctrl.msg), sizeof(im_bro_drive_ctrl_msg_t));
-    in_bup_dcu_rst_im_bro_drive_ctrl_lock_fcn(MJ_MSG_UNLOCK);
-}
-
 static uint32_t bup_dcu_rst_msg_ans_rx_tick = UINT32_MAX - 1.0;
 static uint8_t  in_bup_dcu_rst_msg_ans_lock_cnt = 0;
 static msg_answer_msg_t* in_bup_dcu_rst_msg_ans_delayed_ptr = NULL;
@@ -2846,51 +2576,6 @@ static void in_dcu_formular_copy_fcn(void *dst)
     in_dcu_formular_lock_fcn(MJ_MSG_LOCK);
     memcpy(dst, (void *)(mj_handle.in.dcu.formular.msg), sizeof(formular_info_msg_t));
     in_dcu_formular_lock_fcn(MJ_MSG_UNLOCK);
-}
-
-static uint32_t dcu_im_bro_drive_ctrl_rx_tick = UINT32_MAX - 4.0;
-static uint8_t  in_dcu_im_bro_drive_ctrl_lock_cnt = 0;
-static im_bro_drive_ctrl_msg_t* in_dcu_im_bro_drive_ctrl_delayed_ptr = NULL;
-static uint32_t dcu_im_bro_drive_ctrl_delayed_ts_s = 0;
-static uint32_t dcu_im_bro_drive_ctrl_delayed_ts_ns = 0;
-static uint8_t  in_dcu_im_bro_drive_ctrl_updated = 0;
-static uint32_t  in_dcu_im_bro_drive_ctrl_total = 0;
-static uint32_t  in_dcu_im_bro_drive_ctrl_miss = 0;
-static uint16_t  in_dcu_im_bro_drive_ctrl_last_cnt = 0;
-static mj_msg_state_t in_dcu_im_bro_drive_ctrl_lock_fcn(mj_msg_state_t state)
-{
-    if (state == MJ_MSG_LOCK)
-    {
-        if (in_dcu_im_bro_drive_ctrl_lock_cnt < 255)
-        {
-            in_dcu_im_bro_drive_ctrl_lock_cnt++;
-        }
-    }else{
-        if (in_dcu_im_bro_drive_ctrl_lock_cnt > 0)
-        {
-            if ((in_dcu_im_bro_drive_ctrl_lock_cnt == 1) && (in_dcu_im_bro_drive_ctrl_delayed_ptr))
-            {
-                uint8_t* old_buff = (uint8_t*)(mj_handle.in.dcu.im_bro_drive_ctrl.msg);
-                mj_handle.in.dcu.im_bro_drive_ctrl.msg = (im_bro_drive_ctrl_msg_t*)(in_dcu_im_bro_drive_ctrl_delayed_ptr);
-                mj_handle.in.dcu.im_bro_drive_ctrl.ts_s = dcu_im_bro_drive_ctrl_delayed_ts_s;
-                mj_handle.in.dcu.im_bro_drive_ctrl.ts_ns = dcu_im_bro_drive_ctrl_delayed_ts_ns;
-                dcu_im_bro_drive_ctrl_rx_tick = ticks;
-                mj_handle.in.dcu.im_bro_drive_ctrl.state = MJ_MSG_ACTUAL;
-                in_dcu_im_bro_drive_ctrl_updated = 1;
-                p_drv->udp4.free(old_buff);
-                in_dcu_im_bro_drive_ctrl_delayed_ptr = NULL;
-            }
-            in_dcu_im_bro_drive_ctrl_lock_cnt--;
-        }
-    }
-    return in_dcu_im_bro_drive_ctrl_lock_cnt > 0 ? MJ_MSG_LOCK : MJ_MSG_UNLOCK;
-}
-
-static void in_dcu_im_bro_drive_ctrl_copy_fcn(void *dst)
-{
-    in_dcu_im_bro_drive_ctrl_lock_fcn(MJ_MSG_LOCK);
-    memcpy(dst, (void *)(mj_handle.in.dcu.im_bro_drive_ctrl.msg), sizeof(im_bro_drive_ctrl_msg_t));
-    in_dcu_im_bro_drive_ctrl_lock_fcn(MJ_MSG_UNLOCK);
 }
 
 static uint32_t dcu_msg_ans_rx_tick = UINT32_MAX - 1.0;
@@ -4324,248 +4009,6 @@ static mj_msg_proc_res_t im_bro_drive_ctrl_mcast_cb(uint8_t* data, uint16_t size
         {
             // im_bro_drive_ctrl
             case ID_IM_BRO_DRIVE_CTRL:
-                if (size == sizeof(im_bro_drive_ctrl_msg_t))
-                {
-                    switch (hdr->src)
-                    {
-                        // im_bro_drive_ctrl from bup_dcu_lfd
-                        case BRO30_BUP_DCU_LFD:
-                            if (in_bup_dcu_lfd_im_bro_drive_ctrl_lock_cnt == 0)
-                            {
-                                old_buff = (uint8_t*)mj_handle.in.bup_dcu_lfd.im_bro_drive_ctrl.msg;
-                                mj_handle.in.bup_dcu_lfd.im_bro_drive_ctrl.msg = (im_bro_drive_ctrl_msg_t *)data;
-                                mj_handle.in.bup_dcu_lfd.im_bro_drive_ctrl.ts_s  = ts_s;
-                                mj_handle.in.bup_dcu_lfd.im_bro_drive_ctrl.ts_ns = ts_ns;
-                                in_bup_dcu_lfd_im_bro_drive_ctrl_updated = 1;
-                                in_bup_dcu_lfd_im_bro_drive_ctrl_total++;
-                                uint16_t cnt_diff = (mj_handle.in.bup_dcu_lfd.im_bro_drive_ctrl.msg->hdr.cnt - in_bup_dcu_lfd_im_bro_drive_ctrl_last_cnt);
-                                if (cnt_diff > 1)
-                                {
-                                    in_bup_dcu_lfd_im_bro_drive_ctrl_miss += cnt_diff;
-                                }
-                                in_bup_dcu_lfd_im_bro_drive_ctrl_last_cnt = mj_handle.in.bup_dcu_lfd.im_bro_drive_ctrl.msg->hdr.cnt;
-                                bup_dcu_lfd_im_bro_drive_ctrl_rx_tick = ticks;
-                                mj_handle.in.bup_dcu_lfd.im_bro_drive_ctrl.state = MJ_MSG_ACTUAL;
-                                p_drv->udp4.free(old_buff);
-                            }else{
-                                if (in_bup_dcu_lfd_im_bro_drive_ctrl_delayed_ptr == NULL)
-                                {
-                                    in_bup_dcu_lfd_im_bro_drive_ctrl_delayed_ptr = (im_bro_drive_ctrl_msg_t *)data;
-                                    bup_dcu_lfd_im_bro_drive_ctrl_delayed_ts_s = ts_s;
-                                    bup_dcu_lfd_im_bro_drive_ctrl_delayed_ts_s = ts_ns;;
-                                }else{
-                                    return MJ_REJECT_OVF;
-                                }
-                            }
-                            if (mj_handle.in.bup_dcu_lfd.im_bro_drive_ctrl.irq){
-                                mj_handle.in.bup_dcu_lfd.im_bro_drive_ctrl.irq(data);
-                            }
-                            return MJ_ACCEPT;
-                        // im_bro_drive_ctrl from bup_dcu_lrd
-                        case BRO30_BUP_DCU_LRD:
-                            if (in_bup_dcu_lrd_im_bro_drive_ctrl_lock_cnt == 0)
-                            {
-                                old_buff = (uint8_t*)mj_handle.in.bup_dcu_lrd.im_bro_drive_ctrl.msg;
-                                mj_handle.in.bup_dcu_lrd.im_bro_drive_ctrl.msg = (im_bro_drive_ctrl_msg_t *)data;
-                                mj_handle.in.bup_dcu_lrd.im_bro_drive_ctrl.ts_s  = ts_s;
-                                mj_handle.in.bup_dcu_lrd.im_bro_drive_ctrl.ts_ns = ts_ns;
-                                in_bup_dcu_lrd_im_bro_drive_ctrl_updated = 1;
-                                in_bup_dcu_lrd_im_bro_drive_ctrl_total++;
-                                uint16_t cnt_diff = (mj_handle.in.bup_dcu_lrd.im_bro_drive_ctrl.msg->hdr.cnt - in_bup_dcu_lrd_im_bro_drive_ctrl_last_cnt);
-                                if (cnt_diff > 1)
-                                {
-                                    in_bup_dcu_lrd_im_bro_drive_ctrl_miss += cnt_diff;
-                                }
-                                in_bup_dcu_lrd_im_bro_drive_ctrl_last_cnt = mj_handle.in.bup_dcu_lrd.im_bro_drive_ctrl.msg->hdr.cnt;
-                                bup_dcu_lrd_im_bro_drive_ctrl_rx_tick = ticks;
-                                mj_handle.in.bup_dcu_lrd.im_bro_drive_ctrl.state = MJ_MSG_ACTUAL;
-                                p_drv->udp4.free(old_buff);
-                            }else{
-                                if (in_bup_dcu_lrd_im_bro_drive_ctrl_delayed_ptr == NULL)
-                                {
-                                    in_bup_dcu_lrd_im_bro_drive_ctrl_delayed_ptr = (im_bro_drive_ctrl_msg_t *)data;
-                                    bup_dcu_lrd_im_bro_drive_ctrl_delayed_ts_s = ts_s;
-                                    bup_dcu_lrd_im_bro_drive_ctrl_delayed_ts_s = ts_ns;;
-                                }else{
-                                    return MJ_REJECT_OVF;
-                                }
-                            }
-                            if (mj_handle.in.bup_dcu_lrd.im_bro_drive_ctrl.irq){
-                                mj_handle.in.bup_dcu_lrd.im_bro_drive_ctrl.irq(data);
-                            }
-                            return MJ_ACCEPT;
-                        // im_bro_drive_ctrl from bup_dcu_lst
-                        case BRO30_BUP_DCU_LST:
-                            if (in_bup_dcu_lst_im_bro_drive_ctrl_lock_cnt == 0)
-                            {
-                                old_buff = (uint8_t*)mj_handle.in.bup_dcu_lst.im_bro_drive_ctrl.msg;
-                                mj_handle.in.bup_dcu_lst.im_bro_drive_ctrl.msg = (im_bro_drive_ctrl_msg_t *)data;
-                                mj_handle.in.bup_dcu_lst.im_bro_drive_ctrl.ts_s  = ts_s;
-                                mj_handle.in.bup_dcu_lst.im_bro_drive_ctrl.ts_ns = ts_ns;
-                                in_bup_dcu_lst_im_bro_drive_ctrl_updated = 1;
-                                in_bup_dcu_lst_im_bro_drive_ctrl_total++;
-                                uint16_t cnt_diff = (mj_handle.in.bup_dcu_lst.im_bro_drive_ctrl.msg->hdr.cnt - in_bup_dcu_lst_im_bro_drive_ctrl_last_cnt);
-                                if (cnt_diff > 1)
-                                {
-                                    in_bup_dcu_lst_im_bro_drive_ctrl_miss += cnt_diff;
-                                }
-                                in_bup_dcu_lst_im_bro_drive_ctrl_last_cnt = mj_handle.in.bup_dcu_lst.im_bro_drive_ctrl.msg->hdr.cnt;
-                                bup_dcu_lst_im_bro_drive_ctrl_rx_tick = ticks;
-                                mj_handle.in.bup_dcu_lst.im_bro_drive_ctrl.state = MJ_MSG_ACTUAL;
-                                p_drv->udp4.free(old_buff);
-                            }else{
-                                if (in_bup_dcu_lst_im_bro_drive_ctrl_delayed_ptr == NULL)
-                                {
-                                    in_bup_dcu_lst_im_bro_drive_ctrl_delayed_ptr = (im_bro_drive_ctrl_msg_t *)data;
-                                    bup_dcu_lst_im_bro_drive_ctrl_delayed_ts_s = ts_s;
-                                    bup_dcu_lst_im_bro_drive_ctrl_delayed_ts_s = ts_ns;;
-                                }else{
-                                    return MJ_REJECT_OVF;
-                                }
-                            }
-                            if (mj_handle.in.bup_dcu_lst.im_bro_drive_ctrl.irq){
-                                mj_handle.in.bup_dcu_lst.im_bro_drive_ctrl.irq(data);
-                            }
-                            return MJ_ACCEPT;
-                        // im_bro_drive_ctrl from bup_dcu_rfd
-                        case BRO30_BUP_DCU_RFD:
-                            if (in_bup_dcu_rfd_im_bro_drive_ctrl_lock_cnt == 0)
-                            {
-                                old_buff = (uint8_t*)mj_handle.in.bup_dcu_rfd.im_bro_drive_ctrl.msg;
-                                mj_handle.in.bup_dcu_rfd.im_bro_drive_ctrl.msg = (im_bro_drive_ctrl_msg_t *)data;
-                                mj_handle.in.bup_dcu_rfd.im_bro_drive_ctrl.ts_s  = ts_s;
-                                mj_handle.in.bup_dcu_rfd.im_bro_drive_ctrl.ts_ns = ts_ns;
-                                in_bup_dcu_rfd_im_bro_drive_ctrl_updated = 1;
-                                in_bup_dcu_rfd_im_bro_drive_ctrl_total++;
-                                uint16_t cnt_diff = (mj_handle.in.bup_dcu_rfd.im_bro_drive_ctrl.msg->hdr.cnt - in_bup_dcu_rfd_im_bro_drive_ctrl_last_cnt);
-                                if (cnt_diff > 1)
-                                {
-                                    in_bup_dcu_rfd_im_bro_drive_ctrl_miss += cnt_diff;
-                                }
-                                in_bup_dcu_rfd_im_bro_drive_ctrl_last_cnt = mj_handle.in.bup_dcu_rfd.im_bro_drive_ctrl.msg->hdr.cnt;
-                                bup_dcu_rfd_im_bro_drive_ctrl_rx_tick = ticks;
-                                mj_handle.in.bup_dcu_rfd.im_bro_drive_ctrl.state = MJ_MSG_ACTUAL;
-                                p_drv->udp4.free(old_buff);
-                            }else{
-                                if (in_bup_dcu_rfd_im_bro_drive_ctrl_delayed_ptr == NULL)
-                                {
-                                    in_bup_dcu_rfd_im_bro_drive_ctrl_delayed_ptr = (im_bro_drive_ctrl_msg_t *)data;
-                                    bup_dcu_rfd_im_bro_drive_ctrl_delayed_ts_s = ts_s;
-                                    bup_dcu_rfd_im_bro_drive_ctrl_delayed_ts_s = ts_ns;;
-                                }else{
-                                    return MJ_REJECT_OVF;
-                                }
-                            }
-                            if (mj_handle.in.bup_dcu_rfd.im_bro_drive_ctrl.irq){
-                                mj_handle.in.bup_dcu_rfd.im_bro_drive_ctrl.irq(data);
-                            }
-                            return MJ_ACCEPT;
-                        // im_bro_drive_ctrl from bup_dcu_rrd
-                        case BRO30_BUP_DCU_RRD:
-                            if (in_bup_dcu_rrd_im_bro_drive_ctrl_lock_cnt == 0)
-                            {
-                                old_buff = (uint8_t*)mj_handle.in.bup_dcu_rrd.im_bro_drive_ctrl.msg;
-                                mj_handle.in.bup_dcu_rrd.im_bro_drive_ctrl.msg = (im_bro_drive_ctrl_msg_t *)data;
-                                mj_handle.in.bup_dcu_rrd.im_bro_drive_ctrl.ts_s  = ts_s;
-                                mj_handle.in.bup_dcu_rrd.im_bro_drive_ctrl.ts_ns = ts_ns;
-                                in_bup_dcu_rrd_im_bro_drive_ctrl_updated = 1;
-                                in_bup_dcu_rrd_im_bro_drive_ctrl_total++;
-                                uint16_t cnt_diff = (mj_handle.in.bup_dcu_rrd.im_bro_drive_ctrl.msg->hdr.cnt - in_bup_dcu_rrd_im_bro_drive_ctrl_last_cnt);
-                                if (cnt_diff > 1)
-                                {
-                                    in_bup_dcu_rrd_im_bro_drive_ctrl_miss += cnt_diff;
-                                }
-                                in_bup_dcu_rrd_im_bro_drive_ctrl_last_cnt = mj_handle.in.bup_dcu_rrd.im_bro_drive_ctrl.msg->hdr.cnt;
-                                bup_dcu_rrd_im_bro_drive_ctrl_rx_tick = ticks;
-                                mj_handle.in.bup_dcu_rrd.im_bro_drive_ctrl.state = MJ_MSG_ACTUAL;
-                                p_drv->udp4.free(old_buff);
-                            }else{
-                                if (in_bup_dcu_rrd_im_bro_drive_ctrl_delayed_ptr == NULL)
-                                {
-                                    in_bup_dcu_rrd_im_bro_drive_ctrl_delayed_ptr = (im_bro_drive_ctrl_msg_t *)data;
-                                    bup_dcu_rrd_im_bro_drive_ctrl_delayed_ts_s = ts_s;
-                                    bup_dcu_rrd_im_bro_drive_ctrl_delayed_ts_s = ts_ns;;
-                                }else{
-                                    return MJ_REJECT_OVF;
-                                }
-                            }
-                            if (mj_handle.in.bup_dcu_rrd.im_bro_drive_ctrl.irq){
-                                mj_handle.in.bup_dcu_rrd.im_bro_drive_ctrl.irq(data);
-                            }
-                            return MJ_ACCEPT;
-                        // im_bro_drive_ctrl from bup_dcu_rst
-                        case BRO30_BUP_DCU_RST:
-                            if (in_bup_dcu_rst_im_bro_drive_ctrl_lock_cnt == 0)
-                            {
-                                old_buff = (uint8_t*)mj_handle.in.bup_dcu_rst.im_bro_drive_ctrl.msg;
-                                mj_handle.in.bup_dcu_rst.im_bro_drive_ctrl.msg = (im_bro_drive_ctrl_msg_t *)data;
-                                mj_handle.in.bup_dcu_rst.im_bro_drive_ctrl.ts_s  = ts_s;
-                                mj_handle.in.bup_dcu_rst.im_bro_drive_ctrl.ts_ns = ts_ns;
-                                in_bup_dcu_rst_im_bro_drive_ctrl_updated = 1;
-                                in_bup_dcu_rst_im_bro_drive_ctrl_total++;
-                                uint16_t cnt_diff = (mj_handle.in.bup_dcu_rst.im_bro_drive_ctrl.msg->hdr.cnt - in_bup_dcu_rst_im_bro_drive_ctrl_last_cnt);
-                                if (cnt_diff > 1)
-                                {
-                                    in_bup_dcu_rst_im_bro_drive_ctrl_miss += cnt_diff;
-                                }
-                                in_bup_dcu_rst_im_bro_drive_ctrl_last_cnt = mj_handle.in.bup_dcu_rst.im_bro_drive_ctrl.msg->hdr.cnt;
-                                bup_dcu_rst_im_bro_drive_ctrl_rx_tick = ticks;
-                                mj_handle.in.bup_dcu_rst.im_bro_drive_ctrl.state = MJ_MSG_ACTUAL;
-                                p_drv->udp4.free(old_buff);
-                            }else{
-                                if (in_bup_dcu_rst_im_bro_drive_ctrl_delayed_ptr == NULL)
-                                {
-                                    in_bup_dcu_rst_im_bro_drive_ctrl_delayed_ptr = (im_bro_drive_ctrl_msg_t *)data;
-                                    bup_dcu_rst_im_bro_drive_ctrl_delayed_ts_s = ts_s;
-                                    bup_dcu_rst_im_bro_drive_ctrl_delayed_ts_s = ts_ns;;
-                                }else{
-                                    return MJ_REJECT_OVF;
-                                }
-                            }
-                            if (mj_handle.in.bup_dcu_rst.im_bro_drive_ctrl.irq){
-                                mj_handle.in.bup_dcu_rst.im_bro_drive_ctrl.irq(data);
-                            }
-                            return MJ_ACCEPT;
-                        // im_bro_drive_ctrl from dcu
-                        case BRO30_DCU:
-                            if (in_dcu_im_bro_drive_ctrl_lock_cnt == 0)
-                            {
-                                old_buff = (uint8_t*)mj_handle.in.dcu.im_bro_drive_ctrl.msg;
-                                mj_handle.in.dcu.im_bro_drive_ctrl.msg = (im_bro_drive_ctrl_msg_t *)data;
-                                mj_handle.in.dcu.im_bro_drive_ctrl.ts_s  = ts_s;
-                                mj_handle.in.dcu.im_bro_drive_ctrl.ts_ns = ts_ns;
-                                in_dcu_im_bro_drive_ctrl_updated = 1;
-                                in_dcu_im_bro_drive_ctrl_total++;
-                                uint16_t cnt_diff = (mj_handle.in.dcu.im_bro_drive_ctrl.msg->hdr.cnt - in_dcu_im_bro_drive_ctrl_last_cnt);
-                                if (cnt_diff > 1)
-                                {
-                                    in_dcu_im_bro_drive_ctrl_miss += cnt_diff;
-                                }
-                                in_dcu_im_bro_drive_ctrl_last_cnt = mj_handle.in.dcu.im_bro_drive_ctrl.msg->hdr.cnt;
-                                dcu_im_bro_drive_ctrl_rx_tick = ticks;
-                                mj_handle.in.dcu.im_bro_drive_ctrl.state = MJ_MSG_ACTUAL;
-                                p_drv->udp4.free(old_buff);
-                            }else{
-                                if (in_dcu_im_bro_drive_ctrl_delayed_ptr == NULL)
-                                {
-                                    in_dcu_im_bro_drive_ctrl_delayed_ptr = (im_bro_drive_ctrl_msg_t *)data;
-                                    dcu_im_bro_drive_ctrl_delayed_ts_s = ts_s;
-                                    dcu_im_bro_drive_ctrl_delayed_ts_s = ts_ns;;
-                                }else{
-                                    return MJ_REJECT_OVF;
-                                }
-                            }
-                            if (mj_handle.in.dcu.im_bro_drive_ctrl.irq){
-                                mj_handle.in.dcu.im_bro_drive_ctrl.irq(data);
-                            }
-                            return MJ_ACCEPT;
-                        default:
-                            return MJ_REJECT_SRC;
-                    }
-                }else{
-                    return MJ_REJECT_SIZE;
-                }
-            break;
             default:
                 return MJ_REJECT_ID;    
         }
@@ -5945,34 +5388,6 @@ static void loop_fcn()
         mj_handle.in.dcu.formular.state = MJ_MSG_OBSOLETE;
     }
 
-    if((((int32_t)(c_time - bup_dcu_lfd_im_bro_drive_ctrl_rx_tick)) > 3)){
-        mj_handle.in.bup_dcu_lfd.im_bro_drive_ctrl.state = MJ_MSG_OBSOLETE;
-    }
-
-    if((((int32_t)(c_time - bup_dcu_lrd_im_bro_drive_ctrl_rx_tick)) > 3)){
-        mj_handle.in.bup_dcu_lrd.im_bro_drive_ctrl.state = MJ_MSG_OBSOLETE;
-    }
-
-    if((((int32_t)(c_time - bup_dcu_lst_im_bro_drive_ctrl_rx_tick)) > 3)){
-        mj_handle.in.bup_dcu_lst.im_bro_drive_ctrl.state = MJ_MSG_OBSOLETE;
-    }
-
-    if((((int32_t)(c_time - bup_dcu_rfd_im_bro_drive_ctrl_rx_tick)) > 3)){
-        mj_handle.in.bup_dcu_rfd.im_bro_drive_ctrl.state = MJ_MSG_OBSOLETE;
-    }
-
-    if((((int32_t)(c_time - bup_dcu_rrd_im_bro_drive_ctrl_rx_tick)) > 3)){
-        mj_handle.in.bup_dcu_rrd.im_bro_drive_ctrl.state = MJ_MSG_OBSOLETE;
-    }
-
-    if((((int32_t)(c_time - bup_dcu_rst_im_bro_drive_ctrl_rx_tick)) > 3)){
-        mj_handle.in.bup_dcu_rst.im_bro_drive_ctrl.state = MJ_MSG_OBSOLETE;
-    }
-
-    if((((int32_t)(c_time - dcu_im_bro_drive_ctrl_rx_tick)) > 3)){
-        mj_handle.in.dcu.im_bro_drive_ctrl.state = MJ_MSG_OBSOLETE;
-    }
-
     if((((int32_t)(c_time - im_bro_im_bro_drivers_sens_rx_tick)) > 3)){
         mj_handle.in.im_bro.im_bro_drivers_sens.state = MJ_MSG_OBSOLETE;
     }
@@ -6257,41 +5672,6 @@ static void loop_fcn()
     {
         if(mj_handle.in.dcu.formular.upd_cb){mj_handle.in.dcu.formular.upd_cb();}
         in_dcu_formular_updated = 0;
-    }
-    if(in_bup_dcu_lfd_im_bro_drive_ctrl_updated == 1)
-    {
-        if(mj_handle.in.bup_dcu_lfd.im_bro_drive_ctrl.upd_cb){mj_handle.in.bup_dcu_lfd.im_bro_drive_ctrl.upd_cb();}
-        in_bup_dcu_lfd_im_bro_drive_ctrl_updated = 0;
-    }
-    if(in_bup_dcu_lrd_im_bro_drive_ctrl_updated == 1)
-    {
-        if(mj_handle.in.bup_dcu_lrd.im_bro_drive_ctrl.upd_cb){mj_handle.in.bup_dcu_lrd.im_bro_drive_ctrl.upd_cb();}
-        in_bup_dcu_lrd_im_bro_drive_ctrl_updated = 0;
-    }
-    if(in_bup_dcu_lst_im_bro_drive_ctrl_updated == 1)
-    {
-        if(mj_handle.in.bup_dcu_lst.im_bro_drive_ctrl.upd_cb){mj_handle.in.bup_dcu_lst.im_bro_drive_ctrl.upd_cb();}
-        in_bup_dcu_lst_im_bro_drive_ctrl_updated = 0;
-    }
-    if(in_bup_dcu_rfd_im_bro_drive_ctrl_updated == 1)
-    {
-        if(mj_handle.in.bup_dcu_rfd.im_bro_drive_ctrl.upd_cb){mj_handle.in.bup_dcu_rfd.im_bro_drive_ctrl.upd_cb();}
-        in_bup_dcu_rfd_im_bro_drive_ctrl_updated = 0;
-    }
-    if(in_bup_dcu_rrd_im_bro_drive_ctrl_updated == 1)
-    {
-        if(mj_handle.in.bup_dcu_rrd.im_bro_drive_ctrl.upd_cb){mj_handle.in.bup_dcu_rrd.im_bro_drive_ctrl.upd_cb();}
-        in_bup_dcu_rrd_im_bro_drive_ctrl_updated = 0;
-    }
-    if(in_bup_dcu_rst_im_bro_drive_ctrl_updated == 1)
-    {
-        if(mj_handle.in.bup_dcu_rst.im_bro_drive_ctrl.upd_cb){mj_handle.in.bup_dcu_rst.im_bro_drive_ctrl.upd_cb();}
-        in_bup_dcu_rst_im_bro_drive_ctrl_updated = 0;
-    }
-    if(in_dcu_im_bro_drive_ctrl_updated == 1)
-    {
-        if(mj_handle.in.dcu.im_bro_drive_ctrl.upd_cb){mj_handle.in.dcu.im_bro_drive_ctrl.upd_cb();}
-        in_dcu_im_bro_drive_ctrl_updated = 0;
     }
     if(in_im_bro_im_bro_drivers_sens_updated == 1)
     {
@@ -6812,27 +6192,6 @@ mj_status_t mj_mon_init(mj_drv_interface_t *drv, mj_mon_t ** ptr)
         return MJ_UDP4_ALOC_FAIL;
     }
 
-    if ((mj_handle.in.bup_dcu_lfd.im_bro_drive_ctrl.msg = (im_bro_drive_ctrl_msg_t *)p_drv->udp4.alloc(sizeof(im_bro_drive_ctrl_msg_t)))){
-        if(im_bro_drive_ctrl_type_check(mj_handle.in.bup_dcu_lfd.im_bro_drive_ctrl.msg) == MJ_CHECK_OK){
-            mj_handle.in.bup_dcu_lfd.im_bro_drive_ctrl.msg->hdr.src = BRO30_NONE;
-            mj_handle.in.bup_dcu_lfd.im_bro_drive_ctrl.msg->hdr.dst = BRO30_NONE;
-            mj_handle.in.bup_dcu_lfd.im_bro_drive_ctrl.msg->hdr.cnt = 0;
-            mj_handle.in.bup_dcu_lfd.im_bro_drive_ctrl.msg->hdr.id = 0;
-            mj_handle.in.bup_dcu_lfd.im_bro_drive_ctrl.lock = in_bup_dcu_lfd_im_bro_drive_ctrl_lock_fcn;
-            mj_handle.in.bup_dcu_lfd.im_bro_drive_ctrl.copy = in_bup_dcu_lfd_im_bro_drive_ctrl_copy_fcn;
-            mj_handle.in.bup_dcu_lfd.im_bro_drive_ctrl.upd_cb = NULL;
-            mj_handle.in.bup_dcu_lfd.im_bro_drive_ctrl.irq = NULL;
-            mj_handle.in.bup_dcu_lfd.im_bro_drive_ctrl.state = MJ_MSG_OBSOLETE;
-            mj_handle.in.bup_dcu_lfd.im_bro_drive_ctrl.total = &in_bup_dcu_lfd_im_bro_drive_ctrl_total;
-            mj_handle.in.bup_dcu_lfd.im_bro_drive_ctrl.miss = &in_bup_dcu_lfd_im_bro_drive_ctrl_miss;
-        }else{
-            p_drv->udp4.free((uint8_t *)mj_handle.in.bup_dcu_lfd.im_bro_drive_ctrl.msg);
-            return MJ_INTEGRITY_FAIL;
-        }
-    }else{
-        return MJ_UDP4_ALOC_FAIL;
-    }
-
     if ((mj_handle.in.bup_dcu_lfd.msg_ans.msg = (msg_answer_msg_t *)p_drv->udp4.alloc(sizeof(msg_answer_msg_t)))){
         if(msg_answer_type_check(mj_handle.in.bup_dcu_lfd.msg_ans.msg) == MJ_CHECK_OK){
             mj_handle.in.bup_dcu_lfd.msg_ans.msg->hdr.src = BRO30_NONE;
@@ -6995,27 +6354,6 @@ mj_status_t mj_mon_init(mj_drv_interface_t *drv, mj_mon_t ** ptr)
             mj_handle.in.bup_dcu_lrd.formular.miss = &in_bup_dcu_lrd_formular_miss;
         }else{
             p_drv->udp4.free((uint8_t *)mj_handle.in.bup_dcu_lrd.formular.msg);
-            return MJ_INTEGRITY_FAIL;
-        }
-    }else{
-        return MJ_UDP4_ALOC_FAIL;
-    }
-
-    if ((mj_handle.in.bup_dcu_lrd.im_bro_drive_ctrl.msg = (im_bro_drive_ctrl_msg_t *)p_drv->udp4.alloc(sizeof(im_bro_drive_ctrl_msg_t)))){
-        if(im_bro_drive_ctrl_type_check(mj_handle.in.bup_dcu_lrd.im_bro_drive_ctrl.msg) == MJ_CHECK_OK){
-            mj_handle.in.bup_dcu_lrd.im_bro_drive_ctrl.msg->hdr.src = BRO30_NONE;
-            mj_handle.in.bup_dcu_lrd.im_bro_drive_ctrl.msg->hdr.dst = BRO30_NONE;
-            mj_handle.in.bup_dcu_lrd.im_bro_drive_ctrl.msg->hdr.cnt = 0;
-            mj_handle.in.bup_dcu_lrd.im_bro_drive_ctrl.msg->hdr.id = 0;
-            mj_handle.in.bup_dcu_lrd.im_bro_drive_ctrl.lock = in_bup_dcu_lrd_im_bro_drive_ctrl_lock_fcn;
-            mj_handle.in.bup_dcu_lrd.im_bro_drive_ctrl.copy = in_bup_dcu_lrd_im_bro_drive_ctrl_copy_fcn;
-            mj_handle.in.bup_dcu_lrd.im_bro_drive_ctrl.upd_cb = NULL;
-            mj_handle.in.bup_dcu_lrd.im_bro_drive_ctrl.irq = NULL;
-            mj_handle.in.bup_dcu_lrd.im_bro_drive_ctrl.state = MJ_MSG_OBSOLETE;
-            mj_handle.in.bup_dcu_lrd.im_bro_drive_ctrl.total = &in_bup_dcu_lrd_im_bro_drive_ctrl_total;
-            mj_handle.in.bup_dcu_lrd.im_bro_drive_ctrl.miss = &in_bup_dcu_lrd_im_bro_drive_ctrl_miss;
-        }else{
-            p_drv->udp4.free((uint8_t *)mj_handle.in.bup_dcu_lrd.im_bro_drive_ctrl.msg);
             return MJ_INTEGRITY_FAIL;
         }
     }else{
@@ -7190,27 +6528,6 @@ mj_status_t mj_mon_init(mj_drv_interface_t *drv, mj_mon_t ** ptr)
         return MJ_UDP4_ALOC_FAIL;
     }
 
-    if ((mj_handle.in.bup_dcu_lst.im_bro_drive_ctrl.msg = (im_bro_drive_ctrl_msg_t *)p_drv->udp4.alloc(sizeof(im_bro_drive_ctrl_msg_t)))){
-        if(im_bro_drive_ctrl_type_check(mj_handle.in.bup_dcu_lst.im_bro_drive_ctrl.msg) == MJ_CHECK_OK){
-            mj_handle.in.bup_dcu_lst.im_bro_drive_ctrl.msg->hdr.src = BRO30_NONE;
-            mj_handle.in.bup_dcu_lst.im_bro_drive_ctrl.msg->hdr.dst = BRO30_NONE;
-            mj_handle.in.bup_dcu_lst.im_bro_drive_ctrl.msg->hdr.cnt = 0;
-            mj_handle.in.bup_dcu_lst.im_bro_drive_ctrl.msg->hdr.id = 0;
-            mj_handle.in.bup_dcu_lst.im_bro_drive_ctrl.lock = in_bup_dcu_lst_im_bro_drive_ctrl_lock_fcn;
-            mj_handle.in.bup_dcu_lst.im_bro_drive_ctrl.copy = in_bup_dcu_lst_im_bro_drive_ctrl_copy_fcn;
-            mj_handle.in.bup_dcu_lst.im_bro_drive_ctrl.upd_cb = NULL;
-            mj_handle.in.bup_dcu_lst.im_bro_drive_ctrl.irq = NULL;
-            mj_handle.in.bup_dcu_lst.im_bro_drive_ctrl.state = MJ_MSG_OBSOLETE;
-            mj_handle.in.bup_dcu_lst.im_bro_drive_ctrl.total = &in_bup_dcu_lst_im_bro_drive_ctrl_total;
-            mj_handle.in.bup_dcu_lst.im_bro_drive_ctrl.miss = &in_bup_dcu_lst_im_bro_drive_ctrl_miss;
-        }else{
-            p_drv->udp4.free((uint8_t *)mj_handle.in.bup_dcu_lst.im_bro_drive_ctrl.msg);
-            return MJ_INTEGRITY_FAIL;
-        }
-    }else{
-        return MJ_UDP4_ALOC_FAIL;
-    }
-
     if ((mj_handle.in.bup_dcu_lst.msg_ans.msg = (msg_answer_msg_t *)p_drv->udp4.alloc(sizeof(msg_answer_msg_t)))){
         if(msg_answer_type_check(mj_handle.in.bup_dcu_lst.msg_ans.msg) == MJ_CHECK_OK){
             mj_handle.in.bup_dcu_lst.msg_ans.msg->hdr.src = BRO30_NONE;
@@ -7373,27 +6690,6 @@ mj_status_t mj_mon_init(mj_drv_interface_t *drv, mj_mon_t ** ptr)
             mj_handle.in.bup_dcu_rfd.formular.miss = &in_bup_dcu_rfd_formular_miss;
         }else{
             p_drv->udp4.free((uint8_t *)mj_handle.in.bup_dcu_rfd.formular.msg);
-            return MJ_INTEGRITY_FAIL;
-        }
-    }else{
-        return MJ_UDP4_ALOC_FAIL;
-    }
-
-    if ((mj_handle.in.bup_dcu_rfd.im_bro_drive_ctrl.msg = (im_bro_drive_ctrl_msg_t *)p_drv->udp4.alloc(sizeof(im_bro_drive_ctrl_msg_t)))){
-        if(im_bro_drive_ctrl_type_check(mj_handle.in.bup_dcu_rfd.im_bro_drive_ctrl.msg) == MJ_CHECK_OK){
-            mj_handle.in.bup_dcu_rfd.im_bro_drive_ctrl.msg->hdr.src = BRO30_NONE;
-            mj_handle.in.bup_dcu_rfd.im_bro_drive_ctrl.msg->hdr.dst = BRO30_NONE;
-            mj_handle.in.bup_dcu_rfd.im_bro_drive_ctrl.msg->hdr.cnt = 0;
-            mj_handle.in.bup_dcu_rfd.im_bro_drive_ctrl.msg->hdr.id = 0;
-            mj_handle.in.bup_dcu_rfd.im_bro_drive_ctrl.lock = in_bup_dcu_rfd_im_bro_drive_ctrl_lock_fcn;
-            mj_handle.in.bup_dcu_rfd.im_bro_drive_ctrl.copy = in_bup_dcu_rfd_im_bro_drive_ctrl_copy_fcn;
-            mj_handle.in.bup_dcu_rfd.im_bro_drive_ctrl.upd_cb = NULL;
-            mj_handle.in.bup_dcu_rfd.im_bro_drive_ctrl.irq = NULL;
-            mj_handle.in.bup_dcu_rfd.im_bro_drive_ctrl.state = MJ_MSG_OBSOLETE;
-            mj_handle.in.bup_dcu_rfd.im_bro_drive_ctrl.total = &in_bup_dcu_rfd_im_bro_drive_ctrl_total;
-            mj_handle.in.bup_dcu_rfd.im_bro_drive_ctrl.miss = &in_bup_dcu_rfd_im_bro_drive_ctrl_miss;
-        }else{
-            p_drv->udp4.free((uint8_t *)mj_handle.in.bup_dcu_rfd.im_bro_drive_ctrl.msg);
             return MJ_INTEGRITY_FAIL;
         }
     }else{
@@ -7568,27 +6864,6 @@ mj_status_t mj_mon_init(mj_drv_interface_t *drv, mj_mon_t ** ptr)
         return MJ_UDP4_ALOC_FAIL;
     }
 
-    if ((mj_handle.in.bup_dcu_rrd.im_bro_drive_ctrl.msg = (im_bro_drive_ctrl_msg_t *)p_drv->udp4.alloc(sizeof(im_bro_drive_ctrl_msg_t)))){
-        if(im_bro_drive_ctrl_type_check(mj_handle.in.bup_dcu_rrd.im_bro_drive_ctrl.msg) == MJ_CHECK_OK){
-            mj_handle.in.bup_dcu_rrd.im_bro_drive_ctrl.msg->hdr.src = BRO30_NONE;
-            mj_handle.in.bup_dcu_rrd.im_bro_drive_ctrl.msg->hdr.dst = BRO30_NONE;
-            mj_handle.in.bup_dcu_rrd.im_bro_drive_ctrl.msg->hdr.cnt = 0;
-            mj_handle.in.bup_dcu_rrd.im_bro_drive_ctrl.msg->hdr.id = 0;
-            mj_handle.in.bup_dcu_rrd.im_bro_drive_ctrl.lock = in_bup_dcu_rrd_im_bro_drive_ctrl_lock_fcn;
-            mj_handle.in.bup_dcu_rrd.im_bro_drive_ctrl.copy = in_bup_dcu_rrd_im_bro_drive_ctrl_copy_fcn;
-            mj_handle.in.bup_dcu_rrd.im_bro_drive_ctrl.upd_cb = NULL;
-            mj_handle.in.bup_dcu_rrd.im_bro_drive_ctrl.irq = NULL;
-            mj_handle.in.bup_dcu_rrd.im_bro_drive_ctrl.state = MJ_MSG_OBSOLETE;
-            mj_handle.in.bup_dcu_rrd.im_bro_drive_ctrl.total = &in_bup_dcu_rrd_im_bro_drive_ctrl_total;
-            mj_handle.in.bup_dcu_rrd.im_bro_drive_ctrl.miss = &in_bup_dcu_rrd_im_bro_drive_ctrl_miss;
-        }else{
-            p_drv->udp4.free((uint8_t *)mj_handle.in.bup_dcu_rrd.im_bro_drive_ctrl.msg);
-            return MJ_INTEGRITY_FAIL;
-        }
-    }else{
-        return MJ_UDP4_ALOC_FAIL;
-    }
-
     if ((mj_handle.in.bup_dcu_rrd.msg_ans.msg = (msg_answer_msg_t *)p_drv->udp4.alloc(sizeof(msg_answer_msg_t)))){
         if(msg_answer_type_check(mj_handle.in.bup_dcu_rrd.msg_ans.msg) == MJ_CHECK_OK){
             mj_handle.in.bup_dcu_rrd.msg_ans.msg->hdr.src = BRO30_NONE;
@@ -7757,27 +7032,6 @@ mj_status_t mj_mon_init(mj_drv_interface_t *drv, mj_mon_t ** ptr)
         return MJ_UDP4_ALOC_FAIL;
     }
 
-    if ((mj_handle.in.bup_dcu_rst.im_bro_drive_ctrl.msg = (im_bro_drive_ctrl_msg_t *)p_drv->udp4.alloc(sizeof(im_bro_drive_ctrl_msg_t)))){
-        if(im_bro_drive_ctrl_type_check(mj_handle.in.bup_dcu_rst.im_bro_drive_ctrl.msg) == MJ_CHECK_OK){
-            mj_handle.in.bup_dcu_rst.im_bro_drive_ctrl.msg->hdr.src = BRO30_NONE;
-            mj_handle.in.bup_dcu_rst.im_bro_drive_ctrl.msg->hdr.dst = BRO30_NONE;
-            mj_handle.in.bup_dcu_rst.im_bro_drive_ctrl.msg->hdr.cnt = 0;
-            mj_handle.in.bup_dcu_rst.im_bro_drive_ctrl.msg->hdr.id = 0;
-            mj_handle.in.bup_dcu_rst.im_bro_drive_ctrl.lock = in_bup_dcu_rst_im_bro_drive_ctrl_lock_fcn;
-            mj_handle.in.bup_dcu_rst.im_bro_drive_ctrl.copy = in_bup_dcu_rst_im_bro_drive_ctrl_copy_fcn;
-            mj_handle.in.bup_dcu_rst.im_bro_drive_ctrl.upd_cb = NULL;
-            mj_handle.in.bup_dcu_rst.im_bro_drive_ctrl.irq = NULL;
-            mj_handle.in.bup_dcu_rst.im_bro_drive_ctrl.state = MJ_MSG_OBSOLETE;
-            mj_handle.in.bup_dcu_rst.im_bro_drive_ctrl.total = &in_bup_dcu_rst_im_bro_drive_ctrl_total;
-            mj_handle.in.bup_dcu_rst.im_bro_drive_ctrl.miss = &in_bup_dcu_rst_im_bro_drive_ctrl_miss;
-        }else{
-            p_drv->udp4.free((uint8_t *)mj_handle.in.bup_dcu_rst.im_bro_drive_ctrl.msg);
-            return MJ_INTEGRITY_FAIL;
-        }
-    }else{
-        return MJ_UDP4_ALOC_FAIL;
-    }
-
     if ((mj_handle.in.bup_dcu_rst.msg_ans.msg = (msg_answer_msg_t *)p_drv->udp4.alloc(sizeof(msg_answer_msg_t)))){
         if(msg_answer_type_check(mj_handle.in.bup_dcu_rst.msg_ans.msg) == MJ_CHECK_OK){
             mj_handle.in.bup_dcu_rst.msg_ans.msg->hdr.src = BRO30_NONE;
@@ -7940,27 +7194,6 @@ mj_status_t mj_mon_init(mj_drv_interface_t *drv, mj_mon_t ** ptr)
             mj_handle.in.dcu.formular.miss = &in_dcu_formular_miss;
         }else{
             p_drv->udp4.free((uint8_t *)mj_handle.in.dcu.formular.msg);
-            return MJ_INTEGRITY_FAIL;
-        }
-    }else{
-        return MJ_UDP4_ALOC_FAIL;
-    }
-
-    if ((mj_handle.in.dcu.im_bro_drive_ctrl.msg = (im_bro_drive_ctrl_msg_t *)p_drv->udp4.alloc(sizeof(im_bro_drive_ctrl_msg_t)))){
-        if(im_bro_drive_ctrl_type_check(mj_handle.in.dcu.im_bro_drive_ctrl.msg) == MJ_CHECK_OK){
-            mj_handle.in.dcu.im_bro_drive_ctrl.msg->hdr.src = BRO30_NONE;
-            mj_handle.in.dcu.im_bro_drive_ctrl.msg->hdr.dst = BRO30_NONE;
-            mj_handle.in.dcu.im_bro_drive_ctrl.msg->hdr.cnt = 0;
-            mj_handle.in.dcu.im_bro_drive_ctrl.msg->hdr.id = 0;
-            mj_handle.in.dcu.im_bro_drive_ctrl.lock = in_dcu_im_bro_drive_ctrl_lock_fcn;
-            mj_handle.in.dcu.im_bro_drive_ctrl.copy = in_dcu_im_bro_drive_ctrl_copy_fcn;
-            mj_handle.in.dcu.im_bro_drive_ctrl.upd_cb = NULL;
-            mj_handle.in.dcu.im_bro_drive_ctrl.irq = NULL;
-            mj_handle.in.dcu.im_bro_drive_ctrl.state = MJ_MSG_OBSOLETE;
-            mj_handle.in.dcu.im_bro_drive_ctrl.total = &in_dcu_im_bro_drive_ctrl_total;
-            mj_handle.in.dcu.im_bro_drive_ctrl.miss = &in_dcu_im_bro_drive_ctrl_miss;
-        }else{
-            p_drv->udp4.free((uint8_t *)mj_handle.in.dcu.im_bro_drive_ctrl.msg);
             return MJ_INTEGRITY_FAIL;
         }
     }else{

@@ -16,7 +16,6 @@ static TreeNode *cmd_ans_ptr = 0;
 static TreeNode *dbg_ptr = 0;
 static TreeNode *dcu_tel_ptr = 0;
 static TreeNode *formular_ptr = 0;
-static TreeNode *im_bro_drive_ctrl_ptr = 0;
 static TreeNode *msg_ans_ptr = 0;
 static TreeNode *prm_ans_ptr = 0;
 static TreeNode *ptp_state_ptr = 0;
@@ -185,7 +184,7 @@ static QVariant prm2QVariant(uint32_t id, uint8_t* val, size_t size)
         case 0x6078F429:
             return QVariant(*(float*)val);
  
-        case 0xA6070C18:
+        case 0xF6D4B455:
             return QVariant(*(float*)val);
  
         case 0xDB8CBF1A:
@@ -212,7 +211,7 @@ static QVariant prm2QVariant(uint32_t id, uint8_t* val, size_t size)
         case 0x7705E37C:
             return QVariant(*(float*)val);
  
-        case 0xB17A1B4D:
+        case 0xE1A9A300:
             return QVariant(*(float*)val);
  
         case 0xCCF1A84F:
@@ -239,7 +238,7 @@ static QVariant prm2QVariant(uint32_t id, uint8_t* val, size_t size)
         case 0x9BEBDABA:
             return QVariant(*(float*)val);
  
-        case 0x5D94228B:
+        case 0xD479AC6:
             return QVariant(*(float*)val);
  
         case 0x201F9189:
@@ -532,7 +531,7 @@ static void QVariant2prm(uint32_t id, uint8_t* val, size_t size, QVariant data)
         memcpy(val,&(val_),sizeof(float));
  
     } else 
-    if (id == 0xA6070C18)
+    if (id == 0xF6D4B455)
     {
         float val_ = data.value<float>();
         memcpy(val,&(val_),sizeof(float));
@@ -586,7 +585,7 @@ static void QVariant2prm(uint32_t id, uint8_t* val, size_t size, QVariant data)
         memcpy(val,&(val_),sizeof(float));
  
     } else 
-    if (id == 0xB17A1B4D)
+    if (id == 0xE1A9A300)
     {
         float val_ = data.value<float>();
         memcpy(val,&(val_),sizeof(float));
@@ -640,7 +639,7 @@ static void QVariant2prm(uint32_t id, uint8_t* val, size_t size, QVariant data)
         memcpy(val,&(val_),sizeof(float));
  
     } else 
-    if (id == 0x5D94228B)
+    if (id == 0xD479AC6)
     {
         float val_ = data.value<float>();
         memcpy(val,&(val_),sizeof(float));
@@ -1238,16 +1237,18 @@ node->lch()->lch()->add("b",[](){return QVariant(mj->out.dcu_tel.msg->pwm.b);})-
 node->lch()->lch()->lch()->editable = true;
 node->lch()->lch()->add("c",[](){return QVariant(mj->out.dcu_tel.msg->pwm.c);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->pwm.c=data.value<float>();return;};
 node->lch()->lch()->lch()->editable = true;
-node->lch()->add("park_current",[](){return QVariant();});
-node->lch()->lch()->add("d",[](){return QVariant(mj->out.dcu_tel.msg->park_current.d);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->park_current.d=data.value<float>();return;};
-node->lch()->lch()->lch()->editable = true;
-node->lch()->lch()->add("q",[](){return QVariant(mj->out.dcu_tel.msg->park_current.q);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->park_current.q=data.value<float>();return;};
-node->lch()->lch()->lch()->editable = true;
 node->lch()->add("park_voltage",[](){return QVariant();});
 node->lch()->lch()->add("d",[](){return QVariant(mj->out.dcu_tel.msg->park_voltage.d);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->park_voltage.d=data.value<float>();return;};
 node->lch()->lch()->lch()->editable = true;
 node->lch()->lch()->add("q",[](){return QVariant(mj->out.dcu_tel.msg->park_voltage.q);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->park_voltage.q=data.value<float>();return;};
 node->lch()->lch()->lch()->editable = true;
+node->lch()->add("park_current",[](){return QVariant();});
+node->lch()->lch()->add("d",[](){return QVariant(mj->out.dcu_tel.msg->park_current.d);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->park_current.d=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("q",[](){return QVariant(mj->out.dcu_tel.msg->park_current.q);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->park_current.q=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->add("ibrk",[](){return QVariant(mj->out.dcu_tel.msg->ibrk);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->ibrk=data.value<float>();return;};
+node->lch()->lch()->editable = true;
 node->lch()->add("stator_temp",[](){return QVariant(mj->out.dcu_tel.msg->stator_temp);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->stator_temp=data.value<float>();return;};
 node->lch()->lch()->editable = true;
 node->lch()->add("brake_state",[](){return QVariant((int32_t)(mj->out.dcu_tel.msg->brake_state));},[](){return (rotor_brake_state_str(mj->out.dcu_tel.msg->brake_state));})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->brake_state=(int8_t)(data.value<int32_t>());return;};
@@ -1260,48 +1261,85 @@ node->lch()->lch()->intval.append(0);
 node->lch()->lch()->intval.append(1);
 node->lch()->lch()->intval.append(2);
 node->lch()->lch()->intval.append(3);
-node->lch()->add("ibrk",[](){return QVariant(mj->out.dcu_tel.msg->ibrk);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->ibrk=data.value<float>();return;};
-node->lch()->lch()->editable = true;
 node->lch()->add("power_voltage",[](){return QVariant(mj->out.dcu_tel.msg->power_voltage);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->power_voltage=data.value<float>();return;};
-node->lch()->lch()->editable = true;
-node->lch()->add("id",[](){return QVariant(mj->out.dcu_tel.msg->id);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->id=data.value<float>();return;};
-node->lch()->lch()->editable = true;
-node->lch()->add("iq",[](){return QVariant(mj->out.dcu_tel.msg->iq);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->iq=data.value<float>();return;};
 node->lch()->lch()->editable = true;
 node->lch()->add("electrical_power",[](){return QVariant(mj->out.dcu_tel.msg->electrical_power);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->electrical_power=data.value<float>();return;};
 node->lch()->lch()->editable = true;
-node->lch()->add("ang_pid_err",[](){return QVariant(mj->out.dcu_tel.msg->ang_pid_err);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->ang_pid_err=data.value<float>();return;};
-node->lch()->lch()->editable = true;
-node->lch()->add("ang_pid_in",[](){return QVariant(mj->out.dcu_tel.msg->ang_pid_in);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->ang_pid_in=data.value<float>();return;};
-node->lch()->lch()->editable = true;
-node->lch()->add("ang_pid_out",[](){return QVariant(mj->out.dcu_tel.msg->ang_pid_out);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->ang_pid_out=data.value<float>();return;};
-node->lch()->lch()->editable = true;
-node->lch()->add("ang_pid_intgr",[](){return QVariant(mj->out.dcu_tel.msg->ang_pid_intgr);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->ang_pid_intgr=data.value<float>();return;};
-node->lch()->lch()->editable = true;
-node->lch()->add("rotor_spd_pid_err",[](){return QVariant(mj->out.dcu_tel.msg->rotor_spd_pid_err);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->rotor_spd_pid_err=data.value<float>();return;};
-node->lch()->lch()->editable = true;
-node->lch()->add("rotor_spd_pid_in",[](){return QVariant(mj->out.dcu_tel.msg->rotor_spd_pid_in);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->rotor_spd_pid_in=data.value<float>();return;};
-node->lch()->lch()->editable = true;
-node->lch()->add("rotor_spd_pid_out",[](){return QVariant(mj->out.dcu_tel.msg->rotor_spd_pid_out);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->rotor_spd_pid_out=data.value<float>();return;};
-node->lch()->lch()->editable = true;
-node->lch()->add("rotor_spd_pid_intgr",[](){return QVariant(mj->out.dcu_tel.msg->rotor_spd_pid_intgr);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->rotor_spd_pid_intgr=data.value<float>();return;};
-node->lch()->lch()->editable = true;
-node->lch()->add("load_spd_pid_err",[](){return QVariant(mj->out.dcu_tel.msg->load_spd_pid_err);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->load_spd_pid_err=data.value<float>();return;};
-node->lch()->lch()->editable = true;
-node->lch()->add("load_spd_pid_in",[](){return QVariant(mj->out.dcu_tel.msg->load_spd_pid_in);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->load_spd_pid_in=data.value<float>();return;};
-node->lch()->lch()->editable = true;
-node->lch()->add("load_spd_pid_out",[](){return QVariant(mj->out.dcu_tel.msg->load_spd_pid_out);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->load_spd_pid_out=data.value<float>();return;};
-node->lch()->lch()->editable = true;
-node->lch()->add("load_spd_pid_intgr",[](){return QVariant(mj->out.dcu_tel.msg->load_spd_pid_intgr);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->load_spd_pid_intgr=data.value<float>();return;};
-node->lch()->lch()->editable = true;
-node->lch()->add("curr_pid_err",[](){return QVariant(mj->out.dcu_tel.msg->curr_pid_err);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->curr_pid_err=data.value<float>();return;};
-node->lch()->lch()->editable = true;
-node->lch()->add("curr_pid_in",[](){return QVariant(mj->out.dcu_tel.msg->curr_pid_in);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->curr_pid_in=data.value<float>();return;};
-node->lch()->lch()->editable = true;
-node->lch()->add("curr_pid_out",[](){return QVariant(mj->out.dcu_tel.msg->curr_pid_out);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->curr_pid_out=data.value<float>();return;};
-node->lch()->lch()->editable = true;
-node->lch()->add("curr_pid_intgr",[](){return QVariant(mj->out.dcu_tel.msg->curr_pid_intgr);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->curr_pid_intgr=data.value<float>();return;};
-node->lch()->lch()->editable = true;
+node->lch()->add("ang_pid_state",[](){return QVariant();});
+node->lch()->lch()->add("err",[](){return QVariant(mj->out.dcu_tel.msg->ang_pid_state.err);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->ang_pid_state.err=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("cor_err",[](){return QVariant(mj->out.dcu_tel.msg->ang_pid_state.cor_err);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->ang_pid_state.cor_err=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("feed_forward",[](){return QVariant(mj->out.dcu_tel.msg->ang_pid_state.feed_forward);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->ang_pid_state.feed_forward=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("track",[](){return QVariant(mj->out.dcu_tel.msg->ang_pid_state.track);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->ang_pid_state.track=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("back",[](){return QVariant(mj->out.dcu_tel.msg->ang_pid_state.back);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->ang_pid_state.back=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("int_val",[](){return QVariant(mj->out.dcu_tel.msg->ang_pid_state.int_val);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->ang_pid_state.int_val=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("out",[](){return QVariant(mj->out.dcu_tel.msg->ang_pid_state.out);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->ang_pid_state.out=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->add("rotor_spd_pid_state",[](){return QVariant();});
+node->lch()->lch()->add("err",[](){return QVariant(mj->out.dcu_tel.msg->rotor_spd_pid_state.err);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->rotor_spd_pid_state.err=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("cor_err",[](){return QVariant(mj->out.dcu_tel.msg->rotor_spd_pid_state.cor_err);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->rotor_spd_pid_state.cor_err=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("feed_forward",[](){return QVariant(mj->out.dcu_tel.msg->rotor_spd_pid_state.feed_forward);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->rotor_spd_pid_state.feed_forward=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("track",[](){return QVariant(mj->out.dcu_tel.msg->rotor_spd_pid_state.track);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->rotor_spd_pid_state.track=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("back",[](){return QVariant(mj->out.dcu_tel.msg->rotor_spd_pid_state.back);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->rotor_spd_pid_state.back=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("int_val",[](){return QVariant(mj->out.dcu_tel.msg->rotor_spd_pid_state.int_val);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->rotor_spd_pid_state.int_val=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("out",[](){return QVariant(mj->out.dcu_tel.msg->rotor_spd_pid_state.out);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->rotor_spd_pid_state.out=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->add("load_spd_pid_state",[](){return QVariant();});
+node->lch()->lch()->add("err",[](){return QVariant(mj->out.dcu_tel.msg->load_spd_pid_state.err);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->load_spd_pid_state.err=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("cor_err",[](){return QVariant(mj->out.dcu_tel.msg->load_spd_pid_state.cor_err);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->load_spd_pid_state.cor_err=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("feed_forward",[](){return QVariant(mj->out.dcu_tel.msg->load_spd_pid_state.feed_forward);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->load_spd_pid_state.feed_forward=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("track",[](){return QVariant(mj->out.dcu_tel.msg->load_spd_pid_state.track);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->load_spd_pid_state.track=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("back",[](){return QVariant(mj->out.dcu_tel.msg->load_spd_pid_state.back);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->load_spd_pid_state.back=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("int_val",[](){return QVariant(mj->out.dcu_tel.msg->load_spd_pid_state.int_val);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->load_spd_pid_state.int_val=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("out",[](){return QVariant(mj->out.dcu_tel.msg->load_spd_pid_state.out);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->load_spd_pid_state.out=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->add("curr_q_pid_state",[](){return QVariant();});
+node->lch()->lch()->add("err",[](){return QVariant(mj->out.dcu_tel.msg->curr_q_pid_state.err);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->curr_q_pid_state.err=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("cor_err",[](){return QVariant(mj->out.dcu_tel.msg->curr_q_pid_state.cor_err);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->curr_q_pid_state.cor_err=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("feed_forward",[](){return QVariant(mj->out.dcu_tel.msg->curr_q_pid_state.feed_forward);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->curr_q_pid_state.feed_forward=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("track",[](){return QVariant(mj->out.dcu_tel.msg->curr_q_pid_state.track);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->curr_q_pid_state.track=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("back",[](){return QVariant(mj->out.dcu_tel.msg->curr_q_pid_state.back);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->curr_q_pid_state.back=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("int_val",[](){return QVariant(mj->out.dcu_tel.msg->curr_q_pid_state.int_val);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->curr_q_pid_state.int_val=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("out",[](){return QVariant(mj->out.dcu_tel.msg->curr_q_pid_state.out);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->curr_q_pid_state.out=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->add("curr_d_pid_state",[](){return QVariant();});
+node->lch()->lch()->add("err",[](){return QVariant(mj->out.dcu_tel.msg->curr_d_pid_state.err);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->curr_d_pid_state.err=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("cor_err",[](){return QVariant(mj->out.dcu_tel.msg->curr_d_pid_state.cor_err);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->curr_d_pid_state.cor_err=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("feed_forward",[](){return QVariant(mj->out.dcu_tel.msg->curr_d_pid_state.feed_forward);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->curr_d_pid_state.feed_forward=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("track",[](){return QVariant(mj->out.dcu_tel.msg->curr_d_pid_state.track);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->curr_d_pid_state.track=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("back",[](){return QVariant(mj->out.dcu_tel.msg->curr_d_pid_state.back);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->curr_d_pid_state.back=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("int_val",[](){return QVariant(mj->out.dcu_tel.msg->curr_d_pid_state.int_val);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->curr_d_pid_state.int_val=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("out",[](){return QVariant(mj->out.dcu_tel.msg->curr_d_pid_state.out);})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->curr_d_pid_state.out=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
 node->lch()->add("rotor_sens_state",[](){return QVariant((int32_t)(mj->out.dcu_tel.msg->rotor_sens_state));},[](){return (rotor_ang_sens_status_str(mj->out.dcu_tel.msg->rotor_sens_state));})->setData =  [](QVariant data){ mj->out.dcu_tel.msg->rotor_sens_state=(int8_t)(data.value<int32_t>());return;};
 node->lch()->lch()->editable = true;
 node->lch()->lch()->values.append("UNKNOW");
@@ -1441,19 +1479,6 @@ node->lch()->lch()->editable = true;
 node->lch()->add("code",[](){return QVariant(mj->out.formular.msg->code);})->setData =  [](QVariant data){ mj->out.formular.msg->code=data.value<uint8_t>();return;};
 node->lch()->lch()->editable = true;
 
-im_bro_drive_ctrl_ptr = node->add("im_bro_drive_ctrl",[](){return QVariant(mj->out.im_bro_drive_ctrl.msg->hdr.cnt);});
-im_bro_drive_ctrl_ptr->tx_enable = &mj->out.im_bro_drive_ctrl.tx_enable;
-
-node->lch()->add("voltage",[](){return QVariant();});
-node->lch()->lch()->add("[0]",[](){return QVariant(mj->out.im_bro_drive_ctrl.msg->voltage[0]);})->setData =  [](QVariant data){ mj->out.im_bro_drive_ctrl.msg->voltage[0]=data.value<float>();return;};
-node->lch()->lch()->lch()->editable = true;
-node->lch()->lch()->add("[1]",[](){return QVariant(mj->out.im_bro_drive_ctrl.msg->voltage[1]);})->setData =  [](QVariant data){ mj->out.im_bro_drive_ctrl.msg->voltage[1]=data.value<float>();return;};
-node->lch()->lch()->lch()->editable = true;
-node->lch()->lch()->add("[2]",[](){return QVariant(mj->out.im_bro_drive_ctrl.msg->voltage[2]);})->setData =  [](QVariant data){ mj->out.im_bro_drive_ctrl.msg->voltage[2]=data.value<float>();return;};
-node->lch()->lch()->lch()->editable = true;
-node->lch()->add("connected",[](){return QVariant(mj->out.im_bro_drive_ctrl.msg->connected);})->setData =  [](QVariant data){ mj->out.im_bro_drive_ctrl.msg->connected=data.value<bool>();return;};
-node->lch()->lch()->editable = true;
-
 msg_ans_ptr = node->add("msg_ans",[](){return QVariant(mj->out.msg_ans.msg->hdr.cnt);});
 msg_ans_ptr->tx = [](uint16_t dst){mj->out.msg_ans.tx(dst);};
 
@@ -1514,7 +1539,7 @@ node->lch()->lch()->values.append("curr_out_rate_lim");
 node->lch()->lch()->values.append("curr_err_rate_lim");
 node->lch()->lch()->values.append("load_speed_kp");
 node->lch()->lch()->values.append("load_speed_ki");
-node->lch()->lch()->values.append("load_speed_kd");
+node->lch()->lch()->values.append("load_speed_kb");
 node->lch()->lch()->values.append("load_speed_kt");
 node->lch()->lch()->values.append("load_speed_kf");
 node->lch()->lch()->values.append("load_speed_err_lim");
@@ -1523,7 +1548,7 @@ node->lch()->lch()->values.append("load_speed_out_rate_lim");
 node->lch()->lch()->values.append("load_speed_err_rate_lim");
 node->lch()->lch()->values.append("rotor_speed_kp");
 node->lch()->lch()->values.append("rotor_speed_ki");
-node->lch()->lch()->values.append("rotor_speed_kd");
+node->lch()->lch()->values.append("rotor_speed_kb");
 node->lch()->lch()->values.append("rotor_speed_kt");
 node->lch()->lch()->values.append("rotor_speed_kf");
 node->lch()->lch()->values.append("rotor_speed_err_lim");
@@ -1532,7 +1557,7 @@ node->lch()->lch()->values.append("rotor_speed_out_rate_lim");
 node->lch()->lch()->values.append("rotor_speed_err_rate_lim");
 node->lch()->lch()->values.append("rotor_ang_kp");
 node->lch()->lch()->values.append("rotor_ang_ki");
-node->lch()->lch()->values.append("rotor_ang_kd");
+node->lch()->lch()->values.append("rotor_ang_kb");
 node->lch()->lch()->values.append("rotor_ang_kt");
 node->lch()->lch()->values.append("rotor_ang_kf");
 node->lch()->lch()->values.append("rotor_ang_err_lim");
@@ -1589,7 +1614,7 @@ node->lch()->lch()->intval.append(0x41824DD2);
 node->lch()->lch()->intval.append(0x6EFAD7A0);
 node->lch()->lch()->intval.append(0x44EE1601);
 node->lch()->lch()->intval.append(0x6078F429);
-node->lch()->lch()->intval.append(0xA6070C18);
+node->lch()->lch()->intval.append(0xF6D4B455);
 node->lch()->lch()->intval.append(0xDB8CBF1A);
 node->lch()->lch()->intval.append(0x69B61D4E);
 node->lch()->lch()->intval.append(0xDA07EA66);
@@ -1598,7 +1623,7 @@ node->lch()->lch()->intval.append(0x4608CFD6);
 node->lch()->lch()->intval.append(0x697055A4);
 node->lch()->lch()->intval.append(0x53930154);
 node->lch()->lch()->intval.append(0x7705E37C);
-node->lch()->lch()->intval.append(0xB17A1B4D);
+node->lch()->lch()->intval.append(0xE1A9A300);
 node->lch()->lch()->intval.append(0xCCF1A84F);
 node->lch()->lch()->intval.append(0x7ECB0A1B);
 node->lch()->lch()->intval.append(0xA2564CDF);
@@ -1607,7 +1632,7 @@ node->lch()->lch()->intval.append(0x86EE36E2);
 node->lch()->lch()->intval.append(0xA996AC90);
 node->lch()->lch()->intval.append(0xBF7D3892);
 node->lch()->lch()->intval.append(0x9BEBDABA);
-node->lch()->lch()->intval.append(0x5D94228B);
+node->lch()->lch()->intval.append(0xD479AC6);
 node->lch()->lch()->intval.append(0x201F9189);
 node->lch()->lch()->intval.append(0x922533DD);
 node->lch()->lch()->intval.append(0x74081F2D);

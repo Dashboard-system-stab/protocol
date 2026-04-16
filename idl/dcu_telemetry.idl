@@ -7,6 +7,7 @@
 #include "dcu_status.idl"
 #include "park_vec.idl"
 #include "rotor_brake_state.idl"
+#include "pid_state.idl"
 
 @doc('Теелеметрия модуля управления приводом БУП')
 struct dcu_telemetry
@@ -42,11 +43,14 @@ struct dcu_telemetry
     @doc('Коэффициент заполнения ШИМ')
     three_phase_val pwm;
 
+    @doc('Напряжение на фазах в СК Парка-Горева, В')
+    park_vec park_voltage;
+
     @doc('Ток фаз в СК Парка-Горева, A')
     park_vec park_current;
 
-    @doc('Напряжение на фазах в СК Парка-Горева, В')
-    park_vec park_voltage;
+    @doc('Ток тормоза')
+    float ibrk;
 
     @doc('Температра статора, C')
     float stator_temp;
@@ -55,73 +59,26 @@ struct dcu_telemetry
     @alias('rotor_brake_state')
     int8 brake_state;
 
-    @doc('Ток тормоза')
-    float ibrk;
-
     @doc('Напряжение питания модуля, В')
     float power_voltage;
-
-    @doc('Ток id, А')
-    float id;
-
-    @doc('Ток iq, А')
-    float iq;
 
     @doc('Мощность, положителная - потребляем, отрицательная - генерируем в сеть, ВА')
     float electrical_power;
 
+    @doc('Состояние ПИД регулятора угла')
+    pid_state ang_pid_state;
 
-    @doc('Ошибка ПИД регулятора угла')
-    float ang_pid_err;
+    @doc('Состояние ПИД регулятора скорости ротора')
+    pid_state rotor_spd_pid_state;
 
-    @doc('Входное значение ПИД регулятора угла')
-    float ang_pid_in;
+    @doc('Состояние ПИД регулятора скорости нагрузки')
+    pid_state load_spd_pid_state;
 
-    @doc('Выходное значение ПИД регулятора угла')
-    float ang_pid_out;
+    @doc('Состояние ПИД регулятора тока q')
+    pid_state curr_q_pid_state;
 
-    @doc('Значение регулятора ПИД регулятора угла')
-    float ang_pid_intgr;
-
-
-    @doc('Ошибка ПИД регулятора скорости ротора')
-    float rotor_spd_pid_err;
-
-    @doc('Входное значение ПИД регулятора скорости ротора')
-    float rotor_spd_pid_in;
-
-    @doc('Выходное значение ПИД регулятора скорости ротора')
-    float rotor_spd_pid_out;
-
-    @doc('Значение регулятора ПИД регулятора скорости ротора')
-    float rotor_spd_pid_intgr;
-
-
-    @doc('Ошибка ПИД регулятора скорости нагрузки')
-    float load_spd_pid_err;
-
-    @doc('Входное значение ПИД регулятора скорости нагрузки')
-    float load_spd_pid_in;
-
-    @doc('Выходное значение ПИД регулятора скорости нагрузки')
-    float load_spd_pid_out;
-
-    @doc('Значение регулятора ПИД регулятора скорости нагрузки')
-    float load_spd_pid_intgr;
-
-
-    @doc('Ошибка ПИД регулятора тока')
-    float curr_pid_err;
-
-    @doc('Входное значение ПИД регулятора тока')
-    float curr_pid_in;
-
-    @doc('Выходное значение ПИД регулятора тока')
-    float curr_pid_out;
-
-    @doc('Значение регулятора ПИД регулятора тока')
-    float curr_pid_intgr;
-
+    @doc('Состояние ПИД регулятора тока d')
+    pid_state curr_d_pid_state;
 
     @doc('Состояние датчика углового положения ротора')
     @alias('rotor_ang_sens_status')

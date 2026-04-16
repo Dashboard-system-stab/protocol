@@ -9,10 +9,10 @@
 #endif
 
 /** Specification version: bro30 1.11.5.1.1.0 */
-/** Library created: 10-04-26 */
+/** Library created: 16-04-26 */
 /**    gen. version: 11.5 */
 static const char mj_bro30_spec_ver[] = { 0x62,0x72,0x6f,0x33,0x30,0x20,0x31,0x2e,0x31,0x31,0x2e,0x35,0x2e,0x31,0x2e,0x31,0x2e,0x30,0x00 };
-static const char mj_bro30_gen_date[] = { 0x31,0x30,0x2d,0x30,0x34,0x2d,0x32,0x36,0x00 };
+static const char mj_bro30_gen_date[] = { 0x31,0x36,0x2d,0x30,0x34,0x2d,0x32,0x36,0x00 };
 
 #ifndef SRV_MCAST_REQ_IP
 #define SRV_MCAST_REQ_IP (0x1c8c8ef) // srv_mcast_req 239.200.200.1
@@ -89,7 +89,7 @@ typedef enum bro30_msg_id
 	ID_MSG_REQ = 0xD801,
 	ID_MSG_ANS = 0xD80F,
 	ID_DBG = 0x3894,
-	ID_DCU_TEL = 0x7DEC,
+	ID_DCU_TEL = 0xD63C,
 	ID_BUP_STATE = 0x824,
 	ID_BUP_CTRL = 0xD994,
 	ID_BUP_MULTI_CONTROL = 0x76A9,
@@ -138,7 +138,7 @@ typedef enum bro30_prm_id
      PRM_FLOAT_CURR_ERR_RATE_LIM = ((int)0x6EFAD7A0),
      PRM_FLOAT_LOAD_SPEED_KP = ((int)0x44EE1601),
      PRM_FLOAT_LOAD_SPEED_KI = ((int)0x6078F429),
-     PRM_FLOAT_LOAD_SPEED_KD = ((int)0xA6070C18),
+     PRM_FLOAT_LOAD_SPEED_KB = ((int)0xF6D4B455),
      PRM_FLOAT_LOAD_SPEED_KT = ((int)0xDB8CBF1A),
      PRM_FLOAT_LOAD_SPEED_KF = ((int)0x69B61D4E),
      PRM_FLOAT_LOAD_SPEED_ERR_LIM = ((int)0xDA07EA66),
@@ -147,7 +147,7 @@ typedef enum bro30_prm_id
      PRM_FLOAT_LOAD_SPEED_ERR_RATE_LIM = ((int)0x697055A4),
      PRM_FLOAT_ROTOR_SPEED_KP = ((int)0x53930154),
      PRM_FLOAT_ROTOR_SPEED_KI = ((int)0x7705E37C),
-     PRM_FLOAT_ROTOR_SPEED_KD = ((int)0xB17A1B4D),
+     PRM_FLOAT_ROTOR_SPEED_KB = ((int)0xE1A9A300),
      PRM_FLOAT_ROTOR_SPEED_KT = ((int)0xCCF1A84F),
      PRM_FLOAT_ROTOR_SPEED_KF = ((int)0x7ECB0A1B),
      PRM_FLOAT_ROTOR_SPEED_ERR_LIM = ((int)0xA2564CDF),
@@ -156,7 +156,7 @@ typedef enum bro30_prm_id
      PRM_FLOAT_ROTOR_SPEED_ERR_RATE_LIM = ((int)0xA996AC90),
      PRM_FLOAT_ROTOR_ANG_KP = ((int)0xBF7D3892),
      PRM_FLOAT_ROTOR_ANG_KI = ((int)0x9BEBDABA),
-     PRM_FLOAT_ROTOR_ANG_KD = ((int)0x5D94228B),
+     PRM_FLOAT_ROTOR_ANG_KB = ((int)0xD479AC6),
      PRM_FLOAT_ROTOR_ANG_KT = ((int)0x201F9189),
      PRM_FLOAT_ROTOR_ANG_KF = ((int)0x922533DD),
      PRM_FLOAT_ROTOR_ANG_ERR_LIM = ((int)0x74081F2D),

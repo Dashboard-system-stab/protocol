@@ -176,7 +176,7 @@ static QVariant prm2QVariant(uint32_t id, uint8_t* val, size_t size)
         case 0x6078F429:
             return QVariant(*(float*)val);
  
-        case 0xA6070C18:
+        case 0xF6D4B455:
             return QVariant(*(float*)val);
  
         case 0xDB8CBF1A:
@@ -203,7 +203,7 @@ static QVariant prm2QVariant(uint32_t id, uint8_t* val, size_t size)
         case 0x7705E37C:
             return QVariant(*(float*)val);
  
-        case 0xB17A1B4D:
+        case 0xE1A9A300:
             return QVariant(*(float*)val);
  
         case 0xCCF1A84F:
@@ -230,7 +230,7 @@ static QVariant prm2QVariant(uint32_t id, uint8_t* val, size_t size)
         case 0x9BEBDABA:
             return QVariant(*(float*)val);
  
-        case 0x5D94228B:
+        case 0xD479AC6:
             return QVariant(*(float*)val);
  
         case 0x201F9189:
@@ -523,7 +523,7 @@ static void QVariant2prm(uint32_t id, uint8_t* val, size_t size, QVariant data)
         memcpy(val,&(val_),sizeof(float));
  
     } else 
-    if (id == 0xA6070C18)
+    if (id == 0xF6D4B455)
     {
         float val_ = data.value<float>();
         memcpy(val,&(val_),sizeof(float));
@@ -577,7 +577,7 @@ static void QVariant2prm(uint32_t id, uint8_t* val, size_t size, QVariant data)
         memcpy(val,&(val_),sizeof(float));
  
     } else 
-    if (id == 0xB17A1B4D)
+    if (id == 0xE1A9A300)
     {
         float val_ = data.value<float>();
         memcpy(val,&(val_),sizeof(float));
@@ -631,7 +631,7 @@ static void QVariant2prm(uint32_t id, uint8_t* val, size_t size, QVariant data)
         memcpy(val,&(val_),sizeof(float));
  
     } else 
-    if (id == 0x5D94228B)
+    if (id == 0xD479AC6)
     {
         float val_ = data.value<float>();
         memcpy(val,&(val_),sizeof(float));

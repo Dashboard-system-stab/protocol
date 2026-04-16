@@ -209,7 +209,7 @@
 
         "load_speed_kp":{"type":"float","unit":"-"},
         "load_speed_ki":{"type":"float","unit":"-"},
-        "load_speed_kd":{"type":"float","unit":"-"},
+        "load_speed_kb":{"type":"float","unit":"-"},
         "load_speed_kt":{"type":"float","unit":"-"},
         "load_speed_kf":{"type":"float","unit":"-"},
         "load_speed_err_lim":{"type":"float","unit":"-"},
@@ -219,7 +219,7 @@
 
         "rotor_speed_kp":{"type":"float","unit":"-"},
         "rotor_speed_ki":{"type":"float","unit":"-"},
-        "rotor_speed_kd":{"type":"float","unit":"-"},
+        "rotor_speed_kb":{"type":"float","unit":"-"},
         "rotor_speed_kt":{"type":"float","unit":"-"},
         "rotor_speed_kf":{"type":"float","unit":"-"},
         "rotor_speed_err_lim":{"type":"float","unit":"-"},
@@ -229,7 +229,7 @@
 
         "rotor_ang_kp":{"type":"float","unit":"-"},
         "rotor_ang_ki":{"type":"float","unit":"-"},
-        "rotor_ang_kd":{"type":"float","unit":"-"},
+        "rotor_ang_kb":{"type":"float","unit":"-"},
         "rotor_ang_kt":{"type":"float","unit":"-"},
         "rotor_ang_kf":{"type":"float","unit":"-"},
         "rotor_ang_err_lim":{"type":"float","unit":"-"},
@@ -332,7 +332,7 @@
 
                 "load_speed_kp": 0.0,
                 "load_speed_ki": 0.0,
-                "load_speed_kd": 0.0,
+                "load_speed_kb": 0.0,
                 "load_speed_kt": 0.0,
                 "load_speed_kf": 0.0,
                 "load_speed_err_lim": 0.0,
@@ -342,7 +342,7 @@
 
                 "rotor_speed_kp": 0.0,
                 "rotor_speed_ki": 0.0,
-                "rotor_speed_kd": 0.0,
+                "rotor_speed_kb": 0.0,
                 "rotor_speed_kt": 0.0,
                 "rotor_speed_kf": 0.0,
                 "rotor_speed_err_lim": 0.0,
@@ -352,7 +352,7 @@
 
                 "rotor_ang_kp": 0.0,
                 "rotor_ang_ki": 0.0,
-                "rotor_ang_kd": 0.0,
+                "rotor_ang_kb": 0.0,
                 "rotor_ang_kt": 0.0,
                 "rotor_ang_kf": 0.0,
                 "rotor_ang_err_lim": 0.0,
@@ -368,7 +368,6 @@
             {
                 "dcu_tel":{},
                 "bup_state":{},
-                "im_bro_drive_ctrl":{},
                 "prm_ans":{},
                 "cmd_ans":{},
                 "msg_ans":{},

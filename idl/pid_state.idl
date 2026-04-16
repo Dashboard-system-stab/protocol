@@ -1,0 +1,26 @@
+
+@doc('Состояние ПИД регулятора')
+
+struct pid_state
+{
+    @doc('Ошибка')
+    float err;
+
+    @doc('Откорректированная ошибка')
+    float cor_err;
+
+    @doc('Вклад Feed-forward')
+    float feed_forward;
+
+    @doc('Вклад Tracking')
+    float track;
+
+    @doc('Anti-Windup back calculation')
+    float back;
+
+    @doc('Интегральная составляющая')
+    float int_val;
+
+    @doc('Выход')
+    float out;
+};

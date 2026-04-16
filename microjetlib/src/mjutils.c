@@ -245,7 +245,7 @@ const char* mj_get_prm_name(int32_t val)
         case PRM_FLOAT_CURR_ERR_RATE_LIM: return "curr_err_rate_lim";
         case PRM_FLOAT_LOAD_SPEED_KP: return "load_speed_kp";
         case PRM_FLOAT_LOAD_SPEED_KI: return "load_speed_ki";
-        case PRM_FLOAT_LOAD_SPEED_KD: return "load_speed_kd";
+        case PRM_FLOAT_LOAD_SPEED_KB: return "load_speed_kb";
         case PRM_FLOAT_LOAD_SPEED_KT: return "load_speed_kt";
         case PRM_FLOAT_LOAD_SPEED_KF: return "load_speed_kf";
         case PRM_FLOAT_LOAD_SPEED_ERR_LIM: return "load_speed_err_lim";
@@ -254,7 +254,7 @@ const char* mj_get_prm_name(int32_t val)
         case PRM_FLOAT_LOAD_SPEED_ERR_RATE_LIM: return "load_speed_err_rate_lim";
         case PRM_FLOAT_ROTOR_SPEED_KP: return "rotor_speed_kp";
         case PRM_FLOAT_ROTOR_SPEED_KI: return "rotor_speed_ki";
-        case PRM_FLOAT_ROTOR_SPEED_KD: return "rotor_speed_kd";
+        case PRM_FLOAT_ROTOR_SPEED_KB: return "rotor_speed_kb";
         case PRM_FLOAT_ROTOR_SPEED_KT: return "rotor_speed_kt";
         case PRM_FLOAT_ROTOR_SPEED_KF: return "rotor_speed_kf";
         case PRM_FLOAT_ROTOR_SPEED_ERR_LIM: return "rotor_speed_err_lim";
@@ -263,7 +263,7 @@ const char* mj_get_prm_name(int32_t val)
         case PRM_FLOAT_ROTOR_SPEED_ERR_RATE_LIM: return "rotor_speed_err_rate_lim";
         case PRM_FLOAT_ROTOR_ANG_KP: return "rotor_ang_kp";
         case PRM_FLOAT_ROTOR_ANG_KI: return "rotor_ang_ki";
-        case PRM_FLOAT_ROTOR_ANG_KD: return "rotor_ang_kd";
+        case PRM_FLOAT_ROTOR_ANG_KB: return "rotor_ang_kb";
         case PRM_FLOAT_ROTOR_ANG_KT: return "rotor_ang_kt";
         case PRM_FLOAT_ROTOR_ANG_KF: return "rotor_ang_kf";
         case PRM_FLOAT_ROTOR_ANG_ERR_LIM: return "rotor_ang_err_lim";

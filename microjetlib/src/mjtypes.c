@@ -275,115 +275,166 @@ mj_check_result_t dcu_telemetry_type_check(dcu_telemetry_msg_t * ptr)
         (((mj_ptr_t)(&(ptr->pwm.c)) - baseAddr) == 36) &&
         (sizeof(ptr->pwm.c) == 4) &&
 
-        (((mj_ptr_t)(&(ptr->park_current.d)) - baseAddr) == 40) &&
-        (sizeof(ptr->park_current.d) == 4) &&
-
-        (((mj_ptr_t)(&(ptr->park_current.q)) - baseAddr) == 44) &&
-        (sizeof(ptr->park_current.q) == 4) &&
-
-        (((mj_ptr_t)(&(ptr->park_voltage.d)) - baseAddr) == 48) &&
+        (((mj_ptr_t)(&(ptr->park_voltage.d)) - baseAddr) == 40) &&
         (sizeof(ptr->park_voltage.d) == 4) &&
 
-        (((mj_ptr_t)(&(ptr->park_voltage.q)) - baseAddr) == 52) &&
+        (((mj_ptr_t)(&(ptr->park_voltage.q)) - baseAddr) == 44) &&
         (sizeof(ptr->park_voltage.q) == 4) &&
 
-        (((mj_ptr_t)(&(ptr->stator_temp)) - baseAddr) == 56) &&
+        (((mj_ptr_t)(&(ptr->park_current.d)) - baseAddr) == 48) &&
+        (sizeof(ptr->park_current.d) == 4) &&
+
+        (((mj_ptr_t)(&(ptr->park_current.q)) - baseAddr) == 52) &&
+        (sizeof(ptr->park_current.q) == 4) &&
+
+        (((mj_ptr_t)(&(ptr->ibrk)) - baseAddr) == 56) &&
+        (sizeof(ptr->ibrk) == 4) &&
+
+        (((mj_ptr_t)(&(ptr->stator_temp)) - baseAddr) == 60) &&
         (sizeof(ptr->stator_temp) == 4) &&
 
-        (((mj_ptr_t)(&(ptr->brake_state)) - baseAddr) == 60) &&
+        (((mj_ptr_t)(&(ptr->brake_state)) - baseAddr) == 64) &&
         (sizeof(ptr->brake_state) == 1) &&
-
-        (((mj_ptr_t)(&(ptr->ibrk)) - baseAddr) == 64) &&
-        (sizeof(ptr->ibrk) == 4) &&
 
         (((mj_ptr_t)(&(ptr->power_voltage)) - baseAddr) == 68) &&
         (sizeof(ptr->power_voltage) == 4) &&
 
-        (((mj_ptr_t)(&(ptr->id)) - baseAddr) == 72) &&
-        (sizeof(ptr->id) == 4) &&
-
-        (((mj_ptr_t)(&(ptr->iq)) - baseAddr) == 76) &&
-        (sizeof(ptr->iq) == 4) &&
-
-        (((mj_ptr_t)(&(ptr->electrical_power)) - baseAddr) == 80) &&
+        (((mj_ptr_t)(&(ptr->electrical_power)) - baseAddr) == 72) &&
         (sizeof(ptr->electrical_power) == 4) &&
 
-        (((mj_ptr_t)(&(ptr->ang_pid_err)) - baseAddr) == 84) &&
-        (sizeof(ptr->ang_pid_err) == 4) &&
+        (((mj_ptr_t)(&(ptr->ang_pid_state.err)) - baseAddr) == 76) &&
+        (sizeof(ptr->ang_pid_state.err) == 4) &&
 
-        (((mj_ptr_t)(&(ptr->ang_pid_in)) - baseAddr) == 88) &&
-        (sizeof(ptr->ang_pid_in) == 4) &&
+        (((mj_ptr_t)(&(ptr->ang_pid_state.cor_err)) - baseAddr) == 80) &&
+        (sizeof(ptr->ang_pid_state.cor_err) == 4) &&
 
-        (((mj_ptr_t)(&(ptr->ang_pid_out)) - baseAddr) == 92) &&
-        (sizeof(ptr->ang_pid_out) == 4) &&
+        (((mj_ptr_t)(&(ptr->ang_pid_state.feed_forward)) - baseAddr) == 84) &&
+        (sizeof(ptr->ang_pid_state.feed_forward) == 4) &&
 
-        (((mj_ptr_t)(&(ptr->ang_pid_intgr)) - baseAddr) == 96) &&
-        (sizeof(ptr->ang_pid_intgr) == 4) &&
+        (((mj_ptr_t)(&(ptr->ang_pid_state.track)) - baseAddr) == 88) &&
+        (sizeof(ptr->ang_pid_state.track) == 4) &&
 
-        (((mj_ptr_t)(&(ptr->rotor_spd_pid_err)) - baseAddr) == 100) &&
-        (sizeof(ptr->rotor_spd_pid_err) == 4) &&
+        (((mj_ptr_t)(&(ptr->ang_pid_state.back)) - baseAddr) == 92) &&
+        (sizeof(ptr->ang_pid_state.back) == 4) &&
 
-        (((mj_ptr_t)(&(ptr->rotor_spd_pid_in)) - baseAddr) == 104) &&
-        (sizeof(ptr->rotor_spd_pid_in) == 4) &&
+        (((mj_ptr_t)(&(ptr->ang_pid_state.int_val)) - baseAddr) == 96) &&
+        (sizeof(ptr->ang_pid_state.int_val) == 4) &&
 
-        (((mj_ptr_t)(&(ptr->rotor_spd_pid_out)) - baseAddr) == 108) &&
-        (sizeof(ptr->rotor_spd_pid_out) == 4) &&
+        (((mj_ptr_t)(&(ptr->ang_pid_state.out)) - baseAddr) == 100) &&
+        (sizeof(ptr->ang_pid_state.out) == 4) &&
 
-        (((mj_ptr_t)(&(ptr->rotor_spd_pid_intgr)) - baseAddr) == 112) &&
-        (sizeof(ptr->rotor_spd_pid_intgr) == 4) &&
+        (((mj_ptr_t)(&(ptr->rotor_spd_pid_state.err)) - baseAddr) == 104) &&
+        (sizeof(ptr->rotor_spd_pid_state.err) == 4) &&
 
-        (((mj_ptr_t)(&(ptr->load_spd_pid_err)) - baseAddr) == 116) &&
-        (sizeof(ptr->load_spd_pid_err) == 4) &&
+        (((mj_ptr_t)(&(ptr->rotor_spd_pid_state.cor_err)) - baseAddr) == 108) &&
+        (sizeof(ptr->rotor_spd_pid_state.cor_err) == 4) &&
 
-        (((mj_ptr_t)(&(ptr->load_spd_pid_in)) - baseAddr) == 120) &&
-        (sizeof(ptr->load_spd_pid_in) == 4) &&
+        (((mj_ptr_t)(&(ptr->rotor_spd_pid_state.feed_forward)) - baseAddr) == 112) &&
+        (sizeof(ptr->rotor_spd_pid_state.feed_forward) == 4) &&
 
-        (((mj_ptr_t)(&(ptr->load_spd_pid_out)) - baseAddr) == 124) &&
-        (sizeof(ptr->load_spd_pid_out) == 4) &&
+        (((mj_ptr_t)(&(ptr->rotor_spd_pid_state.track)) - baseAddr) == 116) &&
+        (sizeof(ptr->rotor_spd_pid_state.track) == 4) &&
 
-        (((mj_ptr_t)(&(ptr->load_spd_pid_intgr)) - baseAddr) == 128) &&
-        (sizeof(ptr->load_spd_pid_intgr) == 4) &&
+        (((mj_ptr_t)(&(ptr->rotor_spd_pid_state.back)) - baseAddr) == 120) &&
+        (sizeof(ptr->rotor_spd_pid_state.back) == 4) &&
 
-        (((mj_ptr_t)(&(ptr->curr_pid_err)) - baseAddr) == 132) &&
-        (sizeof(ptr->curr_pid_err) == 4) &&
+        (((mj_ptr_t)(&(ptr->rotor_spd_pid_state.int_val)) - baseAddr) == 124) &&
+        (sizeof(ptr->rotor_spd_pid_state.int_val) == 4) &&
 
-        (((mj_ptr_t)(&(ptr->curr_pid_in)) - baseAddr) == 136) &&
-        (sizeof(ptr->curr_pid_in) == 4) &&
+        (((mj_ptr_t)(&(ptr->rotor_spd_pid_state.out)) - baseAddr) == 128) &&
+        (sizeof(ptr->rotor_spd_pid_state.out) == 4) &&
 
-        (((mj_ptr_t)(&(ptr->curr_pid_out)) - baseAddr) == 140) &&
-        (sizeof(ptr->curr_pid_out) == 4) &&
+        (((mj_ptr_t)(&(ptr->load_spd_pid_state.err)) - baseAddr) == 132) &&
+        (sizeof(ptr->load_spd_pid_state.err) == 4) &&
 
-        (((mj_ptr_t)(&(ptr->curr_pid_intgr)) - baseAddr) == 144) &&
-        (sizeof(ptr->curr_pid_intgr) == 4) &&
+        (((mj_ptr_t)(&(ptr->load_spd_pid_state.cor_err)) - baseAddr) == 136) &&
+        (sizeof(ptr->load_spd_pid_state.cor_err) == 4) &&
 
-        (((mj_ptr_t)(&(ptr->rotor_sens_state)) - baseAddr) == 148) &&
+        (((mj_ptr_t)(&(ptr->load_spd_pid_state.feed_forward)) - baseAddr) == 140) &&
+        (sizeof(ptr->load_spd_pid_state.feed_forward) == 4) &&
+
+        (((mj_ptr_t)(&(ptr->load_spd_pid_state.track)) - baseAddr) == 144) &&
+        (sizeof(ptr->load_spd_pid_state.track) == 4) &&
+
+        (((mj_ptr_t)(&(ptr->load_spd_pid_state.back)) - baseAddr) == 148) &&
+        (sizeof(ptr->load_spd_pid_state.back) == 4) &&
+
+        (((mj_ptr_t)(&(ptr->load_spd_pid_state.int_val)) - baseAddr) == 152) &&
+        (sizeof(ptr->load_spd_pid_state.int_val) == 4) &&
+
+        (((mj_ptr_t)(&(ptr->load_spd_pid_state.out)) - baseAddr) == 156) &&
+        (sizeof(ptr->load_spd_pid_state.out) == 4) &&
+
+        (((mj_ptr_t)(&(ptr->curr_q_pid_state.err)) - baseAddr) == 160) &&
+        (sizeof(ptr->curr_q_pid_state.err) == 4) &&
+
+        (((mj_ptr_t)(&(ptr->curr_q_pid_state.cor_err)) - baseAddr) == 164) &&
+        (sizeof(ptr->curr_q_pid_state.cor_err) == 4) &&
+
+        (((mj_ptr_t)(&(ptr->curr_q_pid_state.feed_forward)) - baseAddr) == 168) &&
+        (sizeof(ptr->curr_q_pid_state.feed_forward) == 4) &&
+
+        (((mj_ptr_t)(&(ptr->curr_q_pid_state.track)) - baseAddr) == 172) &&
+        (sizeof(ptr->curr_q_pid_state.track) == 4) &&
+
+        (((mj_ptr_t)(&(ptr->curr_q_pid_state.back)) - baseAddr) == 176) &&
+        (sizeof(ptr->curr_q_pid_state.back) == 4) &&
+
+        (((mj_ptr_t)(&(ptr->curr_q_pid_state.int_val)) - baseAddr) == 180) &&
+        (sizeof(ptr->curr_q_pid_state.int_val) == 4) &&
+
+        (((mj_ptr_t)(&(ptr->curr_q_pid_state.out)) - baseAddr) == 184) &&
+        (sizeof(ptr->curr_q_pid_state.out) == 4) &&
+
+        (((mj_ptr_t)(&(ptr->curr_d_pid_state.err)) - baseAddr) == 188) &&
+        (sizeof(ptr->curr_d_pid_state.err) == 4) &&
+
+        (((mj_ptr_t)(&(ptr->curr_d_pid_state.cor_err)) - baseAddr) == 192) &&
+        (sizeof(ptr->curr_d_pid_state.cor_err) == 4) &&
+
+        (((mj_ptr_t)(&(ptr->curr_d_pid_state.feed_forward)) - baseAddr) == 196) &&
+        (sizeof(ptr->curr_d_pid_state.feed_forward) == 4) &&
+
+        (((mj_ptr_t)(&(ptr->curr_d_pid_state.track)) - baseAddr) == 200) &&
+        (sizeof(ptr->curr_d_pid_state.track) == 4) &&
+
+        (((mj_ptr_t)(&(ptr->curr_d_pid_state.back)) - baseAddr) == 204) &&
+        (sizeof(ptr->curr_d_pid_state.back) == 4) &&
+
+        (((mj_ptr_t)(&(ptr->curr_d_pid_state.int_val)) - baseAddr) == 208) &&
+        (sizeof(ptr->curr_d_pid_state.int_val) == 4) &&
+
+        (((mj_ptr_t)(&(ptr->curr_d_pid_state.out)) - baseAddr) == 212) &&
+        (sizeof(ptr->curr_d_pid_state.out) == 4) &&
+
+        (((mj_ptr_t)(&(ptr->rotor_sens_state)) - baseAddr) == 216) &&
         (sizeof(ptr->rotor_sens_state) == 1) &&
 
-        (((mj_ptr_t)(&(ptr->rotor_sens_angle)) - baseAddr) == 152) &&
+        (((mj_ptr_t)(&(ptr->rotor_sens_angle)) - baseAddr) == 220) &&
         (sizeof(ptr->rotor_sens_angle) == 4) &&
 
-        (((mj_ptr_t)(&(ptr->rotor_sens_speed)) - baseAddr) == 156) &&
+        (((mj_ptr_t)(&(ptr->rotor_sens_speed)) - baseAddr) == 224) &&
         (sizeof(ptr->rotor_sens_speed) == 4) &&
 
-        (((mj_ptr_t)(&(ptr->on)) - baseAddr) == 160) &&
+        (((mj_ptr_t)(&(ptr->on)) - baseAddr) == 228) &&
         (sizeof(ptr->on) == 1) &&
 
-        (((mj_ptr_t)(&(ptr->manual)) - baseAddr) == 161) &&
+        (((mj_ptr_t)(&(ptr->manual)) - baseAddr) == 229) &&
         (sizeof(ptr->manual) == 1) &&
 
-        (((mj_ptr_t)(&(ptr->block)) - baseAddr) == 162) &&
+        (((mj_ptr_t)(&(ptr->block)) - baseAddr) == 230) &&
         (sizeof(ptr->block) == 1) &&
 
-        (((mj_ptr_t)(&(ptr->sync)) - baseAddr) == 163) &&
+        (((mj_ptr_t)(&(ptr->sync)) - baseAddr) == 231) &&
         (sizeof(ptr->sync) == 1) &&
 
-        (((mj_ptr_t)(&(ptr->inv_octw)) - baseAddr) == 164) &&
+        (((mj_ptr_t)(&(ptr->inv_octw)) - baseAddr) == 232) &&
         (sizeof(ptr->inv_octw) == 1) &&
 
-        (((mj_ptr_t)(&(ptr->inv_fault)) - baseAddr) == 165) &&
+        (((mj_ptr_t)(&(ptr->inv_fault)) - baseAddr) == 233) &&
         (sizeof(ptr->inv_fault) == 1) &&
 
-        (((mj_ptr_t)(&(ptr->en_gate)) - baseAddr) == 166) &&
+        (((mj_ptr_t)(&(ptr->en_gate)) - baseAddr) == 234) &&
         (sizeof(ptr->en_gate) == 1)
     )
     {

@@ -527,6 +527,27 @@ typedef struct park_vec
 } park_vec_t;
 
 /**
+ *  Состояние ПИД регулятора
+ */
+typedef struct pid_state
+{
+    /** Ошибка. */
+    float err;
+    /** Откорректированная ошибка. */
+    float cor_err;
+    /** Вклад Feed-forward. */
+    float feed_forward;
+    /** Вклад Tracking. */
+    float track;
+    /** Anti-Windup back calculation. */
+    float back;
+    /** Интегральная составляющая. */
+    float int_val;
+    /** Выход. */
+    float out;
+} pid_state_t;
+
+/**
  *  Теелеметрия модуля управления приводом БУП
  */
 typedef struct dcu_telemetry
@@ -553,57 +574,31 @@ typedef struct dcu_telemetry
     three_phase_val_t current;
     /** Коэффициент заполнения ШИМ. */
     three_phase_val_t pwm;
-    /** Ток фаз в СК Парка-Горева, A. */
-    park_vec_t park_current;
     /** Напряжение на фазах в СК Парка-Горева, В. */
     park_vec_t park_voltage;
+    /** Ток фаз в СК Парка-Горева, A. */
+    park_vec_t park_current;
+    /** Ток тормоза. */
+    float ibrk;
     /** Температра статора, C. */
     float stator_temp;
     /** Состояние тормоза. */
     /** alias: rotor_brake_state_t */
     int8_t brake_state;
-    /** Ток тормоза. */
-    float ibrk;
     /** Напряжение питания модуля, В. */
     float power_voltage;
-    /** Ток id, А. */
-    float id;
-    /** Ток iq, А. */
-    float iq;
     /** Мощность, положителная - потребляем, отрицательная - генерируем в сеть, ВА. */
     float electrical_power;
-    /** Ошибка ПИД регулятора угла. */
-    float ang_pid_err;
-    /** Входное значение ПИД регулятора угла. */
-    float ang_pid_in;
-    /** Выходное значение ПИД регулятора угла. */
-    float ang_pid_out;
-    /** Значение регулятора ПИД регулятора угла. */
-    float ang_pid_intgr;
-    /** Ошибка ПИД регулятора скорости ротора. */
-    float rotor_spd_pid_err;
-    /** Входное значение ПИД регулятора скорости ротора. */
-    float rotor_spd_pid_in;
-    /** Выходное значение ПИД регулятора скорости ротора. */
-    float rotor_spd_pid_out;
-    /** Значение регулятора ПИД регулятора скорости ротора. */
-    float rotor_spd_pid_intgr;
-    /** Ошибка ПИД регулятора скорости нагрузки. */
-    float load_spd_pid_err;
-    /** Входное значение ПИД регулятора скорости нагрузки. */
-    float load_spd_pid_in;
-    /** Выходное значение ПИД регулятора скорости нагрузки. */
-    float load_spd_pid_out;
-    /** Значение регулятора ПИД регулятора скорости нагрузки. */
-    float load_spd_pid_intgr;
-    /** Ошибка ПИД регулятора тока. */
-    float curr_pid_err;
-    /** Входное значение ПИД регулятора тока. */
-    float curr_pid_in;
-    /** Выходное значение ПИД регулятора тока. */
-    float curr_pid_out;
-    /** Значение регулятора ПИД регулятора тока. */
-    float curr_pid_intgr;
+    /** Состояние ПИД регулятора угла. */
+    pid_state_t ang_pid_state;
+    /** Состояние ПИД регулятора скорости ротора. */
+    pid_state_t rotor_spd_pid_state;
+    /** Состояние ПИД регулятора скорости нагрузки. */
+    pid_state_t load_spd_pid_state;
+    /** Состояние ПИД регулятора тока q. */
+    pid_state_t curr_q_pid_state;
+    /** Состояние ПИД регулятора тока d. */
+    pid_state_t curr_d_pid_state;
     /** Состояние датчика углового положения ротора. */
     /** alias: rotor_ang_sens_status_t */
     int8_t rotor_sens_state;
@@ -1006,57 +1001,31 @@ typedef struct dcu_telemetry_msg{
     three_phase_val_t current;
     /** Коэффициент заполнения ШИМ. */
     three_phase_val_t pwm;
-    /** Ток фаз в СК Парка-Горева, A. */
-    park_vec_t park_current;
     /** Напряжение на фазах в СК Парка-Горева, В. */
     park_vec_t park_voltage;
+    /** Ток фаз в СК Парка-Горева, A. */
+    park_vec_t park_current;
+    /** Ток тормоза.*/
+    float ibrk;
     /** Температра статора, C.*/
     float stator_temp;
     /** Состояние тормоза.*/
     /** alias: rotor_brake_state_t */
     int8_t brake_state;
-    /** Ток тормоза.*/
-    float ibrk;
     /** Напряжение питания модуля, В.*/
     float power_voltage;
-    /** Ток id, А.*/
-    float id;
-    /** Ток iq, А.*/
-    float iq;
     /** Мощность, положителная - потребляем, отрицательная - генерируем в сеть, ВА.*/
     float electrical_power;
-    /** Ошибка ПИД регулятора угла.*/
-    float ang_pid_err;
-    /** Входное значение ПИД регулятора угла.*/
-    float ang_pid_in;
-    /** Выходное значение ПИД регулятора угла.*/
-    float ang_pid_out;
-    /** Значение регулятора ПИД регулятора угла.*/
-    float ang_pid_intgr;
-    /** Ошибка ПИД регулятора скорости ротора.*/
-    float rotor_spd_pid_err;
-    /** Входное значение ПИД регулятора скорости ротора.*/
-    float rotor_spd_pid_in;
-    /** Выходное значение ПИД регулятора скорости ротора.*/
-    float rotor_spd_pid_out;
-    /** Значение регулятора ПИД регулятора скорости ротора.*/
-    float rotor_spd_pid_intgr;
-    /** Ошибка ПИД регулятора скорости нагрузки.*/
-    float load_spd_pid_err;
-    /** Входное значение ПИД регулятора скорости нагрузки.*/
-    float load_spd_pid_in;
-    /** Выходное значение ПИД регулятора скорости нагрузки.*/
-    float load_spd_pid_out;
-    /** Значение регулятора ПИД регулятора скорости нагрузки.*/
-    float load_spd_pid_intgr;
-    /** Ошибка ПИД регулятора тока.*/
-    float curr_pid_err;
-    /** Входное значение ПИД регулятора тока.*/
-    float curr_pid_in;
-    /** Выходное значение ПИД регулятора тока.*/
-    float curr_pid_out;
-    /** Значение регулятора ПИД регулятора тока.*/
-    float curr_pid_intgr;
+    /** Состояние ПИД регулятора угла. */
+    pid_state_t ang_pid_state;
+    /** Состояние ПИД регулятора скорости ротора. */
+    pid_state_t rotor_spd_pid_state;
+    /** Состояние ПИД регулятора скорости нагрузки. */
+    pid_state_t load_spd_pid_state;
+    /** Состояние ПИД регулятора тока q. */
+    pid_state_t curr_q_pid_state;
+    /** Состояние ПИД регулятора тока d. */
+    pid_state_t curr_d_pid_state;
     /** Состояние датчика углового положения ротора.*/
     /** alias: rotor_ang_sens_status_t */
     int8_t rotor_sens_state;

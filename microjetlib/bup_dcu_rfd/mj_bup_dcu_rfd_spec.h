@@ -24,8 +24,6 @@ typedef struct bup_dcu_rfd_prm{
      char com_if_bro_bup_srv_mcast[32];
      /** com_if_im_bro_drive_mcast [-] */
      char com_if_im_bro_drive_mcast[32];
-     /** com_if_im_bro_drive_ctrl_mcast [-] */
-     char com_if_im_bro_drive_ctrl_mcast[32];
      /** service_mode [-] */
      bool service_mode;
      /** dbg_mode [-] */
@@ -98,8 +96,8 @@ typedef struct bup_dcu_rfd_prm{
      float load_speed_kp;
      /** load_speed_ki [-] */
      float load_speed_ki;
-     /** load_speed_kd [-] */
-     float load_speed_kd;
+     /** load_speed_kb [-] */
+     float load_speed_kb;
      /** load_speed_kt [-] */
      float load_speed_kt;
      /** load_speed_kf [-] */
@@ -116,8 +114,8 @@ typedef struct bup_dcu_rfd_prm{
      float rotor_speed_kp;
      /** rotor_speed_ki [-] */
      float rotor_speed_ki;
-     /** rotor_speed_kd [-] */
-     float rotor_speed_kd;
+     /** rotor_speed_kb [-] */
+     float rotor_speed_kb;
      /** rotor_speed_kt [-] */
      float rotor_speed_kt;
      /** rotor_speed_kf [-] */
@@ -134,8 +132,8 @@ typedef struct bup_dcu_rfd_prm{
      float rotor_ang_kp;
      /** rotor_ang_ki [-] */
      float rotor_ang_ki;
-     /** rotor_ang_kd [-] */
-     float rotor_ang_kd;
+     /** rotor_ang_kb [-] */
+     float rotor_ang_kb;
      /** rotor_ang_kt [-] */
      float rotor_ang_kt;
      /** rotor_ang_kf [-] */
@@ -333,13 +331,6 @@ typedef struct mj_bup_dcu_rfd
                formular_info_msg_t *msg;
                void (*tx)(uint16_t);
           } formular;
-          /** im_bro_drive_ctrl */
-          struct 
-          {
-               im_bro_drive_ctrl_msg_t *msg;
-               mj_msg_state_t (*lock)(mj_msg_state_t state);
-               bool tx_enable;
-          } im_bro_drive_ctrl;
           /** msg_ans */
           struct 
           {

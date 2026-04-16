@@ -522,41 +522,6 @@ static void out_formular_tx_fcn(uint16_t dst)
     p_drv->udp4.tx(out_formular_pkt,NULL);
 }
 
-static void * out_im_bro_drive_ctrl_pkt = NULL;
-static im_bro_drive_ctrl_msg_t * p_out_im_bro_drive_ctrl_msg = NULL;
-static mj_msg_state_t out_im_bro_drive_ctrl_lock_fcn(mj_msg_state_t state)
-{
-    mj_msg_state_t res = MJ_MSG_UNDEFINED;
-    if (state == MJ_MSG_LOCK)
-    {
-        if (p_out_im_bro_drive_ctrl_msg == NULL)
-        {
-            if ((p_out_im_bro_drive_ctrl_msg = (im_bro_drive_ctrl_msg_t *)p_drv->udp4.alloc(sizeof(im_bro_drive_ctrl_msg_t))))
-            {
-                memcpy((void *)p_out_im_bro_drive_ctrl_msg, (void *)(mj_handle.out.im_bro_drive_ctrl.msg), sizeof(im_bro_drive_ctrl_msg_t));
-                p_drv->udp4.set_payload(out_im_bro_drive_ctrl_pkt, (uint8_t *)p_out_im_bro_drive_ctrl_msg);
-                res = MJ_MSG_LOCK;
-            }else{
-                res = MJ_MSG_UNLOCK;
-            }
-        }else{
-            res = MJ_MSG_LOCK;
-        }
-    }else{
-        res = MJ_MSG_LOCK;
-        if (p_out_im_bro_drive_ctrl_msg)
-        {
-            p_drv->udp4.set_payload(out_im_bro_drive_ctrl_pkt, (uint8_t *)mj_handle.out.im_bro_drive_ctrl.msg);
-            p_drv->udp4.free((uint8_t *)p_out_im_bro_drive_ctrl_msg);
-            p_out_im_bro_drive_ctrl_msg = NULL;
-            res = MJ_MSG_UNLOCK;
-        }else{
-            res = MJ_MSG_UNLOCK;
-        }
-    }
-    return res;
-}
-
 static void * out_msg_ans_pkt = NULL;
 static void out_msg_ans_tx_fcn(uint16_t dst)
 {
@@ -728,8 +693,8 @@ mj_prm_status_t bup_dcu_lrd_prm_write(int id, void *data)
         case PRM_FLOAT_LOAD_SPEED_KI:
             memcpy(&(_bup_dcu_lrd_prm.load_speed_ki),data,sizeof(_bup_dcu_lrd_prm.load_speed_ki));
             return MJ_PRM_OK;
-        case PRM_FLOAT_LOAD_SPEED_KD:
-            memcpy(&(_bup_dcu_lrd_prm.load_speed_kd),data,sizeof(_bup_dcu_lrd_prm.load_speed_kd));
+        case PRM_FLOAT_LOAD_SPEED_KB:
+            memcpy(&(_bup_dcu_lrd_prm.load_speed_kb),data,sizeof(_bup_dcu_lrd_prm.load_speed_kb));
             return MJ_PRM_OK;
         case PRM_FLOAT_LOAD_SPEED_KT:
             memcpy(&(_bup_dcu_lrd_prm.load_speed_kt),data,sizeof(_bup_dcu_lrd_prm.load_speed_kt));
@@ -755,8 +720,8 @@ mj_prm_status_t bup_dcu_lrd_prm_write(int id, void *data)
         case PRM_FLOAT_ROTOR_SPEED_KI:
             memcpy(&(_bup_dcu_lrd_prm.rotor_speed_ki),data,sizeof(_bup_dcu_lrd_prm.rotor_speed_ki));
             return MJ_PRM_OK;
-        case PRM_FLOAT_ROTOR_SPEED_KD:
-            memcpy(&(_bup_dcu_lrd_prm.rotor_speed_kd),data,sizeof(_bup_dcu_lrd_prm.rotor_speed_kd));
+        case PRM_FLOAT_ROTOR_SPEED_KB:
+            memcpy(&(_bup_dcu_lrd_prm.rotor_speed_kb),data,sizeof(_bup_dcu_lrd_prm.rotor_speed_kb));
             return MJ_PRM_OK;
         case PRM_FLOAT_ROTOR_SPEED_KT:
             memcpy(&(_bup_dcu_lrd_prm.rotor_speed_kt),data,sizeof(_bup_dcu_lrd_prm.rotor_speed_kt));
@@ -782,8 +747,8 @@ mj_prm_status_t bup_dcu_lrd_prm_write(int id, void *data)
         case PRM_FLOAT_ROTOR_ANG_KI:
             memcpy(&(_bup_dcu_lrd_prm.rotor_ang_ki),data,sizeof(_bup_dcu_lrd_prm.rotor_ang_ki));
             return MJ_PRM_OK;
-        case PRM_FLOAT_ROTOR_ANG_KD:
-            memcpy(&(_bup_dcu_lrd_prm.rotor_ang_kd),data,sizeof(_bup_dcu_lrd_prm.rotor_ang_kd));
+        case PRM_FLOAT_ROTOR_ANG_KB:
+            memcpy(&(_bup_dcu_lrd_prm.rotor_ang_kb),data,sizeof(_bup_dcu_lrd_prm.rotor_ang_kb));
             return MJ_PRM_OK;
         case PRM_FLOAT_ROTOR_ANG_KT:
             memcpy(&(_bup_dcu_lrd_prm.rotor_ang_kt),data,sizeof(_bup_dcu_lrd_prm.rotor_ang_kt));
@@ -832,9 +797,6 @@ mj_prm_status_t bup_dcu_lrd_prm_write(int id, void *data)
             return MJ_PRM_OK;
         case PRM_STRING_COM_IF_IM_BRO_DRIVE_MCAST:
             memcpy(&(_bup_dcu_lrd_prm.com_if_im_bro_drive_mcast),data,sizeof(_bup_dcu_lrd_prm.com_if_im_bro_drive_mcast));
-            return MJ_PRM_OK;
-        case PRM_STRING_COM_IF_IM_BRO_DRIVE_CTRL_MCAST:
-            memcpy(&(_bup_dcu_lrd_prm.com_if_im_bro_drive_ctrl_mcast),data,sizeof(_bup_dcu_lrd_prm.com_if_im_bro_drive_ctrl_mcast));
             return MJ_PRM_OK;
         default:
             return MJ_PRM_UNKNOW;
@@ -952,8 +914,8 @@ mj_prm_status_t bup_dcu_lrd_prm_read(int id, void *data)
         case PRM_FLOAT_LOAD_SPEED_KI:
             memcpy(data,&_bup_dcu_lrd_prm.load_speed_ki,sizeof(_bup_dcu_lrd_prm.load_speed_ki));
             return MJ_PRM_OK;
-        case PRM_FLOAT_LOAD_SPEED_KD:
-            memcpy(data,&_bup_dcu_lrd_prm.load_speed_kd,sizeof(_bup_dcu_lrd_prm.load_speed_kd));
+        case PRM_FLOAT_LOAD_SPEED_KB:
+            memcpy(data,&_bup_dcu_lrd_prm.load_speed_kb,sizeof(_bup_dcu_lrd_prm.load_speed_kb));
             return MJ_PRM_OK;
         case PRM_FLOAT_LOAD_SPEED_KT:
             memcpy(data,&_bup_dcu_lrd_prm.load_speed_kt,sizeof(_bup_dcu_lrd_prm.load_speed_kt));
@@ -979,8 +941,8 @@ mj_prm_status_t bup_dcu_lrd_prm_read(int id, void *data)
         case PRM_FLOAT_ROTOR_SPEED_KI:
             memcpy(data,&_bup_dcu_lrd_prm.rotor_speed_ki,sizeof(_bup_dcu_lrd_prm.rotor_speed_ki));
             return MJ_PRM_OK;
-        case PRM_FLOAT_ROTOR_SPEED_KD:
-            memcpy(data,&_bup_dcu_lrd_prm.rotor_speed_kd,sizeof(_bup_dcu_lrd_prm.rotor_speed_kd));
+        case PRM_FLOAT_ROTOR_SPEED_KB:
+            memcpy(data,&_bup_dcu_lrd_prm.rotor_speed_kb,sizeof(_bup_dcu_lrd_prm.rotor_speed_kb));
             return MJ_PRM_OK;
         case PRM_FLOAT_ROTOR_SPEED_KT:
             memcpy(data,&_bup_dcu_lrd_prm.rotor_speed_kt,sizeof(_bup_dcu_lrd_prm.rotor_speed_kt));
@@ -1006,8 +968,8 @@ mj_prm_status_t bup_dcu_lrd_prm_read(int id, void *data)
         case PRM_FLOAT_ROTOR_ANG_KI:
             memcpy(data,&_bup_dcu_lrd_prm.rotor_ang_ki,sizeof(_bup_dcu_lrd_prm.rotor_ang_ki));
             return MJ_PRM_OK;
-        case PRM_FLOAT_ROTOR_ANG_KD:
-            memcpy(data,&_bup_dcu_lrd_prm.rotor_ang_kd,sizeof(_bup_dcu_lrd_prm.rotor_ang_kd));
+        case PRM_FLOAT_ROTOR_ANG_KB:
+            memcpy(data,&_bup_dcu_lrd_prm.rotor_ang_kb,sizeof(_bup_dcu_lrd_prm.rotor_ang_kb));
             return MJ_PRM_OK;
         case PRM_FLOAT_ROTOR_ANG_KT:
             memcpy(data,&_bup_dcu_lrd_prm.rotor_ang_kt,sizeof(_bup_dcu_lrd_prm.rotor_ang_kt));
@@ -1057,15 +1019,12 @@ mj_prm_status_t bup_dcu_lrd_prm_read(int id, void *data)
         case PRM_STRING_COM_IF_IM_BRO_DRIVE_MCAST:
             memcpy(data,&_bup_dcu_lrd_prm.com_if_im_bro_drive_mcast,sizeof(_bup_dcu_lrd_prm.com_if_im_bro_drive_mcast));
             return MJ_PRM_OK;
-        case PRM_STRING_COM_IF_IM_BRO_DRIVE_CTRL_MCAST:
-            memcpy(data,&_bup_dcu_lrd_prm.com_if_im_bro_drive_ctrl_mcast,sizeof(_bup_dcu_lrd_prm.com_if_im_bro_drive_ctrl_mcast));
-            return MJ_PRM_OK;
         default:
             return MJ_PRM_UNKNOW;
     }
 }
 
-static const uint32_t _prm_ids[72] = {
+static const uint32_t _prm_ids[71] = {
     PRM_BOOL_SERVICE_MODE,
     PRM_BOOL_DBG_MODE,
     PRM_BOOL_PTP_STAT,
@@ -1102,7 +1061,7 @@ static const uint32_t _prm_ids[72] = {
     PRM_FLOAT_CURR_ERR_RATE_LIM,
     PRM_FLOAT_LOAD_SPEED_KP,
     PRM_FLOAT_LOAD_SPEED_KI,
-    PRM_FLOAT_LOAD_SPEED_KD,
+    PRM_FLOAT_LOAD_SPEED_KB,
     PRM_FLOAT_LOAD_SPEED_KT,
     PRM_FLOAT_LOAD_SPEED_KF,
     PRM_FLOAT_LOAD_SPEED_ERR_LIM,
@@ -1111,7 +1070,7 @@ static const uint32_t _prm_ids[72] = {
     PRM_FLOAT_LOAD_SPEED_ERR_RATE_LIM,
     PRM_FLOAT_ROTOR_SPEED_KP,
     PRM_FLOAT_ROTOR_SPEED_KI,
-    PRM_FLOAT_ROTOR_SPEED_KD,
+    PRM_FLOAT_ROTOR_SPEED_KB,
     PRM_FLOAT_ROTOR_SPEED_KT,
     PRM_FLOAT_ROTOR_SPEED_KF,
     PRM_FLOAT_ROTOR_SPEED_ERR_LIM,
@@ -1120,7 +1079,7 @@ static const uint32_t _prm_ids[72] = {
     PRM_FLOAT_ROTOR_SPEED_ERR_RATE_LIM,
     PRM_FLOAT_ROTOR_ANG_KP,
     PRM_FLOAT_ROTOR_ANG_KI,
-    PRM_FLOAT_ROTOR_ANG_KD,
+    PRM_FLOAT_ROTOR_ANG_KB,
     PRM_FLOAT_ROTOR_ANG_KT,
     PRM_FLOAT_ROTOR_ANG_KF,
     PRM_FLOAT_ROTOR_ANG_ERR_LIM,
@@ -1136,13 +1095,12 @@ static const uint32_t _prm_ids[72] = {
     PRM_STRING_COM_IF_BRO_BUP_CTRL_MCAST,
     PRM_STRING_COM_IF_BRO_BUP_DATA_MCAST,
     PRM_STRING_COM_IF_BRO_BUP_SRV_MCAST,
-    PRM_STRING_COM_IF_IM_BRO_DRIVE_MCAST,
-    PRM_STRING_COM_IF_IM_BRO_DRIVE_CTRL_MCAST
+    PRM_STRING_COM_IF_IM_BRO_DRIVE_MCAST
 };
 
 static const uint32_t * bup_dcu_lrd_prm_list(uint32_t *size)
 {
-    *size = 72;
+    *size = 71;
     return _prm_ids;
 }
 
@@ -1170,12 +1128,6 @@ static void tick_fcn()
             mj_handle.out.dcu_tel.msg->hdr.ts_status = p_drv->timestamp(&mj_handle.out.dcu_tel.msg->hdr.ts_s,&_temp_ns);
             mj_handle.out.dcu_tel.msg->hdr.ts_ns = _temp_ns;
             p_drv->udp4.tx(out_dcu_tel_pkt,NULL);
-        }
-        if (mj_handle.out.im_bro_drive_ctrl.tx_enable){
-            mj_handle.out.im_bro_drive_ctrl.msg->hdr.cnt = _250_us_cnt;
-            mj_handle.out.im_bro_drive_ctrl.msg->hdr.ts_status = p_drv->timestamp(&mj_handle.out.im_bro_drive_ctrl.msg->hdr.ts_s,&_temp_ns);
-            mj_handle.out.im_bro_drive_ctrl.msg->hdr.ts_ns = _temp_ns;
-            p_drv->udp4.tx(out_im_bro_drive_ctrl_pkt,NULL);
         }
         _250_us_tick = 0;
     }
@@ -1821,9 +1773,6 @@ mj_status_t mj_bup_dcu_lrd_prm_init(mj_bup_dcu_lrd_t ** ptr){
     /* prms[p] */
     const uint8_t default_com_if_im_bro_drive_mcast[] = { 0x32,0x33,0x39,0x2e,0x32,0x30,0x30,0x2e,0x39,0x30,0x2e,0x31,0x3a,0x34,0x39,0x30,0x30,0x31, 0x00};
     memcpy(&(_bup_dcu_lrd_prm.com_if_im_bro_drive_mcast), default_com_if_im_bro_drive_mcast, sizeof(default_com_if_im_bro_drive_mcast) > 32 ? 32 : sizeof(default_com_if_im_bro_drive_mcast));
-    /* prms[p] */
-    const uint8_t default_com_if_im_bro_drive_ctrl_mcast[] = { 0x32,0x33,0x39,0x2e,0x32,0x30,0x30,0x2e,0x39,0x30,0x2e,0x31,0x3a,0x34,0x39,0x30,0x30,0x31, 0x00};
-    memcpy(&(_bup_dcu_lrd_prm.com_if_im_bro_drive_ctrl_mcast), default_com_if_im_bro_drive_ctrl_mcast, sizeof(default_com_if_im_bro_drive_ctrl_mcast) > 32 ? 32 : sizeof(default_com_if_im_bro_drive_ctrl_mcast));
     _bup_dcu_lrd_prm.service_mode = 0;
     _bup_dcu_lrd_prm.dbg_mode = 0;
     _bup_dcu_lrd_prm.ptp_stat = 0;
@@ -1860,7 +1809,7 @@ mj_status_t mj_bup_dcu_lrd_prm_init(mj_bup_dcu_lrd_t ** ptr){
     _bup_dcu_lrd_prm.curr_err_rate_lim = 0.0;
     _bup_dcu_lrd_prm.load_speed_kp = 0.0;
     _bup_dcu_lrd_prm.load_speed_ki = 0.0;
-    _bup_dcu_lrd_prm.load_speed_kd = 0.0;
+    _bup_dcu_lrd_prm.load_speed_kb = 0.0;
     _bup_dcu_lrd_prm.load_speed_kt = 0.0;
     _bup_dcu_lrd_prm.load_speed_kf = 0.0;
     _bup_dcu_lrd_prm.load_speed_err_lim = 0.0;
@@ -1869,7 +1818,7 @@ mj_status_t mj_bup_dcu_lrd_prm_init(mj_bup_dcu_lrd_t ** ptr){
     _bup_dcu_lrd_prm.load_speed_err_rate_lim = 0.0;
     _bup_dcu_lrd_prm.rotor_speed_kp = 0.0;
     _bup_dcu_lrd_prm.rotor_speed_ki = 0.0;
-    _bup_dcu_lrd_prm.rotor_speed_kd = 0.0;
+    _bup_dcu_lrd_prm.rotor_speed_kb = 0.0;
     _bup_dcu_lrd_prm.rotor_speed_kt = 0.0;
     _bup_dcu_lrd_prm.rotor_speed_kf = 0.0;
     _bup_dcu_lrd_prm.rotor_speed_err_lim = 0.0;
@@ -1878,7 +1827,7 @@ mj_status_t mj_bup_dcu_lrd_prm_init(mj_bup_dcu_lrd_t ** ptr){
     _bup_dcu_lrd_prm.rotor_speed_err_rate_lim = 0.0;
     _bup_dcu_lrd_prm.rotor_ang_kp = 0.0;
     _bup_dcu_lrd_prm.rotor_ang_ki = 0.0;
-    _bup_dcu_lrd_prm.rotor_ang_kd = 0.0;
+    _bup_dcu_lrd_prm.rotor_ang_kb = 0.0;
     _bup_dcu_lrd_prm.rotor_ang_kt = 0.0;
     _bup_dcu_lrd_prm.rotor_ang_kf = 0.0;
     _bup_dcu_lrd_prm.rotor_ang_err_lim = 0.0;
@@ -1926,11 +1875,6 @@ mj_status_t mj_bup_dcu_lrd_init(mj_drv_interface_t *drv, mj_bup_dcu_lrd_t ** ptr
     uint32_t bro_bup_srv_mcast_ip_be = BRO_BUP_SRV_MCAST_IP;
     uint16_t bro_bup_srv_mcast_port_be = 0x69bf;
     if (mj_str_if_to_int(mj_handle.prm.ptr->com_if_bro_bup_srv_mcast, &bro_bup_srv_mcast_ip_be, &bro_bup_srv_mcast_port_be) != 0){
-        return MJ_UDP4_CB_FAIL;
-    }
-    uint32_t im_bro_drive_ctrl_mcast_ip_be = IM_BRO_DRIVE_CTRL_MCAST_IP;
-    uint16_t im_bro_drive_ctrl_mcast_port_be = 0x69bf;
-    if (mj_str_if_to_int(mj_handle.prm.ptr->com_if_im_bro_drive_ctrl_mcast, &im_bro_drive_ctrl_mcast_ip_be, &im_bro_drive_ctrl_mcast_port_be) != 0){
         return MJ_UDP4_CB_FAIL;
     }
     uint32_t im_bro_drive_mcast_ip_be = IM_BRO_DRIVE_MCAST_IP;
@@ -2067,27 +2011,6 @@ mj_status_t mj_bup_dcu_lrd_init(mj_drv_interface_t *drv, mj_bup_dcu_lrd_t ** ptr
             mj_handle.out.formular.tx = out_formular_tx_fcn;
         }else{
             p_drv->udp4.free((uint8_t *)mj_handle.out.formular.msg);
-            return MJ_INTEGRITY_FAIL;
-        }
-    }else{
-        return MJ_UDP4_ALOC_FAIL;
-    }
-
-    /** im_bro_drive_ctrl */
-    if ((mj_handle.out.im_bro_drive_ctrl.msg = (im_bro_drive_ctrl_msg_t *)p_drv->udp4.alloc(sizeof(im_bro_drive_ctrl_msg_t))))
-    {
-        if(im_bro_drive_ctrl_type_check(mj_handle.out.im_bro_drive_ctrl.msg) == MJ_CHECK_OK)
-        {
-            out_im_bro_drive_ctrl_pkt = p_drv->udp4.create_out_pkt(ethInt,im_bro_drive_ctrl_mcast_ip_be, im_bro_drive_ctrl_mcast_port_be, 0x00,(uint8_t*)mj_handle.out.im_bro_drive_ctrl.msg, sizeof(im_bro_drive_ctrl_msg_t));
-            if (out_im_bro_drive_ctrl_pkt == NULL){return MJ_UDP4_PKT_FAIL;}
-            mj_handle.out.im_bro_drive_ctrl.msg->hdr.src = self_dev_id;
-            mj_handle.out.im_bro_drive_ctrl.msg->hdr.cnt = 0;
-            mj_handle.out.im_bro_drive_ctrl.msg->hdr.id = ID_IM_BRO_DRIVE_CTRL;
-            mj_handle.out.im_bro_drive_ctrl.msg->hdr.dst = BRO30_ALL;
-            mj_handle.out.im_bro_drive_ctrl.lock = out_im_bro_drive_ctrl_lock_fcn;
-            mj_handle.out.im_bro_drive_ctrl.tx_enable = true;
-        }else{
-            p_drv->udp4.free((uint8_t *)mj_handle.out.im_bro_drive_ctrl.msg);
             return MJ_INTEGRITY_FAIL;
         }
     }else{
