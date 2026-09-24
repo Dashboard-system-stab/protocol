@@ -1,0 +1,518 @@
+#include "microjet.h"
+
+// DEVICE: {{dev_name}}
+
+static size_t buf_start =0, buf_end=0;
+static char* p_print_buf = NULL;
+static size_t buf_size = 0;
+static size_t send_size = 0;
+
+static char* get_buffer_content(size_t* size) {
+    if (p_print_buf == NULL)
+    {
+        return NULL;
+    }
+    if (buf_start == buf_end) {
+        *size = 0;
+        return NULL;  // Buffer is empty
+    }
+
+    if (buf_start < buf_end) {
+        *size = buf_end - buf_start;
+        return p_print_buf + buf_start;
+    } else {
+        // Return data until the end of the buffer
+        *size = buf_size - buf_start;
+        return p_print_buf + buf_start;
+    }
+}
+
+static void mark_data_as_sent(size_t size_sent) {
+    if (buf_size == 0)
+    {
+        return;
+    }
+    buf_start = (buf_start + size_sent) % buf_size;
+    if (buf_start == buf_end) {
+        buf_end = 0;
+        buf_start = 0;
+    }
+}
+
+static msg_header_t print_header;
+
+int mj_printf(const char* format, ...) {
+    if (p_print_buf)
+    {
+        va_list args;
+        va_start(args, format);
+        int available_space, written;
+        
+        available_space = (buf_start <= buf_end) ?
+                        (buf_size - buf_end + buf_start - 1) :
+                        (buf_start - buf_end - 1);
+        
+        if (buf_start < buf_end || (buf_start == buf_end && buf_start == 0)) {
+            written = vsnprintf(p_print_buf + buf_end, (unsigned int)available_space, format, args);
+        } else {
+            written = vsnprintf(p_print_buf + buf_end, buf_size - buf_end, format, args);
+        }
+
+        va_end(args);
+
+        if (written < 0 || written >= available_space) {
+            return -1;  // Not enough space
+        }
+
+        buf_end = (buf_end + written) % buf_size;
+        return written;
+    }else{
+        return -2;  // BUFFER NOT AVALIABLE
+    }
+}
+
+#define IN_INT_COUNT {{len(in_int)}}
+
+static uint32_t group_addr[IN_INT_COUNT] = {
+{%for i in in_int%}
+{%set ip = cc.interfaces[i]['IP']%}
+    {{cc.ip4Convert(ip)}}{%if not loop.last %},{%else%} {%endif%} // {{ip}}
+{% endfor %}
+};
+
+static uint8_t is_mj_init = 0;
+{%set outMsg = sorted(spec['out'])%}
+{%set inMsg = sorted(spec['in'])%}
+{%set prms = spec['parameters']%}
+{%set devIp  = cc.ip4Convert(spec['IP'])%}
+{%set devmacbytes = binascii.unhexlify(spec['MAC'].replace(':', ''))%}
+static uint8_t devMac[6] = { {%for b in devmacbytes%}{{hex(b)}}{%if not loop.last%},{% endif %}{% endfor %} };
+
+{%if len(prms) > 0%}
+static mj_parameters_t _mj_prm;
+mj_parameters_t * mj_prm()
+{
+    return &_mj_prm;
+}
+
+{%set d_prm = cc.devPrms(dev_name)%}
+mj_prm_status_k mj_prm_write(uint32_t id, void *data)
+{
+    switch (id){
+{%for p in d_prm%}
+        case MJ_PRM_EN_{{p}}:
+        memcpy(&_mj_prm.{{p}},data,sizeof(_mj_prm.{{p}}));
+        return MJ_PRM_OK;
+{%endfor%}
+    }
+    return MJ_PRM_UNKNOW;
+}
+
+mj_prm_status_k mj_prm_read(uint32_t id, void *data)
+{
+    switch (id){
+{%for p in d_prm%}
+        case MJ_PRM_EN_{{p}}:
+        memcpy(data,&_mj_prm.{{p}},sizeof(_mj_prm.{{p}}));
+        return MJ_PRM_OK;
+{%endfor%}
+    }
+    return MJ_PRM_UNKNOW;
+}
+
+const uint32_t _prm_ids[{{len(d_prm)}}] = {
+{%for p in d_prm%}
+    MJ_PRM_EN_{{p}}{%if not loop.last%},{% endif %}
+
+{%endfor%}
+};
+const uint32_t * mj_prm_list(uint32_t *size)
+{
+    *size = {{len(d_prm)}};
+    return _prm_ids;
+}
+
+static void (*mj_prm_upd_fcn)(uint32_t prm_id)  = NULL;
+void mj_prm_upd_reg_cb(void (*cbfcn)(uint32_t prm_id))
+{
+    mj_prm_upd_fcn = cbfcn;
+}
+{% endif %}
+static uint32_t mj_time_us = 0;
+{%if len(outMsg) > 0%}
+static mj_out_t _out;
+mj_out_t * out(){return &_out;}
+static mj_in_t _in;
+mj_in_t  * in(){return &_in;}
+static void *ethInt = NULL;
+
+{%for o in outMsg%}
+static uint8_t * tx_{{o}} = NULL;
+{%if cc.msg[o]['period'] > 0%}
+static {{o}}_msg_t out_{{o}}_msg[2];
+{%else%}
+static {{o}}_msg_t out_{{o}}_msg[1];
+{% endif %}
+{% endfor %}
+{% endif %}
+
+{%for o in outMsg%}
+{%set msg_list = cc.msgSerialize(cc.msg[o]['type'],'data')%}
+uint8_t {{o}}_structCheck()
+{
+	PTRTYPE baseAddr = (PTRTYPE)&out_{{o}}_msg[0].data;
+    if ({%for e in msg_list%}
+    (((PTRTYPE)&(out_{{o}}_msg[0].{{e['path']}}) - baseAddr) == {{e['offset']}}UL) &&
+    (sizeof(out_{{o}}_msg[0].{{e['path']}}) == {{e['size']}}UL){%if not loop.last%} &&
+    {% endif %}
+    {% endfor %})
+    {
+        return 0;
+    }
+    return -1;
+}
+{% endfor %}
+
+{%if len(inMsg) > 0%}
+{%set dev_src = sorted(cc.inputDev(dev_name))%}
+{%for d in dev_src%}
+{%set in_dev_m = sorted(cc.inputMsg(dev_name,d))%}
+{%for dm in in_dev_m%}
+static uint32_t {{d}}_{{dm}}_rx_time = UINT32_MAX - ({{cc.msg[dm]['period']}}*3+1);
+static uint8_t  in_{{d}}_{{dm}}_lock_cnt = 0;
+static uint8_t* in_{{d}}_{{dm}}_delayed_ptr = NULL;
+static uint8_t  in_{{d}}_{{dm}}_updated = 0;
+__attribute__((optimize("O2"))) uint8_t  in_{{d}}_{{dm}}_lock_fcn(bool state)
+{
+    if (state)
+    {
+        if (in_{{d}}_{{dm}}_lock_cnt < 255)
+        {
+            in_{{d}}_{{dm}}_lock_cnt++;
+        }
+    }else{
+        if (in_{{d}}_{{dm}}_lock_cnt > 0)
+        {
+            if ((in_{{d}}_{{dm}}_lock_cnt == 1) && (in_{{d}}_{{dm}}_delayed_ptr))
+            {
+                uint8_t* old_buff = (uint8_t*)_in.{{d}}.{{dm}}.header;
+                _in.{{d}}.{{dm}}.header = (msg_header_t*)in_{{d}}_{{dm}}_delayed_ptr;
+                _in.{{d}}.{{dm}}.data = ({{cc.msg[dm]['type']}}*)(in_{{d}}_{{dm}}_delayed_ptr+sizeof(msg_header_t));
+                {{d}}_{{dm}}_rx_time = mj_time_us;
+                _in.{{d}}.{{dm}}.status = INMSG_STATUS_ACTUAL;
+                in_{{d}}_{{dm}}_updated = 1;
+                mj_freeUdp4Buff(old_buff);
+                in_{{d}}_{{dm}}_delayed_ptr = NULL;
+            }
+            in_{{d}}_{{dm}}_lock_cnt--;
+        }
+    }
+    return in_{{d}}_{{dm}}_lock_cnt;
+}
+
+__attribute__((optimize("O2"))) void  in_{{d}}_{{dm}}_copy_fcn(void *dst)
+{
+    in_{{d}}_{{dm}}_lock_fcn(true);
+    memcpy(dst, (void *)_in.{{d}}.{{dm}}.header, sizeof({{dm}}_msg_t));
+    in_{{d}}_{{dm}}_lock_fcn(false);
+}
+{% endfor %}
+{% endfor %}
+{% endif %}
+
+{%for o in outMsg%}
+
+__attribute__((optimize("O2"))) void out_{{o}}_apply_fcn()
+{
+    uint8_t *pl_ptr = mj_getUdp4Payload(tx_{{o}});
+    if ((pl_ptr) && (pl_ptr == (uint8_t*)out_{{o}}_msg))
+    {
+        mj_setUdp4PayloadPtr(tx_{{o}}, (uint8_t*)(out_{{o}}_msg+1));
+    }else{
+        mj_setUdp4PayloadPtr(tx_{{o}}, (uint8_t*)(out_{{o}}_msg));
+    }
+    return;
+}
+
+static uint8_t {{o}}_tx_is_done = 1;
+
+__attribute__((optimize("O2"))) void out_{{o}}_cb_fcn(bool res)
+{
+    {{o}}_tx_is_done = 1;
+}
+
+{% endfor %}
+
+{%for o in outMsg%}
+{%if cc.msg[o]['period'] == 0%}
+static uint8_t out_{{o}}_tx_req = 0;
+__attribute__((optimize("O2"))) void out_{{o}}_tx_fcn(uint16_t dst)
+{
+    out_{{o}}_msg[0].header.dst = dst;
+    out_{{o}}_msg[0].header.cnt++;
+    {{o}}_tx_is_done = 0;
+    out_{{o}}_tx_req = 0;
+    mj_udp4tx(tx_{{o}},out_{{o}}_cb_fcn);
+    out_{{o}}_tx_req = 1;
+    mj_txpool();
+}
+{%else%}
+__attribute__((optimize("O2"))) {{cc.msg[o]['type']}} *  out_{{o}}_mutate_fcn()
+{
+    uint8_t *pl_ptr = mj_getUdp4Payload(tx_{{o}});
+    if ((pl_ptr) && (pl_ptr == (uint8_t*)out_{{o}}_msg))
+    {
+        memcpy(&out_{{o}}_msg[1].data,&out_{{o}}_msg[0].data,sizeof({{cc.msg[o]['type']}}));
+        return &out_{{o}}_msg[1].data;
+    }else{
+        memcpy(&out_{{o}}_msg[0].data,&out_{{o}}_msg[1].data,sizeof({{cc.msg[o]['type']}}));
+        return &out_{{o}}_msg[0].data;
+    }
+}
+{% endif %}
+{% endfor %}
+
+void mj_tick()
+{
+    if (is_mj_init == 0)
+    {
+        return;
+    }
+{%set periods = cc.txPeriods(dev_name)%}
+{%for T in periods%}
+{%if T > 0%}
+    if ((mj_time_us % {{T}}) == 0)
+    {
+{%for o in outMsg%}
+{%if cc.msg[o]['period'] == T%}
+        out_{{o}}_msg[0].header.cnt++;
+        out_{{o}}_msg[1].header.cnt = out_{{o}}_msg[0].header.cnt;
+        mj_udp4tx(tx_{{o}},NULL);
+
+{% endif %}
+{% endfor %}
+    }
+{% endif %}
+{% endfor %}
+    int m_frac = mj_time_us % 1000000;
+    if (m_frac < IN_INT_COUNT)
+    {
+        mj_mcastJoin(ethInt, group_addr[m_frac]);
+    }
+    mark_data_as_sent(send_size);
+    //char* data = get_buffer_content(&send_size);
+    //if (send_size > 0)
+    //    mj_send_print_buf((uint8_t*)&print_header, sizeof(msg_header_t), data, send_size);
+    mj_time_us+=250;
+    mj_txpool();
+}
+
+{%for i in in_int%}
+
+__attribute__((optimize("O2"))) bool {{i}}_cb(uint8_t* data, uint16_t size)
+{
+    msg_header_t *hdr = (msg_header_t*)data;
+    if ((hdr->dst == DEV_SRCID_EN_ALL) || (hdr->dst == DEV_SRCID_EN_{{dev_name}}))
+    {
+        uint8_t *old_buff = NULL;
+        switch (hdr->id)
+        {
+{%for o in inMsg%}
+{%set interface = cc.msg[o]['transport']%}
+{%set port = interface['port']%}
+{%if interface == i%}
+{%set dev_src = sorted(cc.msgSources(o,dev_name))%}
+            // {{o}}
+            case MSG_ID_EN_{{o}}:
+{%if len(dev_src) > 0%}
+                if (size == sizeof({{o}}_msg_t))
+                {
+                    switch (hdr->src)
+                    {
+{%for d in dev_src%}
+                        // {{o}} from {{d}}
+                        case DEV_SRCID_EN_{{d}}:
+                            if (hdr->type == MSG_TYPE_EN_{{o}})
+                            {
+                                if (in_{{d}}_{{o}}_lock_cnt == 0)
+                                {
+                                    old_buff = (uint8_t*)_in.{{d}}.{{o}}.header;
+                                    _in.{{d}}.{{o}}.header = (msg_header_t *)data;
+                                    _in.{{d}}.{{o}}.data = ({{cc.msg[o]['type']}} *)(data+sizeof(msg_header_t));
+                                    in_{{d}}_{{o}}_updated = 1;
+                                    {{d}}_{{o}}_rx_time = mj_time_us;
+                                    _in.{{d}}.{{o}}.status = INMSG_STATUS_ACTUAL;
+                                    mj_freeUdp4Buff(old_buff);
+                                }else{
+                                    if (in_{{d}}_{{o}}_delayed_ptr)
+                                    {
+                                        mj_freeUdp4Buff(in_{{d}}_{{o}}_delayed_ptr);
+                                    }
+                                    in_{{d}}_{{o}}_delayed_ptr = (uint8_t *)data;
+                                }
+                                return true;
+                            }else{
+                                _in.{{d}}.{{o}}.status = INMSG_STATUS_WRONGTYPE;
+                                return false;
+                            }
+{% endfor %}
+                        default:
+                            return false;
+                    }
+                }else{
+                    return false;
+                }
+            break;
+{% endif %}
+{% endif %}
+{% endfor %}
+            default:
+                return false;    
+        } 
+    }
+    return false; 
+}
+
+{% endfor %}
+
+{%for o in inMsg%}
+{%set dev_src = sorted(cc.msgSources(o,dev_name))%}
+{%if len(dev_src) > 0%}
+{%for d in dev_src%}
+void_fcn in_{{d}}_{{o}}_user_cb = NULL;
+void in_{{d}}_{{o}}_user_cb_reg(void_fcn f)
+{
+    in_{{d}}_{{o}}_user_cb = f;
+}
+{% endfor %}
+
+{% endif %}
+{% endfor %}
+
+mj_status_k mj_init()
+{
+    mj_drvInit();
+    ethInt = mj_regEthInterface(devMac, {{devIp}});
+    if (ethInt == NULL){return MJ_ETH_INTERFACE_REG_ERR;};
+
+{%for i in in_int%}
+{%set ip = cc.interfaces[i]['IP']%}
+{%set port = cc.interfaces[i]['port']%}
+    if (!mj_regUdp4Cb({{cc.ip4Convert(ip)}}, {{cc.portConvert(port)}}, {{i}}_cb))
+    {
+        return MJ_RXCB_REG_ERR;
+    }
+{% endfor %}
+
+    /* OUT */
+{%for o in outMsg%}
+{%set interface = cc.interfaces[cc.msg[o].transport]%}
+{%set port = interface['port']%}
+    // {{o}}
+    if({{o}}_structCheck() != 0){return MJ_INTEGRETY_CHECK_FAIL;}
+    tx_{{o}} = mj_regUdp4Pkt(ethInt, {{cc.ip4Convert(interface['IP'])}}, {{cc.portConvert(port)}}, 0x00,(uint8_t*)&out_{{o}}_msg[0], sizeof(out_{{o}}_msg[0]));
+    if (tx_{{o}} == NULL){return MJ_UDP4_PKT_REG_ERR;}
+{% if cc.getMsgPrioriry(o) %}
+{%endif%}
+    out_{{o}}_msg[0].header.src = DEV_SRCID_EN_{{dev_name}};
+    out_{{o}}_msg[0].header.cnt = 0;
+    out_{{o}}_msg[0].header.id = MSG_ID_EN_{{o}};
+    out_{{o}}_msg[0].header.type = MSG_TYPE_EN_{{o}};
+    _out.{{o}}.header = &out_{{o}}_msg[0].header;
+    _out.{{o}}.data = &out_{{o}}_msg[0].data;
+{%if cc.msg[o]['period'] == 0%}
+    _out.{{o}}.tx = out_{{o}}_tx_fcn;
+    out_{{o}}_msg[0].header.dst = DEV_SRCID_EN_NONE;
+{%else%}
+    out_{{o}}_msg[0].header.dst = DEV_SRCID_EN_ALL;
+    out_{{o}}_msg[1].header = out_{{o}}_msg[0].header;
+    _out.{{o}}.mutate = out_{{o}}_mutate_fcn;
+    _out.{{o}}.apply = out_{{o}}_apply_fcn;
+{%endif%}
+{% endfor %}
+
+    /* IN */
+{%set dev_src = sorted(cc.inputDev(dev_name))%}
+{%for d in dev_src%}
+{%set in_dev_m = sorted(cc.inputMsg(dev_name,d))%}
+{%for dm in in_dev_m%}
+    uint8_t *{{d}}_{{dm}}_ptr = mj_allocUdp4Buff(sizeof({{dm}}_msg_t));
+    if ({{d}}_{{dm}}_ptr == NULL){return MJ_UDP4_ALLOC_ERR;};
+    _in.{{d}}.{{dm}}.header = &(({{dm}}_msg_t *){{d}}_{{dm}}_ptr)->header;
+    _in.{{d}}.{{dm}}.data = &(({{dm}}_msg_t *){{d}}_{{dm}}_ptr)->data;
+    _in.{{d}}.{{dm}}.lock = in_{{d}}_{{dm}}_lock_fcn;
+    _in.{{d}}.{{dm}}.copy = in_{{d}}_{{dm}}_copy_fcn;
+    _in.{{d}}.{{dm}}.regcb = in_{{d}}_{{dm}}_user_cb_reg;
+    _in.{{d}}.{{dm}}.status = INMSG_STATUS_OBSOLETE;
+{% endfor %}
+{% endfor %}
+
+{%if len(prms) > 0%}
+    /* PRM */
+{%for p in prms%}
+    _mj_prm.{{p}} = {{prms[p]["default"]}};
+{% endfor %}
+
+{% endif %}
+    mj_get_print_buf(&p_print_buf, &buf_size);
+    print_header.src = DEV_SRCID_EN_{{dev_name}};
+    print_header.cnt = 0;
+    print_header.id = MSG_ID_EN_COMPRINT;
+    print_header.type = MSG_TYPE_EN_COMPRINT;
+    is_mj_init = 1;
+    return MJ_OK;
+}
+
+void mj_loop()
+{
+    if (is_mj_init == 0){
+        return;
+    }
+    uint32_t c_time = mj_time_us;
+{%for o in inMsg%}
+{%set dev_src = sorted(cc.msgSources(o,dev_name))%}
+{%if len(dev_src) > 0%}
+{%for d in dev_src%}
+{% if cc.msg[o]['period']!=0 %}
+    if ((_in.{{d}}.{{o}}.status == INMSG_STATUS_ACTUAL) && (((int32_t)(c_time - {{d}}_{{o}}_rx_time)) > {{cc.msg[o]['period']*3}})){
+        _in.{{d}}.{{o}}.status = INMSG_STATUS_OBSOLETE;
+    }
+{% endif %}
+    if(in_{{d}}_{{o}}_updated == 1)
+    {
+{% if o == 'prmReq' %}
+        uint32_t prmId = _in.{{d}}.{{o}}.data->id;
+        ParametersReqKind rtype = _in.{{d}}.{{o}}.data->type;
+        switch (prmId)
+        {
+{%for p in prms%}
+            case MJ_PRM_EN_{{p}}:
+                _out.prmAns.data->ans = ParametersStatusKind_OK;
+                if (rtype == ParametersReqKind_WRITE)
+                {
+                    memcpy(&_mj_prm.{{p}},_in.{{d}}.{{o}}.data->val,sizeof(_mj_prm.{{p}}));
+                    if (mj_prm_upd_fcn)
+                    {
+                        mj_prm_upd_fcn(prmId);
+                    }
+                }
+                _out.prmAns.data->id = prmId;
+                memcpy(_out.prmAns.data->val,&_mj_prm.{{p}},sizeof(_mj_prm.{{p}}));
+                break;
+{% endfor %}
+            default:
+                _out.prmAns.data->ans = ParametersStatusKind_UNKNOWPRM;
+                break;
+        }
+        _out.prmAns.tx(DEV_SRCID_EN_ALL);
+{% endif %}
+        if (in_{{d}}_{{o}}_user_cb)
+        {
+            in_{{d}}_{{o}}_user_cb();
+        }
+        in_{{d}}_{{o}}_updated = 0;
+    }
+{% endfor %}
+{% endif %}
+{% endfor %}
+};

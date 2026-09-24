@@ -1,6 +1,6 @@
 #include "mj_bup_dcu_lst_spec.h"
 
-#define IN_INT_COUNT 4
+#define IN_INT_COUNT 5
 
 static uint32_t group_addr[IN_INT_COUNT*2];
 
@@ -13,7 +13,7 @@ static uint16_t self_dev_id = BRO30_BUP_DCU_LST;
 
 static mj_bup_dcu_lst_t mj_handle;
 
-static uint32_t aufd_bup_ctrl_rx_tick = UINT32_MAX - 1.0;
+static uint32_t aufd_bup_ctrl_rx_tick = UINT32_MAX - 241.0;
 static uint8_t  in_aufd_bup_ctrl_lock_cnt = 0;
 static bup_drv_control_msg_t* in_aufd_bup_ctrl_delayed_ptr = NULL;
 static uint32_t aufd_bup_ctrl_delayed_ts_s = 0;
@@ -56,6 +56,51 @@ static void in_aufd_bup_ctrl_copy_fcn(void *dst)
     in_aufd_bup_ctrl_lock_fcn(MJ_MSG_LOCK);
     memcpy(dst, (void *)(mj_handle.in.aufd.bup_ctrl.msg), sizeof(bup_drv_control_msg_t));
     in_aufd_bup_ctrl_lock_fcn(MJ_MSG_UNLOCK);
+}
+
+static uint32_t aufd_bup_multi_control_rx_tick = UINT32_MAX - 241.0;
+static uint8_t  in_aufd_bup_multi_control_lock_cnt = 0;
+static bup_drv_multi_control_msg_t* in_aufd_bup_multi_control_delayed_ptr = NULL;
+static uint32_t aufd_bup_multi_control_delayed_ts_s = 0;
+static uint32_t aufd_bup_multi_control_delayed_ts_ns = 0;
+static uint8_t  in_aufd_bup_multi_control_updated = 0;
+static uint32_t  in_aufd_bup_multi_control_total = 0;
+static uint32_t  in_aufd_bup_multi_control_miss = 0;
+static uint16_t  in_aufd_bup_multi_control_last_cnt = 0;
+static mj_msg_state_t in_aufd_bup_multi_control_lock_fcn(mj_msg_state_t state)
+{
+    if (state == MJ_MSG_LOCK)
+    {
+        if (in_aufd_bup_multi_control_lock_cnt < 255)
+        {
+            in_aufd_bup_multi_control_lock_cnt++;
+        }
+    }else{
+        if (in_aufd_bup_multi_control_lock_cnt > 0)
+        {
+            if ((in_aufd_bup_multi_control_lock_cnt == 1) && (in_aufd_bup_multi_control_delayed_ptr))
+            {
+                uint8_t* old_buff = (uint8_t*)(mj_handle.in.aufd.bup_multi_control.msg);
+                mj_handle.in.aufd.bup_multi_control.msg = (bup_drv_multi_control_msg_t*)(in_aufd_bup_multi_control_delayed_ptr);
+                mj_handle.in.aufd.bup_multi_control.ts_s = aufd_bup_multi_control_delayed_ts_s;
+                mj_handle.in.aufd.bup_multi_control.ts_ns = aufd_bup_multi_control_delayed_ts_ns;
+                aufd_bup_multi_control_rx_tick = ticks;
+                mj_handle.in.aufd.bup_multi_control.state = MJ_MSG_ACTUAL;
+                in_aufd_bup_multi_control_updated = 1;
+                p_drv->udp4.free(old_buff);
+                in_aufd_bup_multi_control_delayed_ptr = NULL;
+            }
+            in_aufd_bup_multi_control_lock_cnt--;
+        }
+    }
+    return in_aufd_bup_multi_control_lock_cnt > 0 ? MJ_MSG_LOCK : MJ_MSG_UNLOCK;
+}
+
+static void in_aufd_bup_multi_control_copy_fcn(void *dst)
+{
+    in_aufd_bup_multi_control_lock_fcn(MJ_MSG_LOCK);
+    memcpy(dst, (void *)(mj_handle.in.aufd.bup_multi_control.msg), sizeof(bup_drv_multi_control_msg_t));
+    in_aufd_bup_multi_control_lock_fcn(MJ_MSG_UNLOCK);
 }
 
 static uint32_t aufd_cmd_req_rx_tick = UINT32_MAX - 1.0;
@@ -193,6 +238,546 @@ static void in_aufd_prm_req_copy_fcn(void *dst)
     in_aufd_prm_req_lock_fcn(MJ_MSG_UNLOCK);
 }
 
+static uint32_t bup_dcu_lfd_drive_master_ctrl_rx_tick = UINT32_MAX - 13.0;
+static uint8_t  in_bup_dcu_lfd_drive_master_ctrl_lock_cnt = 0;
+static drive_master_ctrl_msg_t* in_bup_dcu_lfd_drive_master_ctrl_delayed_ptr = NULL;
+static uint32_t bup_dcu_lfd_drive_master_ctrl_delayed_ts_s = 0;
+static uint32_t bup_dcu_lfd_drive_master_ctrl_delayed_ts_ns = 0;
+static uint8_t  in_bup_dcu_lfd_drive_master_ctrl_updated = 0;
+static uint32_t  in_bup_dcu_lfd_drive_master_ctrl_total = 0;
+static uint32_t  in_bup_dcu_lfd_drive_master_ctrl_miss = 0;
+static uint16_t  in_bup_dcu_lfd_drive_master_ctrl_last_cnt = 0;
+static mj_msg_state_t in_bup_dcu_lfd_drive_master_ctrl_lock_fcn(mj_msg_state_t state)
+{
+    if (state == MJ_MSG_LOCK)
+    {
+        if (in_bup_dcu_lfd_drive_master_ctrl_lock_cnt < 255)
+        {
+            in_bup_dcu_lfd_drive_master_ctrl_lock_cnt++;
+        }
+    }else{
+        if (in_bup_dcu_lfd_drive_master_ctrl_lock_cnt > 0)
+        {
+            if ((in_bup_dcu_lfd_drive_master_ctrl_lock_cnt == 1) && (in_bup_dcu_lfd_drive_master_ctrl_delayed_ptr))
+            {
+                uint8_t* old_buff = (uint8_t*)(mj_handle.in.bup_dcu_lfd.drive_master_ctrl.msg);
+                mj_handle.in.bup_dcu_lfd.drive_master_ctrl.msg = (drive_master_ctrl_msg_t*)(in_bup_dcu_lfd_drive_master_ctrl_delayed_ptr);
+                mj_handle.in.bup_dcu_lfd.drive_master_ctrl.ts_s = bup_dcu_lfd_drive_master_ctrl_delayed_ts_s;
+                mj_handle.in.bup_dcu_lfd.drive_master_ctrl.ts_ns = bup_dcu_lfd_drive_master_ctrl_delayed_ts_ns;
+                bup_dcu_lfd_drive_master_ctrl_rx_tick = ticks;
+                mj_handle.in.bup_dcu_lfd.drive_master_ctrl.state = MJ_MSG_ACTUAL;
+                in_bup_dcu_lfd_drive_master_ctrl_updated = 1;
+                p_drv->udp4.free(old_buff);
+                in_bup_dcu_lfd_drive_master_ctrl_delayed_ptr = NULL;
+            }
+            in_bup_dcu_lfd_drive_master_ctrl_lock_cnt--;
+        }
+    }
+    return in_bup_dcu_lfd_drive_master_ctrl_lock_cnt > 0 ? MJ_MSG_LOCK : MJ_MSG_UNLOCK;
+}
+
+static void in_bup_dcu_lfd_drive_master_ctrl_copy_fcn(void *dst)
+{
+    in_bup_dcu_lfd_drive_master_ctrl_lock_fcn(MJ_MSG_LOCK);
+    memcpy(dst, (void *)(mj_handle.in.bup_dcu_lfd.drive_master_ctrl.msg), sizeof(drive_master_ctrl_msg_t));
+    in_bup_dcu_lfd_drive_master_ctrl_lock_fcn(MJ_MSG_UNLOCK);
+}
+
+static uint32_t bup_dcu_lfd_drive_slave_fb_rx_tick = UINT32_MAX - 13.0;
+static uint8_t  in_bup_dcu_lfd_drive_slave_fb_lock_cnt = 0;
+static drive_slave_fb_msg_t* in_bup_dcu_lfd_drive_slave_fb_delayed_ptr = NULL;
+static uint32_t bup_dcu_lfd_drive_slave_fb_delayed_ts_s = 0;
+static uint32_t bup_dcu_lfd_drive_slave_fb_delayed_ts_ns = 0;
+static uint8_t  in_bup_dcu_lfd_drive_slave_fb_updated = 0;
+static uint32_t  in_bup_dcu_lfd_drive_slave_fb_total = 0;
+static uint32_t  in_bup_dcu_lfd_drive_slave_fb_miss = 0;
+static uint16_t  in_bup_dcu_lfd_drive_slave_fb_last_cnt = 0;
+static mj_msg_state_t in_bup_dcu_lfd_drive_slave_fb_lock_fcn(mj_msg_state_t state)
+{
+    if (state == MJ_MSG_LOCK)
+    {
+        if (in_bup_dcu_lfd_drive_slave_fb_lock_cnt < 255)
+        {
+            in_bup_dcu_lfd_drive_slave_fb_lock_cnt++;
+        }
+    }else{
+        if (in_bup_dcu_lfd_drive_slave_fb_lock_cnt > 0)
+        {
+            if ((in_bup_dcu_lfd_drive_slave_fb_lock_cnt == 1) && (in_bup_dcu_lfd_drive_slave_fb_delayed_ptr))
+            {
+                uint8_t* old_buff = (uint8_t*)(mj_handle.in.bup_dcu_lfd.drive_slave_fb.msg);
+                mj_handle.in.bup_dcu_lfd.drive_slave_fb.msg = (drive_slave_fb_msg_t*)(in_bup_dcu_lfd_drive_slave_fb_delayed_ptr);
+                mj_handle.in.bup_dcu_lfd.drive_slave_fb.ts_s = bup_dcu_lfd_drive_slave_fb_delayed_ts_s;
+                mj_handle.in.bup_dcu_lfd.drive_slave_fb.ts_ns = bup_dcu_lfd_drive_slave_fb_delayed_ts_ns;
+                bup_dcu_lfd_drive_slave_fb_rx_tick = ticks;
+                mj_handle.in.bup_dcu_lfd.drive_slave_fb.state = MJ_MSG_ACTUAL;
+                in_bup_dcu_lfd_drive_slave_fb_updated = 1;
+                p_drv->udp4.free(old_buff);
+                in_bup_dcu_lfd_drive_slave_fb_delayed_ptr = NULL;
+            }
+            in_bup_dcu_lfd_drive_slave_fb_lock_cnt--;
+        }
+    }
+    return in_bup_dcu_lfd_drive_slave_fb_lock_cnt > 0 ? MJ_MSG_LOCK : MJ_MSG_UNLOCK;
+}
+
+static void in_bup_dcu_lfd_drive_slave_fb_copy_fcn(void *dst)
+{
+    in_bup_dcu_lfd_drive_slave_fb_lock_fcn(MJ_MSG_LOCK);
+    memcpy(dst, (void *)(mj_handle.in.bup_dcu_lfd.drive_slave_fb.msg), sizeof(drive_slave_fb_msg_t));
+    in_bup_dcu_lfd_drive_slave_fb_lock_fcn(MJ_MSG_UNLOCK);
+}
+
+static uint32_t bup_dcu_lrd_drive_master_ctrl_rx_tick = UINT32_MAX - 13.0;
+static uint8_t  in_bup_dcu_lrd_drive_master_ctrl_lock_cnt = 0;
+static drive_master_ctrl_msg_t* in_bup_dcu_lrd_drive_master_ctrl_delayed_ptr = NULL;
+static uint32_t bup_dcu_lrd_drive_master_ctrl_delayed_ts_s = 0;
+static uint32_t bup_dcu_lrd_drive_master_ctrl_delayed_ts_ns = 0;
+static uint8_t  in_bup_dcu_lrd_drive_master_ctrl_updated = 0;
+static uint32_t  in_bup_dcu_lrd_drive_master_ctrl_total = 0;
+static uint32_t  in_bup_dcu_lrd_drive_master_ctrl_miss = 0;
+static uint16_t  in_bup_dcu_lrd_drive_master_ctrl_last_cnt = 0;
+static mj_msg_state_t in_bup_dcu_lrd_drive_master_ctrl_lock_fcn(mj_msg_state_t state)
+{
+    if (state == MJ_MSG_LOCK)
+    {
+        if (in_bup_dcu_lrd_drive_master_ctrl_lock_cnt < 255)
+        {
+            in_bup_dcu_lrd_drive_master_ctrl_lock_cnt++;
+        }
+    }else{
+        if (in_bup_dcu_lrd_drive_master_ctrl_lock_cnt > 0)
+        {
+            if ((in_bup_dcu_lrd_drive_master_ctrl_lock_cnt == 1) && (in_bup_dcu_lrd_drive_master_ctrl_delayed_ptr))
+            {
+                uint8_t* old_buff = (uint8_t*)(mj_handle.in.bup_dcu_lrd.drive_master_ctrl.msg);
+                mj_handle.in.bup_dcu_lrd.drive_master_ctrl.msg = (drive_master_ctrl_msg_t*)(in_bup_dcu_lrd_drive_master_ctrl_delayed_ptr);
+                mj_handle.in.bup_dcu_lrd.drive_master_ctrl.ts_s = bup_dcu_lrd_drive_master_ctrl_delayed_ts_s;
+                mj_handle.in.bup_dcu_lrd.drive_master_ctrl.ts_ns = bup_dcu_lrd_drive_master_ctrl_delayed_ts_ns;
+                bup_dcu_lrd_drive_master_ctrl_rx_tick = ticks;
+                mj_handle.in.bup_dcu_lrd.drive_master_ctrl.state = MJ_MSG_ACTUAL;
+                in_bup_dcu_lrd_drive_master_ctrl_updated = 1;
+                p_drv->udp4.free(old_buff);
+                in_bup_dcu_lrd_drive_master_ctrl_delayed_ptr = NULL;
+            }
+            in_bup_dcu_lrd_drive_master_ctrl_lock_cnt--;
+        }
+    }
+    return in_bup_dcu_lrd_drive_master_ctrl_lock_cnt > 0 ? MJ_MSG_LOCK : MJ_MSG_UNLOCK;
+}
+
+static void in_bup_dcu_lrd_drive_master_ctrl_copy_fcn(void *dst)
+{
+    in_bup_dcu_lrd_drive_master_ctrl_lock_fcn(MJ_MSG_LOCK);
+    memcpy(dst, (void *)(mj_handle.in.bup_dcu_lrd.drive_master_ctrl.msg), sizeof(drive_master_ctrl_msg_t));
+    in_bup_dcu_lrd_drive_master_ctrl_lock_fcn(MJ_MSG_UNLOCK);
+}
+
+static uint32_t bup_dcu_lrd_drive_slave_fb_rx_tick = UINT32_MAX - 13.0;
+static uint8_t  in_bup_dcu_lrd_drive_slave_fb_lock_cnt = 0;
+static drive_slave_fb_msg_t* in_bup_dcu_lrd_drive_slave_fb_delayed_ptr = NULL;
+static uint32_t bup_dcu_lrd_drive_slave_fb_delayed_ts_s = 0;
+static uint32_t bup_dcu_lrd_drive_slave_fb_delayed_ts_ns = 0;
+static uint8_t  in_bup_dcu_lrd_drive_slave_fb_updated = 0;
+static uint32_t  in_bup_dcu_lrd_drive_slave_fb_total = 0;
+static uint32_t  in_bup_dcu_lrd_drive_slave_fb_miss = 0;
+static uint16_t  in_bup_dcu_lrd_drive_slave_fb_last_cnt = 0;
+static mj_msg_state_t in_bup_dcu_lrd_drive_slave_fb_lock_fcn(mj_msg_state_t state)
+{
+    if (state == MJ_MSG_LOCK)
+    {
+        if (in_bup_dcu_lrd_drive_slave_fb_lock_cnt < 255)
+        {
+            in_bup_dcu_lrd_drive_slave_fb_lock_cnt++;
+        }
+    }else{
+        if (in_bup_dcu_lrd_drive_slave_fb_lock_cnt > 0)
+        {
+            if ((in_bup_dcu_lrd_drive_slave_fb_lock_cnt == 1) && (in_bup_dcu_lrd_drive_slave_fb_delayed_ptr))
+            {
+                uint8_t* old_buff = (uint8_t*)(mj_handle.in.bup_dcu_lrd.drive_slave_fb.msg);
+                mj_handle.in.bup_dcu_lrd.drive_slave_fb.msg = (drive_slave_fb_msg_t*)(in_bup_dcu_lrd_drive_slave_fb_delayed_ptr);
+                mj_handle.in.bup_dcu_lrd.drive_slave_fb.ts_s = bup_dcu_lrd_drive_slave_fb_delayed_ts_s;
+                mj_handle.in.bup_dcu_lrd.drive_slave_fb.ts_ns = bup_dcu_lrd_drive_slave_fb_delayed_ts_ns;
+                bup_dcu_lrd_drive_slave_fb_rx_tick = ticks;
+                mj_handle.in.bup_dcu_lrd.drive_slave_fb.state = MJ_MSG_ACTUAL;
+                in_bup_dcu_lrd_drive_slave_fb_updated = 1;
+                p_drv->udp4.free(old_buff);
+                in_bup_dcu_lrd_drive_slave_fb_delayed_ptr = NULL;
+            }
+            in_bup_dcu_lrd_drive_slave_fb_lock_cnt--;
+        }
+    }
+    return in_bup_dcu_lrd_drive_slave_fb_lock_cnt > 0 ? MJ_MSG_LOCK : MJ_MSG_UNLOCK;
+}
+
+static void in_bup_dcu_lrd_drive_slave_fb_copy_fcn(void *dst)
+{
+    in_bup_dcu_lrd_drive_slave_fb_lock_fcn(MJ_MSG_LOCK);
+    memcpy(dst, (void *)(mj_handle.in.bup_dcu_lrd.drive_slave_fb.msg), sizeof(drive_slave_fb_msg_t));
+    in_bup_dcu_lrd_drive_slave_fb_lock_fcn(MJ_MSG_UNLOCK);
+}
+
+static uint32_t bup_dcu_rfd_drive_master_ctrl_rx_tick = UINT32_MAX - 13.0;
+static uint8_t  in_bup_dcu_rfd_drive_master_ctrl_lock_cnt = 0;
+static drive_master_ctrl_msg_t* in_bup_dcu_rfd_drive_master_ctrl_delayed_ptr = NULL;
+static uint32_t bup_dcu_rfd_drive_master_ctrl_delayed_ts_s = 0;
+static uint32_t bup_dcu_rfd_drive_master_ctrl_delayed_ts_ns = 0;
+static uint8_t  in_bup_dcu_rfd_drive_master_ctrl_updated = 0;
+static uint32_t  in_bup_dcu_rfd_drive_master_ctrl_total = 0;
+static uint32_t  in_bup_dcu_rfd_drive_master_ctrl_miss = 0;
+static uint16_t  in_bup_dcu_rfd_drive_master_ctrl_last_cnt = 0;
+static mj_msg_state_t in_bup_dcu_rfd_drive_master_ctrl_lock_fcn(mj_msg_state_t state)
+{
+    if (state == MJ_MSG_LOCK)
+    {
+        if (in_bup_dcu_rfd_drive_master_ctrl_lock_cnt < 255)
+        {
+            in_bup_dcu_rfd_drive_master_ctrl_lock_cnt++;
+        }
+    }else{
+        if (in_bup_dcu_rfd_drive_master_ctrl_lock_cnt > 0)
+        {
+            if ((in_bup_dcu_rfd_drive_master_ctrl_lock_cnt == 1) && (in_bup_dcu_rfd_drive_master_ctrl_delayed_ptr))
+            {
+                uint8_t* old_buff = (uint8_t*)(mj_handle.in.bup_dcu_rfd.drive_master_ctrl.msg);
+                mj_handle.in.bup_dcu_rfd.drive_master_ctrl.msg = (drive_master_ctrl_msg_t*)(in_bup_dcu_rfd_drive_master_ctrl_delayed_ptr);
+                mj_handle.in.bup_dcu_rfd.drive_master_ctrl.ts_s = bup_dcu_rfd_drive_master_ctrl_delayed_ts_s;
+                mj_handle.in.bup_dcu_rfd.drive_master_ctrl.ts_ns = bup_dcu_rfd_drive_master_ctrl_delayed_ts_ns;
+                bup_dcu_rfd_drive_master_ctrl_rx_tick = ticks;
+                mj_handle.in.bup_dcu_rfd.drive_master_ctrl.state = MJ_MSG_ACTUAL;
+                in_bup_dcu_rfd_drive_master_ctrl_updated = 1;
+                p_drv->udp4.free(old_buff);
+                in_bup_dcu_rfd_drive_master_ctrl_delayed_ptr = NULL;
+            }
+            in_bup_dcu_rfd_drive_master_ctrl_lock_cnt--;
+        }
+    }
+    return in_bup_dcu_rfd_drive_master_ctrl_lock_cnt > 0 ? MJ_MSG_LOCK : MJ_MSG_UNLOCK;
+}
+
+static void in_bup_dcu_rfd_drive_master_ctrl_copy_fcn(void *dst)
+{
+    in_bup_dcu_rfd_drive_master_ctrl_lock_fcn(MJ_MSG_LOCK);
+    memcpy(dst, (void *)(mj_handle.in.bup_dcu_rfd.drive_master_ctrl.msg), sizeof(drive_master_ctrl_msg_t));
+    in_bup_dcu_rfd_drive_master_ctrl_lock_fcn(MJ_MSG_UNLOCK);
+}
+
+static uint32_t bup_dcu_rfd_drive_slave_fb_rx_tick = UINT32_MAX - 13.0;
+static uint8_t  in_bup_dcu_rfd_drive_slave_fb_lock_cnt = 0;
+static drive_slave_fb_msg_t* in_bup_dcu_rfd_drive_slave_fb_delayed_ptr = NULL;
+static uint32_t bup_dcu_rfd_drive_slave_fb_delayed_ts_s = 0;
+static uint32_t bup_dcu_rfd_drive_slave_fb_delayed_ts_ns = 0;
+static uint8_t  in_bup_dcu_rfd_drive_slave_fb_updated = 0;
+static uint32_t  in_bup_dcu_rfd_drive_slave_fb_total = 0;
+static uint32_t  in_bup_dcu_rfd_drive_slave_fb_miss = 0;
+static uint16_t  in_bup_dcu_rfd_drive_slave_fb_last_cnt = 0;
+static mj_msg_state_t in_bup_dcu_rfd_drive_slave_fb_lock_fcn(mj_msg_state_t state)
+{
+    if (state == MJ_MSG_LOCK)
+    {
+        if (in_bup_dcu_rfd_drive_slave_fb_lock_cnt < 255)
+        {
+            in_bup_dcu_rfd_drive_slave_fb_lock_cnt++;
+        }
+    }else{
+        if (in_bup_dcu_rfd_drive_slave_fb_lock_cnt > 0)
+        {
+            if ((in_bup_dcu_rfd_drive_slave_fb_lock_cnt == 1) && (in_bup_dcu_rfd_drive_slave_fb_delayed_ptr))
+            {
+                uint8_t* old_buff = (uint8_t*)(mj_handle.in.bup_dcu_rfd.drive_slave_fb.msg);
+                mj_handle.in.bup_dcu_rfd.drive_slave_fb.msg = (drive_slave_fb_msg_t*)(in_bup_dcu_rfd_drive_slave_fb_delayed_ptr);
+                mj_handle.in.bup_dcu_rfd.drive_slave_fb.ts_s = bup_dcu_rfd_drive_slave_fb_delayed_ts_s;
+                mj_handle.in.bup_dcu_rfd.drive_slave_fb.ts_ns = bup_dcu_rfd_drive_slave_fb_delayed_ts_ns;
+                bup_dcu_rfd_drive_slave_fb_rx_tick = ticks;
+                mj_handle.in.bup_dcu_rfd.drive_slave_fb.state = MJ_MSG_ACTUAL;
+                in_bup_dcu_rfd_drive_slave_fb_updated = 1;
+                p_drv->udp4.free(old_buff);
+                in_bup_dcu_rfd_drive_slave_fb_delayed_ptr = NULL;
+            }
+            in_bup_dcu_rfd_drive_slave_fb_lock_cnt--;
+        }
+    }
+    return in_bup_dcu_rfd_drive_slave_fb_lock_cnt > 0 ? MJ_MSG_LOCK : MJ_MSG_UNLOCK;
+}
+
+static void in_bup_dcu_rfd_drive_slave_fb_copy_fcn(void *dst)
+{
+    in_bup_dcu_rfd_drive_slave_fb_lock_fcn(MJ_MSG_LOCK);
+    memcpy(dst, (void *)(mj_handle.in.bup_dcu_rfd.drive_slave_fb.msg), sizeof(drive_slave_fb_msg_t));
+    in_bup_dcu_rfd_drive_slave_fb_lock_fcn(MJ_MSG_UNLOCK);
+}
+
+static uint32_t bup_dcu_rrd_drive_master_ctrl_rx_tick = UINT32_MAX - 13.0;
+static uint8_t  in_bup_dcu_rrd_drive_master_ctrl_lock_cnt = 0;
+static drive_master_ctrl_msg_t* in_bup_dcu_rrd_drive_master_ctrl_delayed_ptr = NULL;
+static uint32_t bup_dcu_rrd_drive_master_ctrl_delayed_ts_s = 0;
+static uint32_t bup_dcu_rrd_drive_master_ctrl_delayed_ts_ns = 0;
+static uint8_t  in_bup_dcu_rrd_drive_master_ctrl_updated = 0;
+static uint32_t  in_bup_dcu_rrd_drive_master_ctrl_total = 0;
+static uint32_t  in_bup_dcu_rrd_drive_master_ctrl_miss = 0;
+static uint16_t  in_bup_dcu_rrd_drive_master_ctrl_last_cnt = 0;
+static mj_msg_state_t in_bup_dcu_rrd_drive_master_ctrl_lock_fcn(mj_msg_state_t state)
+{
+    if (state == MJ_MSG_LOCK)
+    {
+        if (in_bup_dcu_rrd_drive_master_ctrl_lock_cnt < 255)
+        {
+            in_bup_dcu_rrd_drive_master_ctrl_lock_cnt++;
+        }
+    }else{
+        if (in_bup_dcu_rrd_drive_master_ctrl_lock_cnt > 0)
+        {
+            if ((in_bup_dcu_rrd_drive_master_ctrl_lock_cnt == 1) && (in_bup_dcu_rrd_drive_master_ctrl_delayed_ptr))
+            {
+                uint8_t* old_buff = (uint8_t*)(mj_handle.in.bup_dcu_rrd.drive_master_ctrl.msg);
+                mj_handle.in.bup_dcu_rrd.drive_master_ctrl.msg = (drive_master_ctrl_msg_t*)(in_bup_dcu_rrd_drive_master_ctrl_delayed_ptr);
+                mj_handle.in.bup_dcu_rrd.drive_master_ctrl.ts_s = bup_dcu_rrd_drive_master_ctrl_delayed_ts_s;
+                mj_handle.in.bup_dcu_rrd.drive_master_ctrl.ts_ns = bup_dcu_rrd_drive_master_ctrl_delayed_ts_ns;
+                bup_dcu_rrd_drive_master_ctrl_rx_tick = ticks;
+                mj_handle.in.bup_dcu_rrd.drive_master_ctrl.state = MJ_MSG_ACTUAL;
+                in_bup_dcu_rrd_drive_master_ctrl_updated = 1;
+                p_drv->udp4.free(old_buff);
+                in_bup_dcu_rrd_drive_master_ctrl_delayed_ptr = NULL;
+            }
+            in_bup_dcu_rrd_drive_master_ctrl_lock_cnt--;
+        }
+    }
+    return in_bup_dcu_rrd_drive_master_ctrl_lock_cnt > 0 ? MJ_MSG_LOCK : MJ_MSG_UNLOCK;
+}
+
+static void in_bup_dcu_rrd_drive_master_ctrl_copy_fcn(void *dst)
+{
+    in_bup_dcu_rrd_drive_master_ctrl_lock_fcn(MJ_MSG_LOCK);
+    memcpy(dst, (void *)(mj_handle.in.bup_dcu_rrd.drive_master_ctrl.msg), sizeof(drive_master_ctrl_msg_t));
+    in_bup_dcu_rrd_drive_master_ctrl_lock_fcn(MJ_MSG_UNLOCK);
+}
+
+static uint32_t bup_dcu_rrd_drive_slave_fb_rx_tick = UINT32_MAX - 13.0;
+static uint8_t  in_bup_dcu_rrd_drive_slave_fb_lock_cnt = 0;
+static drive_slave_fb_msg_t* in_bup_dcu_rrd_drive_slave_fb_delayed_ptr = NULL;
+static uint32_t bup_dcu_rrd_drive_slave_fb_delayed_ts_s = 0;
+static uint32_t bup_dcu_rrd_drive_slave_fb_delayed_ts_ns = 0;
+static uint8_t  in_bup_dcu_rrd_drive_slave_fb_updated = 0;
+static uint32_t  in_bup_dcu_rrd_drive_slave_fb_total = 0;
+static uint32_t  in_bup_dcu_rrd_drive_slave_fb_miss = 0;
+static uint16_t  in_bup_dcu_rrd_drive_slave_fb_last_cnt = 0;
+static mj_msg_state_t in_bup_dcu_rrd_drive_slave_fb_lock_fcn(mj_msg_state_t state)
+{
+    if (state == MJ_MSG_LOCK)
+    {
+        if (in_bup_dcu_rrd_drive_slave_fb_lock_cnt < 255)
+        {
+            in_bup_dcu_rrd_drive_slave_fb_lock_cnt++;
+        }
+    }else{
+        if (in_bup_dcu_rrd_drive_slave_fb_lock_cnt > 0)
+        {
+            if ((in_bup_dcu_rrd_drive_slave_fb_lock_cnt == 1) && (in_bup_dcu_rrd_drive_slave_fb_delayed_ptr))
+            {
+                uint8_t* old_buff = (uint8_t*)(mj_handle.in.bup_dcu_rrd.drive_slave_fb.msg);
+                mj_handle.in.bup_dcu_rrd.drive_slave_fb.msg = (drive_slave_fb_msg_t*)(in_bup_dcu_rrd_drive_slave_fb_delayed_ptr);
+                mj_handle.in.bup_dcu_rrd.drive_slave_fb.ts_s = bup_dcu_rrd_drive_slave_fb_delayed_ts_s;
+                mj_handle.in.bup_dcu_rrd.drive_slave_fb.ts_ns = bup_dcu_rrd_drive_slave_fb_delayed_ts_ns;
+                bup_dcu_rrd_drive_slave_fb_rx_tick = ticks;
+                mj_handle.in.bup_dcu_rrd.drive_slave_fb.state = MJ_MSG_ACTUAL;
+                in_bup_dcu_rrd_drive_slave_fb_updated = 1;
+                p_drv->udp4.free(old_buff);
+                in_bup_dcu_rrd_drive_slave_fb_delayed_ptr = NULL;
+            }
+            in_bup_dcu_rrd_drive_slave_fb_lock_cnt--;
+        }
+    }
+    return in_bup_dcu_rrd_drive_slave_fb_lock_cnt > 0 ? MJ_MSG_LOCK : MJ_MSG_UNLOCK;
+}
+
+static void in_bup_dcu_rrd_drive_slave_fb_copy_fcn(void *dst)
+{
+    in_bup_dcu_rrd_drive_slave_fb_lock_fcn(MJ_MSG_LOCK);
+    memcpy(dst, (void *)(mj_handle.in.bup_dcu_rrd.drive_slave_fb.msg), sizeof(drive_slave_fb_msg_t));
+    in_bup_dcu_rrd_drive_slave_fb_lock_fcn(MJ_MSG_UNLOCK);
+}
+
+static uint32_t bup_dcu_rst_drive_master_ctrl_rx_tick = UINT32_MAX - 13.0;
+static uint8_t  in_bup_dcu_rst_drive_master_ctrl_lock_cnt = 0;
+static drive_master_ctrl_msg_t* in_bup_dcu_rst_drive_master_ctrl_delayed_ptr = NULL;
+static uint32_t bup_dcu_rst_drive_master_ctrl_delayed_ts_s = 0;
+static uint32_t bup_dcu_rst_drive_master_ctrl_delayed_ts_ns = 0;
+static uint8_t  in_bup_dcu_rst_drive_master_ctrl_updated = 0;
+static uint32_t  in_bup_dcu_rst_drive_master_ctrl_total = 0;
+static uint32_t  in_bup_dcu_rst_drive_master_ctrl_miss = 0;
+static uint16_t  in_bup_dcu_rst_drive_master_ctrl_last_cnt = 0;
+static mj_msg_state_t in_bup_dcu_rst_drive_master_ctrl_lock_fcn(mj_msg_state_t state)
+{
+    if (state == MJ_MSG_LOCK)
+    {
+        if (in_bup_dcu_rst_drive_master_ctrl_lock_cnt < 255)
+        {
+            in_bup_dcu_rst_drive_master_ctrl_lock_cnt++;
+        }
+    }else{
+        if (in_bup_dcu_rst_drive_master_ctrl_lock_cnt > 0)
+        {
+            if ((in_bup_dcu_rst_drive_master_ctrl_lock_cnt == 1) && (in_bup_dcu_rst_drive_master_ctrl_delayed_ptr))
+            {
+                uint8_t* old_buff = (uint8_t*)(mj_handle.in.bup_dcu_rst.drive_master_ctrl.msg);
+                mj_handle.in.bup_dcu_rst.drive_master_ctrl.msg = (drive_master_ctrl_msg_t*)(in_bup_dcu_rst_drive_master_ctrl_delayed_ptr);
+                mj_handle.in.bup_dcu_rst.drive_master_ctrl.ts_s = bup_dcu_rst_drive_master_ctrl_delayed_ts_s;
+                mj_handle.in.bup_dcu_rst.drive_master_ctrl.ts_ns = bup_dcu_rst_drive_master_ctrl_delayed_ts_ns;
+                bup_dcu_rst_drive_master_ctrl_rx_tick = ticks;
+                mj_handle.in.bup_dcu_rst.drive_master_ctrl.state = MJ_MSG_ACTUAL;
+                in_bup_dcu_rst_drive_master_ctrl_updated = 1;
+                p_drv->udp4.free(old_buff);
+                in_bup_dcu_rst_drive_master_ctrl_delayed_ptr = NULL;
+            }
+            in_bup_dcu_rst_drive_master_ctrl_lock_cnt--;
+        }
+    }
+    return in_bup_dcu_rst_drive_master_ctrl_lock_cnt > 0 ? MJ_MSG_LOCK : MJ_MSG_UNLOCK;
+}
+
+static void in_bup_dcu_rst_drive_master_ctrl_copy_fcn(void *dst)
+{
+    in_bup_dcu_rst_drive_master_ctrl_lock_fcn(MJ_MSG_LOCK);
+    memcpy(dst, (void *)(mj_handle.in.bup_dcu_rst.drive_master_ctrl.msg), sizeof(drive_master_ctrl_msg_t));
+    in_bup_dcu_rst_drive_master_ctrl_lock_fcn(MJ_MSG_UNLOCK);
+}
+
+static uint32_t bup_dcu_rst_drive_slave_fb_rx_tick = UINT32_MAX - 13.0;
+static uint8_t  in_bup_dcu_rst_drive_slave_fb_lock_cnt = 0;
+static drive_slave_fb_msg_t* in_bup_dcu_rst_drive_slave_fb_delayed_ptr = NULL;
+static uint32_t bup_dcu_rst_drive_slave_fb_delayed_ts_s = 0;
+static uint32_t bup_dcu_rst_drive_slave_fb_delayed_ts_ns = 0;
+static uint8_t  in_bup_dcu_rst_drive_slave_fb_updated = 0;
+static uint32_t  in_bup_dcu_rst_drive_slave_fb_total = 0;
+static uint32_t  in_bup_dcu_rst_drive_slave_fb_miss = 0;
+static uint16_t  in_bup_dcu_rst_drive_slave_fb_last_cnt = 0;
+static mj_msg_state_t in_bup_dcu_rst_drive_slave_fb_lock_fcn(mj_msg_state_t state)
+{
+    if (state == MJ_MSG_LOCK)
+    {
+        if (in_bup_dcu_rst_drive_slave_fb_lock_cnt < 255)
+        {
+            in_bup_dcu_rst_drive_slave_fb_lock_cnt++;
+        }
+    }else{
+        if (in_bup_dcu_rst_drive_slave_fb_lock_cnt > 0)
+        {
+            if ((in_bup_dcu_rst_drive_slave_fb_lock_cnt == 1) && (in_bup_dcu_rst_drive_slave_fb_delayed_ptr))
+            {
+                uint8_t* old_buff = (uint8_t*)(mj_handle.in.bup_dcu_rst.drive_slave_fb.msg);
+                mj_handle.in.bup_dcu_rst.drive_slave_fb.msg = (drive_slave_fb_msg_t*)(in_bup_dcu_rst_drive_slave_fb_delayed_ptr);
+                mj_handle.in.bup_dcu_rst.drive_slave_fb.ts_s = bup_dcu_rst_drive_slave_fb_delayed_ts_s;
+                mj_handle.in.bup_dcu_rst.drive_slave_fb.ts_ns = bup_dcu_rst_drive_slave_fb_delayed_ts_ns;
+                bup_dcu_rst_drive_slave_fb_rx_tick = ticks;
+                mj_handle.in.bup_dcu_rst.drive_slave_fb.state = MJ_MSG_ACTUAL;
+                in_bup_dcu_rst_drive_slave_fb_updated = 1;
+                p_drv->udp4.free(old_buff);
+                in_bup_dcu_rst_drive_slave_fb_delayed_ptr = NULL;
+            }
+            in_bup_dcu_rst_drive_slave_fb_lock_cnt--;
+        }
+    }
+    return in_bup_dcu_rst_drive_slave_fb_lock_cnt > 0 ? MJ_MSG_LOCK : MJ_MSG_UNLOCK;
+}
+
+static void in_bup_dcu_rst_drive_slave_fb_copy_fcn(void *dst)
+{
+    in_bup_dcu_rst_drive_slave_fb_lock_fcn(MJ_MSG_LOCK);
+    memcpy(dst, (void *)(mj_handle.in.bup_dcu_rst.drive_slave_fb.msg), sizeof(drive_slave_fb_msg_t));
+    in_bup_dcu_rst_drive_slave_fb_lock_fcn(MJ_MSG_UNLOCK);
+}
+
+static uint32_t dcu_drive_master_ctrl_rx_tick = UINT32_MAX - 13.0;
+static uint8_t  in_dcu_drive_master_ctrl_lock_cnt = 0;
+static drive_master_ctrl_msg_t* in_dcu_drive_master_ctrl_delayed_ptr = NULL;
+static uint32_t dcu_drive_master_ctrl_delayed_ts_s = 0;
+static uint32_t dcu_drive_master_ctrl_delayed_ts_ns = 0;
+static uint8_t  in_dcu_drive_master_ctrl_updated = 0;
+static uint32_t  in_dcu_drive_master_ctrl_total = 0;
+static uint32_t  in_dcu_drive_master_ctrl_miss = 0;
+static uint16_t  in_dcu_drive_master_ctrl_last_cnt = 0;
+static mj_msg_state_t in_dcu_drive_master_ctrl_lock_fcn(mj_msg_state_t state)
+{
+    if (state == MJ_MSG_LOCK)
+    {
+        if (in_dcu_drive_master_ctrl_lock_cnt < 255)
+        {
+            in_dcu_drive_master_ctrl_lock_cnt++;
+        }
+    }else{
+        if (in_dcu_drive_master_ctrl_lock_cnt > 0)
+        {
+            if ((in_dcu_drive_master_ctrl_lock_cnt == 1) && (in_dcu_drive_master_ctrl_delayed_ptr))
+            {
+                uint8_t* old_buff = (uint8_t*)(mj_handle.in.dcu.drive_master_ctrl.msg);
+                mj_handle.in.dcu.drive_master_ctrl.msg = (drive_master_ctrl_msg_t*)(in_dcu_drive_master_ctrl_delayed_ptr);
+                mj_handle.in.dcu.drive_master_ctrl.ts_s = dcu_drive_master_ctrl_delayed_ts_s;
+                mj_handle.in.dcu.drive_master_ctrl.ts_ns = dcu_drive_master_ctrl_delayed_ts_ns;
+                dcu_drive_master_ctrl_rx_tick = ticks;
+                mj_handle.in.dcu.drive_master_ctrl.state = MJ_MSG_ACTUAL;
+                in_dcu_drive_master_ctrl_updated = 1;
+                p_drv->udp4.free(old_buff);
+                in_dcu_drive_master_ctrl_delayed_ptr = NULL;
+            }
+            in_dcu_drive_master_ctrl_lock_cnt--;
+        }
+    }
+    return in_dcu_drive_master_ctrl_lock_cnt > 0 ? MJ_MSG_LOCK : MJ_MSG_UNLOCK;
+}
+
+static void in_dcu_drive_master_ctrl_copy_fcn(void *dst)
+{
+    in_dcu_drive_master_ctrl_lock_fcn(MJ_MSG_LOCK);
+    memcpy(dst, (void *)(mj_handle.in.dcu.drive_master_ctrl.msg), sizeof(drive_master_ctrl_msg_t));
+    in_dcu_drive_master_ctrl_lock_fcn(MJ_MSG_UNLOCK);
+}
+
+static uint32_t dcu_drive_slave_fb_rx_tick = UINT32_MAX - 13.0;
+static uint8_t  in_dcu_drive_slave_fb_lock_cnt = 0;
+static drive_slave_fb_msg_t* in_dcu_drive_slave_fb_delayed_ptr = NULL;
+static uint32_t dcu_drive_slave_fb_delayed_ts_s = 0;
+static uint32_t dcu_drive_slave_fb_delayed_ts_ns = 0;
+static uint8_t  in_dcu_drive_slave_fb_updated = 0;
+static uint32_t  in_dcu_drive_slave_fb_total = 0;
+static uint32_t  in_dcu_drive_slave_fb_miss = 0;
+static uint16_t  in_dcu_drive_slave_fb_last_cnt = 0;
+static mj_msg_state_t in_dcu_drive_slave_fb_lock_fcn(mj_msg_state_t state)
+{
+    if (state == MJ_MSG_LOCK)
+    {
+        if (in_dcu_drive_slave_fb_lock_cnt < 255)
+        {
+            in_dcu_drive_slave_fb_lock_cnt++;
+        }
+    }else{
+        if (in_dcu_drive_slave_fb_lock_cnt > 0)
+        {
+            if ((in_dcu_drive_slave_fb_lock_cnt == 1) && (in_dcu_drive_slave_fb_delayed_ptr))
+            {
+                uint8_t* old_buff = (uint8_t*)(mj_handle.in.dcu.drive_slave_fb.msg);
+                mj_handle.in.dcu.drive_slave_fb.msg = (drive_slave_fb_msg_t*)(in_dcu_drive_slave_fb_delayed_ptr);
+                mj_handle.in.dcu.drive_slave_fb.ts_s = dcu_drive_slave_fb_delayed_ts_s;
+                mj_handle.in.dcu.drive_slave_fb.ts_ns = dcu_drive_slave_fb_delayed_ts_ns;
+                dcu_drive_slave_fb_rx_tick = ticks;
+                mj_handle.in.dcu.drive_slave_fb.state = MJ_MSG_ACTUAL;
+                in_dcu_drive_slave_fb_updated = 1;
+                p_drv->udp4.free(old_buff);
+                in_dcu_drive_slave_fb_delayed_ptr = NULL;
+            }
+            in_dcu_drive_slave_fb_lock_cnt--;
+        }
+    }
+    return in_dcu_drive_slave_fb_lock_cnt > 0 ? MJ_MSG_LOCK : MJ_MSG_UNLOCK;
+}
+
+static void in_dcu_drive_slave_fb_copy_fcn(void *dst)
+{
+    in_dcu_drive_slave_fb_lock_fcn(MJ_MSG_LOCK);
+    memcpy(dst, (void *)(mj_handle.in.dcu.drive_slave_fb.msg), sizeof(drive_slave_fb_msg_t));
+    in_dcu_drive_slave_fb_lock_fcn(MJ_MSG_UNLOCK);
+}
+
 static uint32_t im_bro_im_bro_drivers_sens_rx_tick = UINT32_MAX - 4.0;
 static uint8_t  in_im_bro_im_bro_drivers_sens_lock_cnt = 0;
 static drivers_sens_msg_t* in_im_bro_im_bro_drivers_sens_delayed_ptr = NULL;
@@ -236,6 +821,51 @@ static void in_im_bro_im_bro_drivers_sens_copy_fcn(void *dst)
     in_im_bro_im_bro_drivers_sens_lock_fcn(MJ_MSG_LOCK);
     memcpy(dst, (void *)(mj_handle.in.im_bro.im_bro_drivers_sens.msg), sizeof(drivers_sens_msg_t));
     in_im_bro_im_bro_drivers_sens_lock_fcn(MJ_MSG_UNLOCK);
+}
+
+static uint32_t mon_bup_multi_control_rx_tick = UINT32_MAX - 241.0;
+static uint8_t  in_mon_bup_multi_control_lock_cnt = 0;
+static bup_drv_multi_control_msg_t* in_mon_bup_multi_control_delayed_ptr = NULL;
+static uint32_t mon_bup_multi_control_delayed_ts_s = 0;
+static uint32_t mon_bup_multi_control_delayed_ts_ns = 0;
+static uint8_t  in_mon_bup_multi_control_updated = 0;
+static uint32_t  in_mon_bup_multi_control_total = 0;
+static uint32_t  in_mon_bup_multi_control_miss = 0;
+static uint16_t  in_mon_bup_multi_control_last_cnt = 0;
+static mj_msg_state_t in_mon_bup_multi_control_lock_fcn(mj_msg_state_t state)
+{
+    if (state == MJ_MSG_LOCK)
+    {
+        if (in_mon_bup_multi_control_lock_cnt < 255)
+        {
+            in_mon_bup_multi_control_lock_cnt++;
+        }
+    }else{
+        if (in_mon_bup_multi_control_lock_cnt > 0)
+        {
+            if ((in_mon_bup_multi_control_lock_cnt == 1) && (in_mon_bup_multi_control_delayed_ptr))
+            {
+                uint8_t* old_buff = (uint8_t*)(mj_handle.in.mon.bup_multi_control.msg);
+                mj_handle.in.mon.bup_multi_control.msg = (bup_drv_multi_control_msg_t*)(in_mon_bup_multi_control_delayed_ptr);
+                mj_handle.in.mon.bup_multi_control.ts_s = mon_bup_multi_control_delayed_ts_s;
+                mj_handle.in.mon.bup_multi_control.ts_ns = mon_bup_multi_control_delayed_ts_ns;
+                mon_bup_multi_control_rx_tick = ticks;
+                mj_handle.in.mon.bup_multi_control.state = MJ_MSG_ACTUAL;
+                in_mon_bup_multi_control_updated = 1;
+                p_drv->udp4.free(old_buff);
+                in_mon_bup_multi_control_delayed_ptr = NULL;
+            }
+            in_mon_bup_multi_control_lock_cnt--;
+        }
+    }
+    return in_mon_bup_multi_control_lock_cnt > 0 ? MJ_MSG_LOCK : MJ_MSG_UNLOCK;
+}
+
+static void in_mon_bup_multi_control_copy_fcn(void *dst)
+{
+    in_mon_bup_multi_control_lock_fcn(MJ_MSG_LOCK);
+    memcpy(dst, (void *)(mj_handle.in.mon.bup_multi_control.msg), sizeof(bup_drv_multi_control_msg_t));
+    in_mon_bup_multi_control_lock_fcn(MJ_MSG_UNLOCK);
 }
 
 static uint32_t mon_bup_srv_ctrl_rx_tick = UINT32_MAX - 241.0;
@@ -511,6 +1141,76 @@ static mj_msg_state_t out_dcu_tel_lock_fcn(mj_msg_state_t state)
     return res;
 }
 
+static void * out_drive_master_ctrl_pkt = NULL;
+static drive_master_ctrl_msg_t * p_out_drive_master_ctrl_msg = NULL;
+static mj_msg_state_t out_drive_master_ctrl_lock_fcn(mj_msg_state_t state)
+{
+    mj_msg_state_t res = MJ_MSG_UNDEFINED;
+    if (state == MJ_MSG_LOCK)
+    {
+        if (p_out_drive_master_ctrl_msg == NULL)
+        {
+            if ((p_out_drive_master_ctrl_msg = (drive_master_ctrl_msg_t *)p_drv->udp4.alloc(sizeof(drive_master_ctrl_msg_t))))
+            {
+                memcpy((void *)p_out_drive_master_ctrl_msg, (void *)(mj_handle.out.drive_master_ctrl.msg), sizeof(drive_master_ctrl_msg_t));
+                p_drv->udp4.set_payload(out_drive_master_ctrl_pkt, (uint8_t *)p_out_drive_master_ctrl_msg);
+                res = MJ_MSG_LOCK;
+            }else{
+                res = MJ_MSG_UNLOCK;
+            }
+        }else{
+            res = MJ_MSG_LOCK;
+        }
+    }else{
+        res = MJ_MSG_LOCK;
+        if (p_out_drive_master_ctrl_msg)
+        {
+            p_drv->udp4.set_payload(out_drive_master_ctrl_pkt, (uint8_t *)mj_handle.out.drive_master_ctrl.msg);
+            p_drv->udp4.free((uint8_t *)p_out_drive_master_ctrl_msg);
+            p_out_drive_master_ctrl_msg = NULL;
+            res = MJ_MSG_UNLOCK;
+        }else{
+            res = MJ_MSG_UNLOCK;
+        }
+    }
+    return res;
+}
+
+static void * out_drive_slave_fb_pkt = NULL;
+static drive_slave_fb_msg_t * p_out_drive_slave_fb_msg = NULL;
+static mj_msg_state_t out_drive_slave_fb_lock_fcn(mj_msg_state_t state)
+{
+    mj_msg_state_t res = MJ_MSG_UNDEFINED;
+    if (state == MJ_MSG_LOCK)
+    {
+        if (p_out_drive_slave_fb_msg == NULL)
+        {
+            if ((p_out_drive_slave_fb_msg = (drive_slave_fb_msg_t *)p_drv->udp4.alloc(sizeof(drive_slave_fb_msg_t))))
+            {
+                memcpy((void *)p_out_drive_slave_fb_msg, (void *)(mj_handle.out.drive_slave_fb.msg), sizeof(drive_slave_fb_msg_t));
+                p_drv->udp4.set_payload(out_drive_slave_fb_pkt, (uint8_t *)p_out_drive_slave_fb_msg);
+                res = MJ_MSG_LOCK;
+            }else{
+                res = MJ_MSG_UNLOCK;
+            }
+        }else{
+            res = MJ_MSG_LOCK;
+        }
+    }else{
+        res = MJ_MSG_LOCK;
+        if (p_out_drive_slave_fb_msg)
+        {
+            p_drv->udp4.set_payload(out_drive_slave_fb_pkt, (uint8_t *)mj_handle.out.drive_slave_fb.msg);
+            p_drv->udp4.free((uint8_t *)p_out_drive_slave_fb_msg);
+            p_out_drive_slave_fb_msg = NULL;
+            res = MJ_MSG_UNLOCK;
+        }else{
+            res = MJ_MSG_UNLOCK;
+        }
+    }
+    return res;
+}
+
 static void * out_formular_pkt = NULL;
 static void out_formular_tx_fcn(uint16_t dst)
 {
@@ -633,6 +1333,9 @@ mj_prm_status_t bup_dcu_lst_prm_write(int id, void *data)
         case PRM_FLOAT_OHP_LVL:
             memcpy(&(_bup_dcu_lst_prm.ohp_lvl),data,sizeof(_bup_dcu_lst_prm.ohp_lvl));
             return MJ_PRM_OK;
+        case PRM_FLOAT_OHP_HYST:
+            memcpy(&(_bup_dcu_lst_prm.ohp_hyst),data,sizeof(_bup_dcu_lst_prm.ohp_hyst));
+            return MJ_PRM_OK;
         case PRM_FLOAT_EL_ZERO:
             memcpy(&(_bup_dcu_lst_prm.el_zero),data,sizeof(_bup_dcu_lst_prm.el_zero));
             return MJ_PRM_OK;
@@ -708,11 +1411,59 @@ mj_prm_status_t bup_dcu_lst_prm_write(int id, void *data)
         case PRM_FLOAT_LOAD_SPEED_OUT_LIM:
             memcpy(&(_bup_dcu_lst_prm.load_speed_out_lim),data,sizeof(_bup_dcu_lst_prm.load_speed_out_lim));
             return MJ_PRM_OK;
+        case PRM_FLOAT_LOAD_SPEED_INT_LIM:
+            memcpy(&(_bup_dcu_lst_prm.load_speed_int_lim),data,sizeof(_bup_dcu_lst_prm.load_speed_int_lim));
+            return MJ_PRM_OK;
         case PRM_FLOAT_LOAD_SPEED_OUT_RATE_LIM:
             memcpy(&(_bup_dcu_lst_prm.load_speed_out_rate_lim),data,sizeof(_bup_dcu_lst_prm.load_speed_out_rate_lim));
             return MJ_PRM_OK;
         case PRM_FLOAT_LOAD_SPEED_ERR_RATE_LIM:
             memcpy(&(_bup_dcu_lst_prm.load_speed_err_rate_lim),data,sizeof(_bup_dcu_lst_prm.load_speed_err_rate_lim));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_LOAD_SPEED_FLT_FC:
+            memcpy(&(_bup_dcu_lst_prm.load_speed_flt_fc),data,sizeof(_bup_dcu_lst_prm.load_speed_flt_fc));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_FLT_FC:
+            memcpy(&(_bup_dcu_lst_prm.rotor_speed_flt_fc),data,sizeof(_bup_dcu_lst_prm.rotor_speed_flt_fc));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_LOAD_ANG_KP:
+            memcpy(&(_bup_dcu_lst_prm.load_ang_kp),data,sizeof(_bup_dcu_lst_prm.load_ang_kp));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_LOAD_ANG_KI:
+            memcpy(&(_bup_dcu_lst_prm.load_ang_ki),data,sizeof(_bup_dcu_lst_prm.load_ang_ki));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_LOAD_ANG_KB:
+            memcpy(&(_bup_dcu_lst_prm.load_ang_kb),data,sizeof(_bup_dcu_lst_prm.load_ang_kb));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_LOAD_ANG_KT:
+            memcpy(&(_bup_dcu_lst_prm.load_ang_kt),data,sizeof(_bup_dcu_lst_prm.load_ang_kt));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_LOAD_ANG_KF:
+            memcpy(&(_bup_dcu_lst_prm.load_ang_kf),data,sizeof(_bup_dcu_lst_prm.load_ang_kf));
+            return MJ_PRM_OK;
+        case PRM_BOOL_LOAD_ANG_REV:
+            memcpy(&(_bup_dcu_lst_prm.load_ang_rev),data,sizeof(_bup_dcu_lst_prm.load_ang_rev));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_LOAD_ANG_KD:
+            memcpy(&(_bup_dcu_lst_prm.load_ang_kd),data,sizeof(_bup_dcu_lst_prm.load_ang_kd));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_LOAD_ANG_ERR_LIM:
+            memcpy(&(_bup_dcu_lst_prm.load_ang_err_lim),data,sizeof(_bup_dcu_lst_prm.load_ang_err_lim));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_LOAD_ANG_OUT_LIM:
+            memcpy(&(_bup_dcu_lst_prm.load_ang_out_lim),data,sizeof(_bup_dcu_lst_prm.load_ang_out_lim));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_LOAD_ANG_OUT_RATE_LIM:
+            memcpy(&(_bup_dcu_lst_prm.load_ang_out_rate_lim),data,sizeof(_bup_dcu_lst_prm.load_ang_out_rate_lim));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_LOAD_ANG_ERR_RATE_LIM:
+            memcpy(&(_bup_dcu_lst_prm.load_ang_err_rate_lim),data,sizeof(_bup_dcu_lst_prm.load_ang_err_rate_lim));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_LOAD_ANG_DZ:
+            memcpy(&(_bup_dcu_lst_prm.load_ang_dz),data,sizeof(_bup_dcu_lst_prm.load_ang_dz));
+            return MJ_PRM_OK;
+        case PRM_BOOL_LOAD_ANG_DZ_EN:
+            memcpy(&(_bup_dcu_lst_prm.load_ang_dz_en),data,sizeof(_bup_dcu_lst_prm.load_ang_dz_en));
             return MJ_PRM_OK;
         case PRM_FLOAT_ROTOR_SPEED_KP:
             memcpy(&(_bup_dcu_lst_prm.rotor_speed_kp),data,sizeof(_bup_dcu_lst_prm.rotor_speed_kp));
@@ -735,11 +1486,77 @@ mj_prm_status_t bup_dcu_lst_prm_write(int id, void *data)
         case PRM_FLOAT_ROTOR_SPEED_OUT_LIM:
             memcpy(&(_bup_dcu_lst_prm.rotor_speed_out_lim),data,sizeof(_bup_dcu_lst_prm.rotor_speed_out_lim));
             return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_INT_LIM:
+            memcpy(&(_bup_dcu_lst_prm.rotor_speed_int_lim),data,sizeof(_bup_dcu_lst_prm.rotor_speed_int_lim));
+            return MJ_PRM_OK;
         case PRM_FLOAT_ROTOR_SPEED_OUT_RATE_LIM:
             memcpy(&(_bup_dcu_lst_prm.rotor_speed_out_rate_lim),data,sizeof(_bup_dcu_lst_prm.rotor_speed_out_rate_lim));
             return MJ_PRM_OK;
         case PRM_FLOAT_ROTOR_SPEED_ERR_RATE_LIM:
             memcpy(&(_bup_dcu_lst_prm.rotor_speed_err_rate_lim),data,sizeof(_bup_dcu_lst_prm.rotor_speed_err_rate_lim));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_COMMON_KP:
+            memcpy(&(_bup_dcu_lst_prm.rotor_speed_master_common_kp),data,sizeof(_bup_dcu_lst_prm.rotor_speed_master_common_kp));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_COMMON_KI:
+            memcpy(&(_bup_dcu_lst_prm.rotor_speed_master_common_ki),data,sizeof(_bup_dcu_lst_prm.rotor_speed_master_common_ki));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_COMMON_KB:
+            memcpy(&(_bup_dcu_lst_prm.rotor_speed_master_common_kb),data,sizeof(_bup_dcu_lst_prm.rotor_speed_master_common_kb));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_COMMON_KT:
+            memcpy(&(_bup_dcu_lst_prm.rotor_speed_master_common_kt),data,sizeof(_bup_dcu_lst_prm.rotor_speed_master_common_kt));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_COMMON_KF:
+            memcpy(&(_bup_dcu_lst_prm.rotor_speed_master_common_kf),data,sizeof(_bup_dcu_lst_prm.rotor_speed_master_common_kf));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_COMMON_ERR_LIM:
+            memcpy(&(_bup_dcu_lst_prm.rotor_speed_master_common_err_lim),data,sizeof(_bup_dcu_lst_prm.rotor_speed_master_common_err_lim));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_COMMON_OUT_LIM:
+            memcpy(&(_bup_dcu_lst_prm.rotor_speed_master_common_out_lim),data,sizeof(_bup_dcu_lst_prm.rotor_speed_master_common_out_lim));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_COMMON_INT_LIM:
+            memcpy(&(_bup_dcu_lst_prm.rotor_speed_master_common_int_lim),data,sizeof(_bup_dcu_lst_prm.rotor_speed_master_common_int_lim));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_COMMON_OUT_RATE_LIM:
+            memcpy(&(_bup_dcu_lst_prm.rotor_speed_master_common_out_rate_lim),data,sizeof(_bup_dcu_lst_prm.rotor_speed_master_common_out_rate_lim));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_COMMON_ERR_RATE_LIM:
+            memcpy(&(_bup_dcu_lst_prm.rotor_speed_master_common_err_rate_lim),data,sizeof(_bup_dcu_lst_prm.rotor_speed_master_common_err_rate_lim));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_DIFF_KP:
+            memcpy(&(_bup_dcu_lst_prm.rotor_speed_master_diff_kp),data,sizeof(_bup_dcu_lst_prm.rotor_speed_master_diff_kp));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_DIFF_KI:
+            memcpy(&(_bup_dcu_lst_prm.rotor_speed_master_diff_ki),data,sizeof(_bup_dcu_lst_prm.rotor_speed_master_diff_ki));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_DIFF_KB:
+            memcpy(&(_bup_dcu_lst_prm.rotor_speed_master_diff_kb),data,sizeof(_bup_dcu_lst_prm.rotor_speed_master_diff_kb));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_DIFF_KT:
+            memcpy(&(_bup_dcu_lst_prm.rotor_speed_master_diff_kt),data,sizeof(_bup_dcu_lst_prm.rotor_speed_master_diff_kt));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_DIFF_KF:
+            memcpy(&(_bup_dcu_lst_prm.rotor_speed_master_diff_kf),data,sizeof(_bup_dcu_lst_prm.rotor_speed_master_diff_kf));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_DIFF_ERR_LIM:
+            memcpy(&(_bup_dcu_lst_prm.rotor_speed_master_diff_err_lim),data,sizeof(_bup_dcu_lst_prm.rotor_speed_master_diff_err_lim));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_DIFF_OUT_LIM:
+            memcpy(&(_bup_dcu_lst_prm.rotor_speed_master_diff_out_lim),data,sizeof(_bup_dcu_lst_prm.rotor_speed_master_diff_out_lim));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_DIFF_INT_LIM:
+            memcpy(&(_bup_dcu_lst_prm.rotor_speed_master_diff_int_lim),data,sizeof(_bup_dcu_lst_prm.rotor_speed_master_diff_int_lim));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_DIFF_OUT_RATE_LIM:
+            memcpy(&(_bup_dcu_lst_prm.rotor_speed_master_diff_out_rate_lim),data,sizeof(_bup_dcu_lst_prm.rotor_speed_master_diff_out_rate_lim));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_DIFF_ERR_RATE_LIM:
+            memcpy(&(_bup_dcu_lst_prm.rotor_speed_master_diff_err_rate_lim),data,sizeof(_bup_dcu_lst_prm.rotor_speed_master_diff_err_rate_lim));
+            return MJ_PRM_OK;
+        case PRM_INT_ROTOR_SPEED_ROLE:
+            memcpy(&(_bup_dcu_lst_prm.rotor_speed_role),data,sizeof(_bup_dcu_lst_prm.rotor_speed_role));
             return MJ_PRM_OK;
         case PRM_FLOAT_ROTOR_ANG_KP:
             memcpy(&(_bup_dcu_lst_prm.rotor_ang_kp),data,sizeof(_bup_dcu_lst_prm.rotor_ang_kp));
@@ -768,6 +1585,12 @@ mj_prm_status_t bup_dcu_lst_prm_write(int id, void *data)
         case PRM_FLOAT_ROTOR_ANG_ERR_RATE_LIM:
             memcpy(&(_bup_dcu_lst_prm.rotor_ang_err_rate_lim),data,sizeof(_bup_dcu_lst_prm.rotor_ang_err_rate_lim));
             return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_ANG_DZ:
+            memcpy(&(_bup_dcu_lst_prm.rotor_ang_dz),data,sizeof(_bup_dcu_lst_prm.rotor_ang_dz));
+            return MJ_PRM_OK;
+        case PRM_BOOL_ROTOR_ANG_DZ_EN:
+            memcpy(&(_bup_dcu_lst_prm.rotor_ang_dz_en),data,sizeof(_bup_dcu_lst_prm.rotor_ang_dz_en));
+            return MJ_PRM_OK;
         case PRM_STRING_FACTORY_DATE:
             memcpy(&(_bup_dcu_lst_prm.factory_date),data,sizeof(_bup_dcu_lst_prm.factory_date));
             return MJ_PRM_OK;
@@ -791,6 +1614,9 @@ mj_prm_status_t bup_dcu_lst_prm_write(int id, void *data)
             return MJ_PRM_OK;
         case PRM_STRING_COM_IF_BRO_BUP_DATA_MCAST:
             memcpy(&(_bup_dcu_lst_prm.com_if_bro_bup_data_mcast),data,sizeof(_bup_dcu_lst_prm.com_if_bro_bup_data_mcast));
+            return MJ_PRM_OK;
+        case PRM_STRING_COM_IF_BUP_INTERNAL_MCAST:
+            memcpy(&(_bup_dcu_lst_prm.com_if_bup_internal_mcast),data,sizeof(_bup_dcu_lst_prm.com_if_bup_internal_mcast));
             return MJ_PRM_OK;
         case PRM_STRING_COM_IF_BRO_BUP_SRV_MCAST:
             memcpy(&(_bup_dcu_lst_prm.com_if_bro_bup_srv_mcast),data,sizeof(_bup_dcu_lst_prm.com_if_bro_bup_srv_mcast));
@@ -853,6 +1679,9 @@ mj_prm_status_t bup_dcu_lst_prm_read(int id, void *data)
             return MJ_PRM_OK;
         case PRM_FLOAT_OHP_LVL:
             memcpy(data,&_bup_dcu_lst_prm.ohp_lvl,sizeof(_bup_dcu_lst_prm.ohp_lvl));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_OHP_HYST:
+            memcpy(data,&_bup_dcu_lst_prm.ohp_hyst,sizeof(_bup_dcu_lst_prm.ohp_hyst));
             return MJ_PRM_OK;
         case PRM_FLOAT_EL_ZERO:
             memcpy(data,&_bup_dcu_lst_prm.el_zero,sizeof(_bup_dcu_lst_prm.el_zero));
@@ -929,11 +1758,59 @@ mj_prm_status_t bup_dcu_lst_prm_read(int id, void *data)
         case PRM_FLOAT_LOAD_SPEED_OUT_LIM:
             memcpy(data,&_bup_dcu_lst_prm.load_speed_out_lim,sizeof(_bup_dcu_lst_prm.load_speed_out_lim));
             return MJ_PRM_OK;
+        case PRM_FLOAT_LOAD_SPEED_INT_LIM:
+            memcpy(data,&_bup_dcu_lst_prm.load_speed_int_lim,sizeof(_bup_dcu_lst_prm.load_speed_int_lim));
+            return MJ_PRM_OK;
         case PRM_FLOAT_LOAD_SPEED_OUT_RATE_LIM:
             memcpy(data,&_bup_dcu_lst_prm.load_speed_out_rate_lim,sizeof(_bup_dcu_lst_prm.load_speed_out_rate_lim));
             return MJ_PRM_OK;
         case PRM_FLOAT_LOAD_SPEED_ERR_RATE_LIM:
             memcpy(data,&_bup_dcu_lst_prm.load_speed_err_rate_lim,sizeof(_bup_dcu_lst_prm.load_speed_err_rate_lim));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_LOAD_SPEED_FLT_FC:
+            memcpy(data,&_bup_dcu_lst_prm.load_speed_flt_fc,sizeof(_bup_dcu_lst_prm.load_speed_flt_fc));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_FLT_FC:
+            memcpy(data,&_bup_dcu_lst_prm.rotor_speed_flt_fc,sizeof(_bup_dcu_lst_prm.rotor_speed_flt_fc));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_LOAD_ANG_KP:
+            memcpy(data,&_bup_dcu_lst_prm.load_ang_kp,sizeof(_bup_dcu_lst_prm.load_ang_kp));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_LOAD_ANG_KI:
+            memcpy(data,&_bup_dcu_lst_prm.load_ang_ki,sizeof(_bup_dcu_lst_prm.load_ang_ki));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_LOAD_ANG_KB:
+            memcpy(data,&_bup_dcu_lst_prm.load_ang_kb,sizeof(_bup_dcu_lst_prm.load_ang_kb));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_LOAD_ANG_KT:
+            memcpy(data,&_bup_dcu_lst_prm.load_ang_kt,sizeof(_bup_dcu_lst_prm.load_ang_kt));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_LOAD_ANG_KF:
+            memcpy(data,&_bup_dcu_lst_prm.load_ang_kf,sizeof(_bup_dcu_lst_prm.load_ang_kf));
+            return MJ_PRM_OK;
+        case PRM_BOOL_LOAD_ANG_REV:
+            memcpy(data,&_bup_dcu_lst_prm.load_ang_rev,sizeof(_bup_dcu_lst_prm.load_ang_rev));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_LOAD_ANG_KD:
+            memcpy(data,&_bup_dcu_lst_prm.load_ang_kd,sizeof(_bup_dcu_lst_prm.load_ang_kd));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_LOAD_ANG_ERR_LIM:
+            memcpy(data,&_bup_dcu_lst_prm.load_ang_err_lim,sizeof(_bup_dcu_lst_prm.load_ang_err_lim));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_LOAD_ANG_OUT_LIM:
+            memcpy(data,&_bup_dcu_lst_prm.load_ang_out_lim,sizeof(_bup_dcu_lst_prm.load_ang_out_lim));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_LOAD_ANG_OUT_RATE_LIM:
+            memcpy(data,&_bup_dcu_lst_prm.load_ang_out_rate_lim,sizeof(_bup_dcu_lst_prm.load_ang_out_rate_lim));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_LOAD_ANG_ERR_RATE_LIM:
+            memcpy(data,&_bup_dcu_lst_prm.load_ang_err_rate_lim,sizeof(_bup_dcu_lst_prm.load_ang_err_rate_lim));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_LOAD_ANG_DZ:
+            memcpy(data,&_bup_dcu_lst_prm.load_ang_dz,sizeof(_bup_dcu_lst_prm.load_ang_dz));
+            return MJ_PRM_OK;
+        case PRM_BOOL_LOAD_ANG_DZ_EN:
+            memcpy(data,&_bup_dcu_lst_prm.load_ang_dz_en,sizeof(_bup_dcu_lst_prm.load_ang_dz_en));
             return MJ_PRM_OK;
         case PRM_FLOAT_ROTOR_SPEED_KP:
             memcpy(data,&_bup_dcu_lst_prm.rotor_speed_kp,sizeof(_bup_dcu_lst_prm.rotor_speed_kp));
@@ -956,11 +1833,77 @@ mj_prm_status_t bup_dcu_lst_prm_read(int id, void *data)
         case PRM_FLOAT_ROTOR_SPEED_OUT_LIM:
             memcpy(data,&_bup_dcu_lst_prm.rotor_speed_out_lim,sizeof(_bup_dcu_lst_prm.rotor_speed_out_lim));
             return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_INT_LIM:
+            memcpy(data,&_bup_dcu_lst_prm.rotor_speed_int_lim,sizeof(_bup_dcu_lst_prm.rotor_speed_int_lim));
+            return MJ_PRM_OK;
         case PRM_FLOAT_ROTOR_SPEED_OUT_RATE_LIM:
             memcpy(data,&_bup_dcu_lst_prm.rotor_speed_out_rate_lim,sizeof(_bup_dcu_lst_prm.rotor_speed_out_rate_lim));
             return MJ_PRM_OK;
         case PRM_FLOAT_ROTOR_SPEED_ERR_RATE_LIM:
             memcpy(data,&_bup_dcu_lst_prm.rotor_speed_err_rate_lim,sizeof(_bup_dcu_lst_prm.rotor_speed_err_rate_lim));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_COMMON_KP:
+            memcpy(data,&_bup_dcu_lst_prm.rotor_speed_master_common_kp,sizeof(_bup_dcu_lst_prm.rotor_speed_master_common_kp));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_COMMON_KI:
+            memcpy(data,&_bup_dcu_lst_prm.rotor_speed_master_common_ki,sizeof(_bup_dcu_lst_prm.rotor_speed_master_common_ki));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_COMMON_KB:
+            memcpy(data,&_bup_dcu_lst_prm.rotor_speed_master_common_kb,sizeof(_bup_dcu_lst_prm.rotor_speed_master_common_kb));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_COMMON_KT:
+            memcpy(data,&_bup_dcu_lst_prm.rotor_speed_master_common_kt,sizeof(_bup_dcu_lst_prm.rotor_speed_master_common_kt));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_COMMON_KF:
+            memcpy(data,&_bup_dcu_lst_prm.rotor_speed_master_common_kf,sizeof(_bup_dcu_lst_prm.rotor_speed_master_common_kf));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_COMMON_ERR_LIM:
+            memcpy(data,&_bup_dcu_lst_prm.rotor_speed_master_common_err_lim,sizeof(_bup_dcu_lst_prm.rotor_speed_master_common_err_lim));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_COMMON_OUT_LIM:
+            memcpy(data,&_bup_dcu_lst_prm.rotor_speed_master_common_out_lim,sizeof(_bup_dcu_lst_prm.rotor_speed_master_common_out_lim));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_COMMON_INT_LIM:
+            memcpy(data,&_bup_dcu_lst_prm.rotor_speed_master_common_int_lim,sizeof(_bup_dcu_lst_prm.rotor_speed_master_common_int_lim));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_COMMON_OUT_RATE_LIM:
+            memcpy(data,&_bup_dcu_lst_prm.rotor_speed_master_common_out_rate_lim,sizeof(_bup_dcu_lst_prm.rotor_speed_master_common_out_rate_lim));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_COMMON_ERR_RATE_LIM:
+            memcpy(data,&_bup_dcu_lst_prm.rotor_speed_master_common_err_rate_lim,sizeof(_bup_dcu_lst_prm.rotor_speed_master_common_err_rate_lim));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_DIFF_KP:
+            memcpy(data,&_bup_dcu_lst_prm.rotor_speed_master_diff_kp,sizeof(_bup_dcu_lst_prm.rotor_speed_master_diff_kp));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_DIFF_KI:
+            memcpy(data,&_bup_dcu_lst_prm.rotor_speed_master_diff_ki,sizeof(_bup_dcu_lst_prm.rotor_speed_master_diff_ki));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_DIFF_KB:
+            memcpy(data,&_bup_dcu_lst_prm.rotor_speed_master_diff_kb,sizeof(_bup_dcu_lst_prm.rotor_speed_master_diff_kb));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_DIFF_KT:
+            memcpy(data,&_bup_dcu_lst_prm.rotor_speed_master_diff_kt,sizeof(_bup_dcu_lst_prm.rotor_speed_master_diff_kt));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_DIFF_KF:
+            memcpy(data,&_bup_dcu_lst_prm.rotor_speed_master_diff_kf,sizeof(_bup_dcu_lst_prm.rotor_speed_master_diff_kf));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_DIFF_ERR_LIM:
+            memcpy(data,&_bup_dcu_lst_prm.rotor_speed_master_diff_err_lim,sizeof(_bup_dcu_lst_prm.rotor_speed_master_diff_err_lim));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_DIFF_OUT_LIM:
+            memcpy(data,&_bup_dcu_lst_prm.rotor_speed_master_diff_out_lim,sizeof(_bup_dcu_lst_prm.rotor_speed_master_diff_out_lim));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_DIFF_INT_LIM:
+            memcpy(data,&_bup_dcu_lst_prm.rotor_speed_master_diff_int_lim,sizeof(_bup_dcu_lst_prm.rotor_speed_master_diff_int_lim));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_DIFF_OUT_RATE_LIM:
+            memcpy(data,&_bup_dcu_lst_prm.rotor_speed_master_diff_out_rate_lim,sizeof(_bup_dcu_lst_prm.rotor_speed_master_diff_out_rate_lim));
+            return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_SPEED_MASTER_DIFF_ERR_RATE_LIM:
+            memcpy(data,&_bup_dcu_lst_prm.rotor_speed_master_diff_err_rate_lim,sizeof(_bup_dcu_lst_prm.rotor_speed_master_diff_err_rate_lim));
+            return MJ_PRM_OK;
+        case PRM_INT_ROTOR_SPEED_ROLE:
+            memcpy(data,&_bup_dcu_lst_prm.rotor_speed_role,sizeof(_bup_dcu_lst_prm.rotor_speed_role));
             return MJ_PRM_OK;
         case PRM_FLOAT_ROTOR_ANG_KP:
             memcpy(data,&_bup_dcu_lst_prm.rotor_ang_kp,sizeof(_bup_dcu_lst_prm.rotor_ang_kp));
@@ -989,6 +1932,12 @@ mj_prm_status_t bup_dcu_lst_prm_read(int id, void *data)
         case PRM_FLOAT_ROTOR_ANG_ERR_RATE_LIM:
             memcpy(data,&_bup_dcu_lst_prm.rotor_ang_err_rate_lim,sizeof(_bup_dcu_lst_prm.rotor_ang_err_rate_lim));
             return MJ_PRM_OK;
+        case PRM_FLOAT_ROTOR_ANG_DZ:
+            memcpy(data,&_bup_dcu_lst_prm.rotor_ang_dz,sizeof(_bup_dcu_lst_prm.rotor_ang_dz));
+            return MJ_PRM_OK;
+        case PRM_BOOL_ROTOR_ANG_DZ_EN:
+            memcpy(data,&_bup_dcu_lst_prm.rotor_ang_dz_en,sizeof(_bup_dcu_lst_prm.rotor_ang_dz_en));
+            return MJ_PRM_OK;
         case PRM_STRING_FACTORY_DATE:
             memcpy(data,&_bup_dcu_lst_prm.factory_date,sizeof(_bup_dcu_lst_prm.factory_date));
             return MJ_PRM_OK;
@@ -1013,6 +1962,9 @@ mj_prm_status_t bup_dcu_lst_prm_read(int id, void *data)
         case PRM_STRING_COM_IF_BRO_BUP_DATA_MCAST:
             memcpy(data,&_bup_dcu_lst_prm.com_if_bro_bup_data_mcast,sizeof(_bup_dcu_lst_prm.com_if_bro_bup_data_mcast));
             return MJ_PRM_OK;
+        case PRM_STRING_COM_IF_BUP_INTERNAL_MCAST:
+            memcpy(data,&_bup_dcu_lst_prm.com_if_bup_internal_mcast,sizeof(_bup_dcu_lst_prm.com_if_bup_internal_mcast));
+            return MJ_PRM_OK;
         case PRM_STRING_COM_IF_BRO_BUP_SRV_MCAST:
             memcpy(data,&_bup_dcu_lst_prm.com_if_bro_bup_srv_mcast,sizeof(_bup_dcu_lst_prm.com_if_bro_bup_srv_mcast));
             return MJ_PRM_OK;
@@ -1024,7 +1976,7 @@ mj_prm_status_t bup_dcu_lst_prm_read(int id, void *data)
     }
 }
 
-static const uint32_t _prm_ids[71] = {
+static const uint32_t _prm_ids[113] = {
     PRM_BOOL_SERVICE_MODE,
     PRM_BOOL_DBG_MODE,
     PRM_BOOL_PTP_STAT,
@@ -1041,6 +1993,7 @@ static const uint32_t _prm_ids[71] = {
     PRM_FLOAT_PTP_KI,
     PRM_FLOAT_PTP_KD,
     PRM_FLOAT_OHP_LVL,
+    PRM_FLOAT_OHP_HYST,
     PRM_FLOAT_EL_ZERO,
     PRM_INT_POLE_PAIRS,
     PRM_FLOAT_PH_RESISTANCE,
@@ -1066,8 +2019,24 @@ static const uint32_t _prm_ids[71] = {
     PRM_FLOAT_LOAD_SPEED_KF,
     PRM_FLOAT_LOAD_SPEED_ERR_LIM,
     PRM_FLOAT_LOAD_SPEED_OUT_LIM,
+    PRM_FLOAT_LOAD_SPEED_INT_LIM,
     PRM_FLOAT_LOAD_SPEED_OUT_RATE_LIM,
     PRM_FLOAT_LOAD_SPEED_ERR_RATE_LIM,
+    PRM_FLOAT_LOAD_SPEED_FLT_FC,
+    PRM_FLOAT_ROTOR_SPEED_FLT_FC,
+    PRM_FLOAT_LOAD_ANG_KP,
+    PRM_FLOAT_LOAD_ANG_KI,
+    PRM_FLOAT_LOAD_ANG_KB,
+    PRM_FLOAT_LOAD_ANG_KT,
+    PRM_FLOAT_LOAD_ANG_KF,
+    PRM_BOOL_LOAD_ANG_REV,
+    PRM_FLOAT_LOAD_ANG_KD,
+    PRM_FLOAT_LOAD_ANG_ERR_LIM,
+    PRM_FLOAT_LOAD_ANG_OUT_LIM,
+    PRM_FLOAT_LOAD_ANG_OUT_RATE_LIM,
+    PRM_FLOAT_LOAD_ANG_ERR_RATE_LIM,
+    PRM_FLOAT_LOAD_ANG_DZ,
+    PRM_BOOL_LOAD_ANG_DZ_EN,
     PRM_FLOAT_ROTOR_SPEED_KP,
     PRM_FLOAT_ROTOR_SPEED_KI,
     PRM_FLOAT_ROTOR_SPEED_KB,
@@ -1075,8 +2044,30 @@ static const uint32_t _prm_ids[71] = {
     PRM_FLOAT_ROTOR_SPEED_KF,
     PRM_FLOAT_ROTOR_SPEED_ERR_LIM,
     PRM_FLOAT_ROTOR_SPEED_OUT_LIM,
+    PRM_FLOAT_ROTOR_SPEED_INT_LIM,
     PRM_FLOAT_ROTOR_SPEED_OUT_RATE_LIM,
     PRM_FLOAT_ROTOR_SPEED_ERR_RATE_LIM,
+    PRM_FLOAT_ROTOR_SPEED_MASTER_COMMON_KP,
+    PRM_FLOAT_ROTOR_SPEED_MASTER_COMMON_KI,
+    PRM_FLOAT_ROTOR_SPEED_MASTER_COMMON_KB,
+    PRM_FLOAT_ROTOR_SPEED_MASTER_COMMON_KT,
+    PRM_FLOAT_ROTOR_SPEED_MASTER_COMMON_KF,
+    PRM_FLOAT_ROTOR_SPEED_MASTER_COMMON_ERR_LIM,
+    PRM_FLOAT_ROTOR_SPEED_MASTER_COMMON_OUT_LIM,
+    PRM_FLOAT_ROTOR_SPEED_MASTER_COMMON_INT_LIM,
+    PRM_FLOAT_ROTOR_SPEED_MASTER_COMMON_OUT_RATE_LIM,
+    PRM_FLOAT_ROTOR_SPEED_MASTER_COMMON_ERR_RATE_LIM,
+    PRM_FLOAT_ROTOR_SPEED_MASTER_DIFF_KP,
+    PRM_FLOAT_ROTOR_SPEED_MASTER_DIFF_KI,
+    PRM_FLOAT_ROTOR_SPEED_MASTER_DIFF_KB,
+    PRM_FLOAT_ROTOR_SPEED_MASTER_DIFF_KT,
+    PRM_FLOAT_ROTOR_SPEED_MASTER_DIFF_KF,
+    PRM_FLOAT_ROTOR_SPEED_MASTER_DIFF_ERR_LIM,
+    PRM_FLOAT_ROTOR_SPEED_MASTER_DIFF_OUT_LIM,
+    PRM_FLOAT_ROTOR_SPEED_MASTER_DIFF_INT_LIM,
+    PRM_FLOAT_ROTOR_SPEED_MASTER_DIFF_OUT_RATE_LIM,
+    PRM_FLOAT_ROTOR_SPEED_MASTER_DIFF_ERR_RATE_LIM,
+    PRM_INT_ROTOR_SPEED_ROLE,
     PRM_FLOAT_ROTOR_ANG_KP,
     PRM_FLOAT_ROTOR_ANG_KI,
     PRM_FLOAT_ROTOR_ANG_KB,
@@ -1086,6 +2077,8 @@ static const uint32_t _prm_ids[71] = {
     PRM_FLOAT_ROTOR_ANG_OUT_LIM,
     PRM_FLOAT_ROTOR_ANG_OUT_RATE_LIM,
     PRM_FLOAT_ROTOR_ANG_ERR_RATE_LIM,
+    PRM_FLOAT_ROTOR_ANG_DZ,
+    PRM_BOOL_ROTOR_ANG_DZ_EN,
     PRM_STRING_FACTORY_DATE,
     PRM_STRING_FACTORY_NUMBER,
     PRM_STRING_DESCRIPTION,
@@ -1094,13 +2087,14 @@ static const uint32_t _prm_ids[71] = {
     PRM_STRING_COM_IF_SRV_MCAST_ANS,
     PRM_STRING_COM_IF_BRO_BUP_CTRL_MCAST,
     PRM_STRING_COM_IF_BRO_BUP_DATA_MCAST,
+    PRM_STRING_COM_IF_BUP_INTERNAL_MCAST,
     PRM_STRING_COM_IF_BRO_BUP_SRV_MCAST,
     PRM_STRING_COM_IF_IM_BRO_DRIVE_MCAST
 };
 
 static const uint32_t * bup_dcu_lst_prm_list(uint32_t *size)
 {
-    *size = 71;
+    *size = 113;
     return _prm_ids;
 }
 
@@ -1142,6 +2136,18 @@ static void tick_fcn()
             mj_handle.out.dbg.msg->hdr.ts_status = p_drv->timestamp(&mj_handle.out.dbg.msg->hdr.ts_s,&_temp_ns);
             mj_handle.out.dbg.msg->hdr.ts_ns = _temp_ns;
             p_drv->udp4.tx(out_dbg_pkt,NULL);
+        }
+        if (mj_handle.out.drive_master_ctrl.tx_enable){
+            mj_handle.out.drive_master_ctrl.msg->hdr.cnt = _1000_us_cnt;
+            mj_handle.out.drive_master_ctrl.msg->hdr.ts_status = p_drv->timestamp(&mj_handle.out.drive_master_ctrl.msg->hdr.ts_s,&_temp_ns);
+            mj_handle.out.drive_master_ctrl.msg->hdr.ts_ns = _temp_ns;
+            p_drv->udp4.tx(out_drive_master_ctrl_pkt,NULL);
+        }
+        if (mj_handle.out.drive_slave_fb.tx_enable){
+            mj_handle.out.drive_slave_fb.msg->hdr.cnt = _1000_us_cnt;
+            mj_handle.out.drive_slave_fb.msg->hdr.ts_status = p_drv->timestamp(&mj_handle.out.drive_slave_fb.msg->hdr.ts_s,&_temp_ns);
+            mj_handle.out.drive_slave_fb.msg->hdr.ts_ns = _temp_ns;
+            p_drv->udp4.tx(out_drive_slave_fb_pkt,NULL);
         }
         _1000_us_tick = 0;
     }
@@ -1225,6 +2231,85 @@ static mj_msg_proc_res_t bro_bup_ctrl_mcast_cb(uint8_t* data, uint16_t size, uin
                     return MJ_REJECT_SIZE;
                 }
             break;
+            // bup_multi_control
+            case ID_BUP_MULTI_CONTROL:
+                if (size == sizeof(bup_drv_multi_control_msg_t))
+                {
+                    switch (hdr->src)
+                    {
+                        // bup_multi_control from aufd
+                        case BRO30_AUFD:
+                            if (in_aufd_bup_multi_control_lock_cnt == 0)
+                            {
+                                old_buff = (uint8_t*)mj_handle.in.aufd.bup_multi_control.msg;
+                                mj_handle.in.aufd.bup_multi_control.msg = (bup_drv_multi_control_msg_t *)data;
+                                mj_handle.in.aufd.bup_multi_control.ts_s  = ts_s;
+                                mj_handle.in.aufd.bup_multi_control.ts_ns = ts_ns;
+                                in_aufd_bup_multi_control_updated = 1;
+                                in_aufd_bup_multi_control_total++;
+                                uint16_t cnt_diff = (mj_handle.in.aufd.bup_multi_control.msg->hdr.cnt - in_aufd_bup_multi_control_last_cnt);
+                                if (cnt_diff > 1)
+                                {
+                                    in_aufd_bup_multi_control_miss += cnt_diff;
+                                }
+                                in_aufd_bup_multi_control_last_cnt = mj_handle.in.aufd.bup_multi_control.msg->hdr.cnt;
+                                aufd_bup_multi_control_rx_tick = ticks;
+                                mj_handle.in.aufd.bup_multi_control.state = MJ_MSG_ACTUAL;
+                                p_drv->udp4.free(old_buff);
+                            }else{
+                                if (in_aufd_bup_multi_control_delayed_ptr == NULL)
+                                {
+                                    in_aufd_bup_multi_control_delayed_ptr = (bup_drv_multi_control_msg_t *)data;
+                                    aufd_bup_multi_control_delayed_ts_s = ts_s;
+                                    aufd_bup_multi_control_delayed_ts_s = ts_ns;;
+                                }else{
+                                    return MJ_REJECT_OVF;
+                                }
+                            }
+                            if (mj_handle.in.aufd.bup_multi_control.irq){
+                                mj_handle.in.aufd.bup_multi_control.irq(data);
+                            }
+                            return MJ_ACCEPT;
+                        // bup_multi_control from mon
+                        case BRO30_MON:
+                            if (in_mon_bup_multi_control_lock_cnt == 0)
+                            {
+                                old_buff = (uint8_t*)mj_handle.in.mon.bup_multi_control.msg;
+                                mj_handle.in.mon.bup_multi_control.msg = (bup_drv_multi_control_msg_t *)data;
+                                mj_handle.in.mon.bup_multi_control.ts_s  = ts_s;
+                                mj_handle.in.mon.bup_multi_control.ts_ns = ts_ns;
+                                in_mon_bup_multi_control_updated = 1;
+                                in_mon_bup_multi_control_total++;
+                                uint16_t cnt_diff = (mj_handle.in.mon.bup_multi_control.msg->hdr.cnt - in_mon_bup_multi_control_last_cnt);
+                                if (cnt_diff > 1)
+                                {
+                                    in_mon_bup_multi_control_miss += cnt_diff;
+                                }
+                                in_mon_bup_multi_control_last_cnt = mj_handle.in.mon.bup_multi_control.msg->hdr.cnt;
+                                mon_bup_multi_control_rx_tick = ticks;
+                                mj_handle.in.mon.bup_multi_control.state = MJ_MSG_ACTUAL;
+                                p_drv->udp4.free(old_buff);
+                            }else{
+                                if (in_mon_bup_multi_control_delayed_ptr == NULL)
+                                {
+                                    in_mon_bup_multi_control_delayed_ptr = (bup_drv_multi_control_msg_t *)data;
+                                    mon_bup_multi_control_delayed_ts_s = ts_s;
+                                    mon_bup_multi_control_delayed_ts_s = ts_ns;;
+                                }else{
+                                    return MJ_REJECT_OVF;
+                                }
+                            }
+                            if (mj_handle.in.mon.bup_multi_control.irq){
+                                mj_handle.in.mon.bup_multi_control.irq(data);
+                            }
+                            return MJ_ACCEPT;
+                        default:
+                            return MJ_REJECT_SRC;
+                    }
+                }else{
+                    return MJ_REJECT_SIZE;
+                }
+            break;
             default:
                 return MJ_REJECT_ID;    
         }
@@ -1278,6 +2363,444 @@ static mj_msg_proc_res_t bro_bup_srv_mcast_cb(uint8_t* data, uint16_t size, uint
                             }
                             if (mj_handle.in.mon.bup_srv_ctrl.irq){
                                 mj_handle.in.mon.bup_srv_ctrl.irq(data);
+                            }
+                            return MJ_ACCEPT;
+                        default:
+                            return MJ_REJECT_SRC;
+                    }
+                }else{
+                    return MJ_REJECT_SIZE;
+                }
+            break;
+            default:
+                return MJ_REJECT_ID;    
+        }
+    }
+    return MJ_REJECT_DST; 
+}
+
+
+static mj_msg_proc_res_t bup_internal_mcast_cb(uint8_t* data, uint16_t size, uint32_t ts_s, uint32_t ts_ns)
+{
+    mj_msg_header_t *hdr = (mj_msg_header_t*)data;
+    if ((hdr->dst == BRO30_ALL) || (hdr->dst == self_dev_id))
+    {
+        uint8_t *old_buff = NULL;
+        switch (hdr->id)
+        {
+            // drive_master_ctrl
+            case ID_DRIVE_MASTER_CTRL:
+                if (size == sizeof(drive_master_ctrl_msg_t))
+                {
+                    switch (hdr->src)
+                    {
+                        // drive_master_ctrl from bup_dcu_lfd
+                        case BRO30_BUP_DCU_LFD:
+                            if (in_bup_dcu_lfd_drive_master_ctrl_lock_cnt == 0)
+                            {
+                                old_buff = (uint8_t*)mj_handle.in.bup_dcu_lfd.drive_master_ctrl.msg;
+                                mj_handle.in.bup_dcu_lfd.drive_master_ctrl.msg = (drive_master_ctrl_msg_t *)data;
+                                mj_handle.in.bup_dcu_lfd.drive_master_ctrl.ts_s  = ts_s;
+                                mj_handle.in.bup_dcu_lfd.drive_master_ctrl.ts_ns = ts_ns;
+                                in_bup_dcu_lfd_drive_master_ctrl_updated = 1;
+                                in_bup_dcu_lfd_drive_master_ctrl_total++;
+                                uint16_t cnt_diff = (mj_handle.in.bup_dcu_lfd.drive_master_ctrl.msg->hdr.cnt - in_bup_dcu_lfd_drive_master_ctrl_last_cnt);
+                                if (cnt_diff > 1)
+                                {
+                                    in_bup_dcu_lfd_drive_master_ctrl_miss += cnt_diff;
+                                }
+                                in_bup_dcu_lfd_drive_master_ctrl_last_cnt = mj_handle.in.bup_dcu_lfd.drive_master_ctrl.msg->hdr.cnt;
+                                bup_dcu_lfd_drive_master_ctrl_rx_tick = ticks;
+                                mj_handle.in.bup_dcu_lfd.drive_master_ctrl.state = MJ_MSG_ACTUAL;
+                                p_drv->udp4.free(old_buff);
+                            }else{
+                                if (in_bup_dcu_lfd_drive_master_ctrl_delayed_ptr == NULL)
+                                {
+                                    in_bup_dcu_lfd_drive_master_ctrl_delayed_ptr = (drive_master_ctrl_msg_t *)data;
+                                    bup_dcu_lfd_drive_master_ctrl_delayed_ts_s = ts_s;
+                                    bup_dcu_lfd_drive_master_ctrl_delayed_ts_s = ts_ns;;
+                                }else{
+                                    return MJ_REJECT_OVF;
+                                }
+                            }
+                            if (mj_handle.in.bup_dcu_lfd.drive_master_ctrl.irq){
+                                mj_handle.in.bup_dcu_lfd.drive_master_ctrl.irq(data);
+                            }
+                            return MJ_ACCEPT;
+                        // drive_master_ctrl from bup_dcu_lrd
+                        case BRO30_BUP_DCU_LRD:
+                            if (in_bup_dcu_lrd_drive_master_ctrl_lock_cnt == 0)
+                            {
+                                old_buff = (uint8_t*)mj_handle.in.bup_dcu_lrd.drive_master_ctrl.msg;
+                                mj_handle.in.bup_dcu_lrd.drive_master_ctrl.msg = (drive_master_ctrl_msg_t *)data;
+                                mj_handle.in.bup_dcu_lrd.drive_master_ctrl.ts_s  = ts_s;
+                                mj_handle.in.bup_dcu_lrd.drive_master_ctrl.ts_ns = ts_ns;
+                                in_bup_dcu_lrd_drive_master_ctrl_updated = 1;
+                                in_bup_dcu_lrd_drive_master_ctrl_total++;
+                                uint16_t cnt_diff = (mj_handle.in.bup_dcu_lrd.drive_master_ctrl.msg->hdr.cnt - in_bup_dcu_lrd_drive_master_ctrl_last_cnt);
+                                if (cnt_diff > 1)
+                                {
+                                    in_bup_dcu_lrd_drive_master_ctrl_miss += cnt_diff;
+                                }
+                                in_bup_dcu_lrd_drive_master_ctrl_last_cnt = mj_handle.in.bup_dcu_lrd.drive_master_ctrl.msg->hdr.cnt;
+                                bup_dcu_lrd_drive_master_ctrl_rx_tick = ticks;
+                                mj_handle.in.bup_dcu_lrd.drive_master_ctrl.state = MJ_MSG_ACTUAL;
+                                p_drv->udp4.free(old_buff);
+                            }else{
+                                if (in_bup_dcu_lrd_drive_master_ctrl_delayed_ptr == NULL)
+                                {
+                                    in_bup_dcu_lrd_drive_master_ctrl_delayed_ptr = (drive_master_ctrl_msg_t *)data;
+                                    bup_dcu_lrd_drive_master_ctrl_delayed_ts_s = ts_s;
+                                    bup_dcu_lrd_drive_master_ctrl_delayed_ts_s = ts_ns;;
+                                }else{
+                                    return MJ_REJECT_OVF;
+                                }
+                            }
+                            if (mj_handle.in.bup_dcu_lrd.drive_master_ctrl.irq){
+                                mj_handle.in.bup_dcu_lrd.drive_master_ctrl.irq(data);
+                            }
+                            return MJ_ACCEPT;
+                        // drive_master_ctrl from bup_dcu_rfd
+                        case BRO30_BUP_DCU_RFD:
+                            if (in_bup_dcu_rfd_drive_master_ctrl_lock_cnt == 0)
+                            {
+                                old_buff = (uint8_t*)mj_handle.in.bup_dcu_rfd.drive_master_ctrl.msg;
+                                mj_handle.in.bup_dcu_rfd.drive_master_ctrl.msg = (drive_master_ctrl_msg_t *)data;
+                                mj_handle.in.bup_dcu_rfd.drive_master_ctrl.ts_s  = ts_s;
+                                mj_handle.in.bup_dcu_rfd.drive_master_ctrl.ts_ns = ts_ns;
+                                in_bup_dcu_rfd_drive_master_ctrl_updated = 1;
+                                in_bup_dcu_rfd_drive_master_ctrl_total++;
+                                uint16_t cnt_diff = (mj_handle.in.bup_dcu_rfd.drive_master_ctrl.msg->hdr.cnt - in_bup_dcu_rfd_drive_master_ctrl_last_cnt);
+                                if (cnt_diff > 1)
+                                {
+                                    in_bup_dcu_rfd_drive_master_ctrl_miss += cnt_diff;
+                                }
+                                in_bup_dcu_rfd_drive_master_ctrl_last_cnt = mj_handle.in.bup_dcu_rfd.drive_master_ctrl.msg->hdr.cnt;
+                                bup_dcu_rfd_drive_master_ctrl_rx_tick = ticks;
+                                mj_handle.in.bup_dcu_rfd.drive_master_ctrl.state = MJ_MSG_ACTUAL;
+                                p_drv->udp4.free(old_buff);
+                            }else{
+                                if (in_bup_dcu_rfd_drive_master_ctrl_delayed_ptr == NULL)
+                                {
+                                    in_bup_dcu_rfd_drive_master_ctrl_delayed_ptr = (drive_master_ctrl_msg_t *)data;
+                                    bup_dcu_rfd_drive_master_ctrl_delayed_ts_s = ts_s;
+                                    bup_dcu_rfd_drive_master_ctrl_delayed_ts_s = ts_ns;;
+                                }else{
+                                    return MJ_REJECT_OVF;
+                                }
+                            }
+                            if (mj_handle.in.bup_dcu_rfd.drive_master_ctrl.irq){
+                                mj_handle.in.bup_dcu_rfd.drive_master_ctrl.irq(data);
+                            }
+                            return MJ_ACCEPT;
+                        // drive_master_ctrl from bup_dcu_rrd
+                        case BRO30_BUP_DCU_RRD:
+                            if (in_bup_dcu_rrd_drive_master_ctrl_lock_cnt == 0)
+                            {
+                                old_buff = (uint8_t*)mj_handle.in.bup_dcu_rrd.drive_master_ctrl.msg;
+                                mj_handle.in.bup_dcu_rrd.drive_master_ctrl.msg = (drive_master_ctrl_msg_t *)data;
+                                mj_handle.in.bup_dcu_rrd.drive_master_ctrl.ts_s  = ts_s;
+                                mj_handle.in.bup_dcu_rrd.drive_master_ctrl.ts_ns = ts_ns;
+                                in_bup_dcu_rrd_drive_master_ctrl_updated = 1;
+                                in_bup_dcu_rrd_drive_master_ctrl_total++;
+                                uint16_t cnt_diff = (mj_handle.in.bup_dcu_rrd.drive_master_ctrl.msg->hdr.cnt - in_bup_dcu_rrd_drive_master_ctrl_last_cnt);
+                                if (cnt_diff > 1)
+                                {
+                                    in_bup_dcu_rrd_drive_master_ctrl_miss += cnt_diff;
+                                }
+                                in_bup_dcu_rrd_drive_master_ctrl_last_cnt = mj_handle.in.bup_dcu_rrd.drive_master_ctrl.msg->hdr.cnt;
+                                bup_dcu_rrd_drive_master_ctrl_rx_tick = ticks;
+                                mj_handle.in.bup_dcu_rrd.drive_master_ctrl.state = MJ_MSG_ACTUAL;
+                                p_drv->udp4.free(old_buff);
+                            }else{
+                                if (in_bup_dcu_rrd_drive_master_ctrl_delayed_ptr == NULL)
+                                {
+                                    in_bup_dcu_rrd_drive_master_ctrl_delayed_ptr = (drive_master_ctrl_msg_t *)data;
+                                    bup_dcu_rrd_drive_master_ctrl_delayed_ts_s = ts_s;
+                                    bup_dcu_rrd_drive_master_ctrl_delayed_ts_s = ts_ns;;
+                                }else{
+                                    return MJ_REJECT_OVF;
+                                }
+                            }
+                            if (mj_handle.in.bup_dcu_rrd.drive_master_ctrl.irq){
+                                mj_handle.in.bup_dcu_rrd.drive_master_ctrl.irq(data);
+                            }
+                            return MJ_ACCEPT;
+                        // drive_master_ctrl from bup_dcu_rst
+                        case BRO30_BUP_DCU_RST:
+                            if (in_bup_dcu_rst_drive_master_ctrl_lock_cnt == 0)
+                            {
+                                old_buff = (uint8_t*)mj_handle.in.bup_dcu_rst.drive_master_ctrl.msg;
+                                mj_handle.in.bup_dcu_rst.drive_master_ctrl.msg = (drive_master_ctrl_msg_t *)data;
+                                mj_handle.in.bup_dcu_rst.drive_master_ctrl.ts_s  = ts_s;
+                                mj_handle.in.bup_dcu_rst.drive_master_ctrl.ts_ns = ts_ns;
+                                in_bup_dcu_rst_drive_master_ctrl_updated = 1;
+                                in_bup_dcu_rst_drive_master_ctrl_total++;
+                                uint16_t cnt_diff = (mj_handle.in.bup_dcu_rst.drive_master_ctrl.msg->hdr.cnt - in_bup_dcu_rst_drive_master_ctrl_last_cnt);
+                                if (cnt_diff > 1)
+                                {
+                                    in_bup_dcu_rst_drive_master_ctrl_miss += cnt_diff;
+                                }
+                                in_bup_dcu_rst_drive_master_ctrl_last_cnt = mj_handle.in.bup_dcu_rst.drive_master_ctrl.msg->hdr.cnt;
+                                bup_dcu_rst_drive_master_ctrl_rx_tick = ticks;
+                                mj_handle.in.bup_dcu_rst.drive_master_ctrl.state = MJ_MSG_ACTUAL;
+                                p_drv->udp4.free(old_buff);
+                            }else{
+                                if (in_bup_dcu_rst_drive_master_ctrl_delayed_ptr == NULL)
+                                {
+                                    in_bup_dcu_rst_drive_master_ctrl_delayed_ptr = (drive_master_ctrl_msg_t *)data;
+                                    bup_dcu_rst_drive_master_ctrl_delayed_ts_s = ts_s;
+                                    bup_dcu_rst_drive_master_ctrl_delayed_ts_s = ts_ns;;
+                                }else{
+                                    return MJ_REJECT_OVF;
+                                }
+                            }
+                            if (mj_handle.in.bup_dcu_rst.drive_master_ctrl.irq){
+                                mj_handle.in.bup_dcu_rst.drive_master_ctrl.irq(data);
+                            }
+                            return MJ_ACCEPT;
+                        // drive_master_ctrl from dcu
+                        case BRO30_DCU:
+                            if (in_dcu_drive_master_ctrl_lock_cnt == 0)
+                            {
+                                old_buff = (uint8_t*)mj_handle.in.dcu.drive_master_ctrl.msg;
+                                mj_handle.in.dcu.drive_master_ctrl.msg = (drive_master_ctrl_msg_t *)data;
+                                mj_handle.in.dcu.drive_master_ctrl.ts_s  = ts_s;
+                                mj_handle.in.dcu.drive_master_ctrl.ts_ns = ts_ns;
+                                in_dcu_drive_master_ctrl_updated = 1;
+                                in_dcu_drive_master_ctrl_total++;
+                                uint16_t cnt_diff = (mj_handle.in.dcu.drive_master_ctrl.msg->hdr.cnt - in_dcu_drive_master_ctrl_last_cnt);
+                                if (cnt_diff > 1)
+                                {
+                                    in_dcu_drive_master_ctrl_miss += cnt_diff;
+                                }
+                                in_dcu_drive_master_ctrl_last_cnt = mj_handle.in.dcu.drive_master_ctrl.msg->hdr.cnt;
+                                dcu_drive_master_ctrl_rx_tick = ticks;
+                                mj_handle.in.dcu.drive_master_ctrl.state = MJ_MSG_ACTUAL;
+                                p_drv->udp4.free(old_buff);
+                            }else{
+                                if (in_dcu_drive_master_ctrl_delayed_ptr == NULL)
+                                {
+                                    in_dcu_drive_master_ctrl_delayed_ptr = (drive_master_ctrl_msg_t *)data;
+                                    dcu_drive_master_ctrl_delayed_ts_s = ts_s;
+                                    dcu_drive_master_ctrl_delayed_ts_s = ts_ns;;
+                                }else{
+                                    return MJ_REJECT_OVF;
+                                }
+                            }
+                            if (mj_handle.in.dcu.drive_master_ctrl.irq){
+                                mj_handle.in.dcu.drive_master_ctrl.irq(data);
+                            }
+                            return MJ_ACCEPT;
+                        default:
+                            return MJ_REJECT_SRC;
+                    }
+                }else{
+                    return MJ_REJECT_SIZE;
+                }
+            break;
+            // drive_slave_fb
+            case ID_DRIVE_SLAVE_FB:
+                if (size == sizeof(drive_slave_fb_msg_t))
+                {
+                    switch (hdr->src)
+                    {
+                        // drive_slave_fb from bup_dcu_lfd
+                        case BRO30_BUP_DCU_LFD:
+                            if (in_bup_dcu_lfd_drive_slave_fb_lock_cnt == 0)
+                            {
+                                old_buff = (uint8_t*)mj_handle.in.bup_dcu_lfd.drive_slave_fb.msg;
+                                mj_handle.in.bup_dcu_lfd.drive_slave_fb.msg = (drive_slave_fb_msg_t *)data;
+                                mj_handle.in.bup_dcu_lfd.drive_slave_fb.ts_s  = ts_s;
+                                mj_handle.in.bup_dcu_lfd.drive_slave_fb.ts_ns = ts_ns;
+                                in_bup_dcu_lfd_drive_slave_fb_updated = 1;
+                                in_bup_dcu_lfd_drive_slave_fb_total++;
+                                uint16_t cnt_diff = (mj_handle.in.bup_dcu_lfd.drive_slave_fb.msg->hdr.cnt - in_bup_dcu_lfd_drive_slave_fb_last_cnt);
+                                if (cnt_diff > 1)
+                                {
+                                    in_bup_dcu_lfd_drive_slave_fb_miss += cnt_diff;
+                                }
+                                in_bup_dcu_lfd_drive_slave_fb_last_cnt = mj_handle.in.bup_dcu_lfd.drive_slave_fb.msg->hdr.cnt;
+                                bup_dcu_lfd_drive_slave_fb_rx_tick = ticks;
+                                mj_handle.in.bup_dcu_lfd.drive_slave_fb.state = MJ_MSG_ACTUAL;
+                                p_drv->udp4.free(old_buff);
+                            }else{
+                                if (in_bup_dcu_lfd_drive_slave_fb_delayed_ptr == NULL)
+                                {
+                                    in_bup_dcu_lfd_drive_slave_fb_delayed_ptr = (drive_slave_fb_msg_t *)data;
+                                    bup_dcu_lfd_drive_slave_fb_delayed_ts_s = ts_s;
+                                    bup_dcu_lfd_drive_slave_fb_delayed_ts_s = ts_ns;;
+                                }else{
+                                    return MJ_REJECT_OVF;
+                                }
+                            }
+                            if (mj_handle.in.bup_dcu_lfd.drive_slave_fb.irq){
+                                mj_handle.in.bup_dcu_lfd.drive_slave_fb.irq(data);
+                            }
+                            return MJ_ACCEPT;
+                        // drive_slave_fb from bup_dcu_lrd
+                        case BRO30_BUP_DCU_LRD:
+                            if (in_bup_dcu_lrd_drive_slave_fb_lock_cnt == 0)
+                            {
+                                old_buff = (uint8_t*)mj_handle.in.bup_dcu_lrd.drive_slave_fb.msg;
+                                mj_handle.in.bup_dcu_lrd.drive_slave_fb.msg = (drive_slave_fb_msg_t *)data;
+                                mj_handle.in.bup_dcu_lrd.drive_slave_fb.ts_s  = ts_s;
+                                mj_handle.in.bup_dcu_lrd.drive_slave_fb.ts_ns = ts_ns;
+                                in_bup_dcu_lrd_drive_slave_fb_updated = 1;
+                                in_bup_dcu_lrd_drive_slave_fb_total++;
+                                uint16_t cnt_diff = (mj_handle.in.bup_dcu_lrd.drive_slave_fb.msg->hdr.cnt - in_bup_dcu_lrd_drive_slave_fb_last_cnt);
+                                if (cnt_diff > 1)
+                                {
+                                    in_bup_dcu_lrd_drive_slave_fb_miss += cnt_diff;
+                                }
+                                in_bup_dcu_lrd_drive_slave_fb_last_cnt = mj_handle.in.bup_dcu_lrd.drive_slave_fb.msg->hdr.cnt;
+                                bup_dcu_lrd_drive_slave_fb_rx_tick = ticks;
+                                mj_handle.in.bup_dcu_lrd.drive_slave_fb.state = MJ_MSG_ACTUAL;
+                                p_drv->udp4.free(old_buff);
+                            }else{
+                                if (in_bup_dcu_lrd_drive_slave_fb_delayed_ptr == NULL)
+                                {
+                                    in_bup_dcu_lrd_drive_slave_fb_delayed_ptr = (drive_slave_fb_msg_t *)data;
+                                    bup_dcu_lrd_drive_slave_fb_delayed_ts_s = ts_s;
+                                    bup_dcu_lrd_drive_slave_fb_delayed_ts_s = ts_ns;;
+                                }else{
+                                    return MJ_REJECT_OVF;
+                                }
+                            }
+                            if (mj_handle.in.bup_dcu_lrd.drive_slave_fb.irq){
+                                mj_handle.in.bup_dcu_lrd.drive_slave_fb.irq(data);
+                            }
+                            return MJ_ACCEPT;
+                        // drive_slave_fb from bup_dcu_rfd
+                        case BRO30_BUP_DCU_RFD:
+                            if (in_bup_dcu_rfd_drive_slave_fb_lock_cnt == 0)
+                            {
+                                old_buff = (uint8_t*)mj_handle.in.bup_dcu_rfd.drive_slave_fb.msg;
+                                mj_handle.in.bup_dcu_rfd.drive_slave_fb.msg = (drive_slave_fb_msg_t *)data;
+                                mj_handle.in.bup_dcu_rfd.drive_slave_fb.ts_s  = ts_s;
+                                mj_handle.in.bup_dcu_rfd.drive_slave_fb.ts_ns = ts_ns;
+                                in_bup_dcu_rfd_drive_slave_fb_updated = 1;
+                                in_bup_dcu_rfd_drive_slave_fb_total++;
+                                uint16_t cnt_diff = (mj_handle.in.bup_dcu_rfd.drive_slave_fb.msg->hdr.cnt - in_bup_dcu_rfd_drive_slave_fb_last_cnt);
+                                if (cnt_diff > 1)
+                                {
+                                    in_bup_dcu_rfd_drive_slave_fb_miss += cnt_diff;
+                                }
+                                in_bup_dcu_rfd_drive_slave_fb_last_cnt = mj_handle.in.bup_dcu_rfd.drive_slave_fb.msg->hdr.cnt;
+                                bup_dcu_rfd_drive_slave_fb_rx_tick = ticks;
+                                mj_handle.in.bup_dcu_rfd.drive_slave_fb.state = MJ_MSG_ACTUAL;
+                                p_drv->udp4.free(old_buff);
+                            }else{
+                                if (in_bup_dcu_rfd_drive_slave_fb_delayed_ptr == NULL)
+                                {
+                                    in_bup_dcu_rfd_drive_slave_fb_delayed_ptr = (drive_slave_fb_msg_t *)data;
+                                    bup_dcu_rfd_drive_slave_fb_delayed_ts_s = ts_s;
+                                    bup_dcu_rfd_drive_slave_fb_delayed_ts_s = ts_ns;;
+                                }else{
+                                    return MJ_REJECT_OVF;
+                                }
+                            }
+                            if (mj_handle.in.bup_dcu_rfd.drive_slave_fb.irq){
+                                mj_handle.in.bup_dcu_rfd.drive_slave_fb.irq(data);
+                            }
+                            return MJ_ACCEPT;
+                        // drive_slave_fb from bup_dcu_rrd
+                        case BRO30_BUP_DCU_RRD:
+                            if (in_bup_dcu_rrd_drive_slave_fb_lock_cnt == 0)
+                            {
+                                old_buff = (uint8_t*)mj_handle.in.bup_dcu_rrd.drive_slave_fb.msg;
+                                mj_handle.in.bup_dcu_rrd.drive_slave_fb.msg = (drive_slave_fb_msg_t *)data;
+                                mj_handle.in.bup_dcu_rrd.drive_slave_fb.ts_s  = ts_s;
+                                mj_handle.in.bup_dcu_rrd.drive_slave_fb.ts_ns = ts_ns;
+                                in_bup_dcu_rrd_drive_slave_fb_updated = 1;
+                                in_bup_dcu_rrd_drive_slave_fb_total++;
+                                uint16_t cnt_diff = (mj_handle.in.bup_dcu_rrd.drive_slave_fb.msg->hdr.cnt - in_bup_dcu_rrd_drive_slave_fb_last_cnt);
+                                if (cnt_diff > 1)
+                                {
+                                    in_bup_dcu_rrd_drive_slave_fb_miss += cnt_diff;
+                                }
+                                in_bup_dcu_rrd_drive_slave_fb_last_cnt = mj_handle.in.bup_dcu_rrd.drive_slave_fb.msg->hdr.cnt;
+                                bup_dcu_rrd_drive_slave_fb_rx_tick = ticks;
+                                mj_handle.in.bup_dcu_rrd.drive_slave_fb.state = MJ_MSG_ACTUAL;
+                                p_drv->udp4.free(old_buff);
+                            }else{
+                                if (in_bup_dcu_rrd_drive_slave_fb_delayed_ptr == NULL)
+                                {
+                                    in_bup_dcu_rrd_drive_slave_fb_delayed_ptr = (drive_slave_fb_msg_t *)data;
+                                    bup_dcu_rrd_drive_slave_fb_delayed_ts_s = ts_s;
+                                    bup_dcu_rrd_drive_slave_fb_delayed_ts_s = ts_ns;;
+                                }else{
+                                    return MJ_REJECT_OVF;
+                                }
+                            }
+                            if (mj_handle.in.bup_dcu_rrd.drive_slave_fb.irq){
+                                mj_handle.in.bup_dcu_rrd.drive_slave_fb.irq(data);
+                            }
+                            return MJ_ACCEPT;
+                        // drive_slave_fb from bup_dcu_rst
+                        case BRO30_BUP_DCU_RST:
+                            if (in_bup_dcu_rst_drive_slave_fb_lock_cnt == 0)
+                            {
+                                old_buff = (uint8_t*)mj_handle.in.bup_dcu_rst.drive_slave_fb.msg;
+                                mj_handle.in.bup_dcu_rst.drive_slave_fb.msg = (drive_slave_fb_msg_t *)data;
+                                mj_handle.in.bup_dcu_rst.drive_slave_fb.ts_s  = ts_s;
+                                mj_handle.in.bup_dcu_rst.drive_slave_fb.ts_ns = ts_ns;
+                                in_bup_dcu_rst_drive_slave_fb_updated = 1;
+                                in_bup_dcu_rst_drive_slave_fb_total++;
+                                uint16_t cnt_diff = (mj_handle.in.bup_dcu_rst.drive_slave_fb.msg->hdr.cnt - in_bup_dcu_rst_drive_slave_fb_last_cnt);
+                                if (cnt_diff > 1)
+                                {
+                                    in_bup_dcu_rst_drive_slave_fb_miss += cnt_diff;
+                                }
+                                in_bup_dcu_rst_drive_slave_fb_last_cnt = mj_handle.in.bup_dcu_rst.drive_slave_fb.msg->hdr.cnt;
+                                bup_dcu_rst_drive_slave_fb_rx_tick = ticks;
+                                mj_handle.in.bup_dcu_rst.drive_slave_fb.state = MJ_MSG_ACTUAL;
+                                p_drv->udp4.free(old_buff);
+                            }else{
+                                if (in_bup_dcu_rst_drive_slave_fb_delayed_ptr == NULL)
+                                {
+                                    in_bup_dcu_rst_drive_slave_fb_delayed_ptr = (drive_slave_fb_msg_t *)data;
+                                    bup_dcu_rst_drive_slave_fb_delayed_ts_s = ts_s;
+                                    bup_dcu_rst_drive_slave_fb_delayed_ts_s = ts_ns;;
+                                }else{
+                                    return MJ_REJECT_OVF;
+                                }
+                            }
+                            if (mj_handle.in.bup_dcu_rst.drive_slave_fb.irq){
+                                mj_handle.in.bup_dcu_rst.drive_slave_fb.irq(data);
+                            }
+                            return MJ_ACCEPT;
+                        // drive_slave_fb from dcu
+                        case BRO30_DCU:
+                            if (in_dcu_drive_slave_fb_lock_cnt == 0)
+                            {
+                                old_buff = (uint8_t*)mj_handle.in.dcu.drive_slave_fb.msg;
+                                mj_handle.in.dcu.drive_slave_fb.msg = (drive_slave_fb_msg_t *)data;
+                                mj_handle.in.dcu.drive_slave_fb.ts_s  = ts_s;
+                                mj_handle.in.dcu.drive_slave_fb.ts_ns = ts_ns;
+                                in_dcu_drive_slave_fb_updated = 1;
+                                in_dcu_drive_slave_fb_total++;
+                                uint16_t cnt_diff = (mj_handle.in.dcu.drive_slave_fb.msg->hdr.cnt - in_dcu_drive_slave_fb_last_cnt);
+                                if (cnt_diff > 1)
+                                {
+                                    in_dcu_drive_slave_fb_miss += cnt_diff;
+                                }
+                                in_dcu_drive_slave_fb_last_cnt = mj_handle.in.dcu.drive_slave_fb.msg->hdr.cnt;
+                                dcu_drive_slave_fb_rx_tick = ticks;
+                                mj_handle.in.dcu.drive_slave_fb.state = MJ_MSG_ACTUAL;
+                                p_drv->udp4.free(old_buff);
+                            }else{
+                                if (in_dcu_drive_slave_fb_delayed_ptr == NULL)
+                                {
+                                    in_dcu_drive_slave_fb_delayed_ptr = (drive_slave_fb_msg_t *)data;
+                                    dcu_drive_slave_fb_delayed_ts_s = ts_s;
+                                    dcu_drive_slave_fb_delayed_ts_s = ts_ns;;
+                                }else{
+                                    return MJ_REJECT_OVF;
+                                }
+                            }
+                            if (mj_handle.in.dcu.drive_slave_fb.irq){
+                                mj_handle.in.dcu.drive_slave_fb.irq(data);
                             }
                             return MJ_ACCEPT;
                         default:
@@ -1614,8 +3137,16 @@ static void loop_fcn()
 {
     uint32_t c_time = ticks;
 
-    if((((int32_t)(c_time - aufd_bup_ctrl_rx_tick)) > 400)){
+    if((((int32_t)(c_time - aufd_bup_ctrl_rx_tick)) > 240)){
         mj_handle.in.aufd.bup_ctrl.state = MJ_MSG_OBSOLETE;
+    }
+
+    if((((int32_t)(c_time - aufd_bup_multi_control_rx_tick)) > 240)){
+        mj_handle.in.aufd.bup_multi_control.state = MJ_MSG_OBSOLETE;
+    }
+
+    if((((int32_t)(c_time - mon_bup_multi_control_rx_tick)) > 240)){
+        mj_handle.in.mon.bup_multi_control.state = MJ_MSG_OBSOLETE;
     }
 
     if((((int32_t)(c_time - mon_bup_srv_ctrl_rx_tick)) > 240)){
@@ -1628,6 +3159,54 @@ static void loop_fcn()
 
     if((((int32_t)(c_time - mon_cmd_req_rx_tick)) > 4000)){
         mj_handle.in.mon.cmd_req.state = MJ_MSG_OBSOLETE;
+    }
+
+    if((((int32_t)(c_time - bup_dcu_lfd_drive_master_ctrl_rx_tick)) > 12)){
+        mj_handle.in.bup_dcu_lfd.drive_master_ctrl.state = MJ_MSG_OBSOLETE;
+    }
+
+    if((((int32_t)(c_time - bup_dcu_lrd_drive_master_ctrl_rx_tick)) > 12)){
+        mj_handle.in.bup_dcu_lrd.drive_master_ctrl.state = MJ_MSG_OBSOLETE;
+    }
+
+    if((((int32_t)(c_time - bup_dcu_rfd_drive_master_ctrl_rx_tick)) > 12)){
+        mj_handle.in.bup_dcu_rfd.drive_master_ctrl.state = MJ_MSG_OBSOLETE;
+    }
+
+    if((((int32_t)(c_time - bup_dcu_rrd_drive_master_ctrl_rx_tick)) > 12)){
+        mj_handle.in.bup_dcu_rrd.drive_master_ctrl.state = MJ_MSG_OBSOLETE;
+    }
+
+    if((((int32_t)(c_time - bup_dcu_rst_drive_master_ctrl_rx_tick)) > 12)){
+        mj_handle.in.bup_dcu_rst.drive_master_ctrl.state = MJ_MSG_OBSOLETE;
+    }
+
+    if((((int32_t)(c_time - dcu_drive_master_ctrl_rx_tick)) > 12)){
+        mj_handle.in.dcu.drive_master_ctrl.state = MJ_MSG_OBSOLETE;
+    }
+
+    if((((int32_t)(c_time - bup_dcu_lfd_drive_slave_fb_rx_tick)) > 12)){
+        mj_handle.in.bup_dcu_lfd.drive_slave_fb.state = MJ_MSG_OBSOLETE;
+    }
+
+    if((((int32_t)(c_time - bup_dcu_lrd_drive_slave_fb_rx_tick)) > 12)){
+        mj_handle.in.bup_dcu_lrd.drive_slave_fb.state = MJ_MSG_OBSOLETE;
+    }
+
+    if((((int32_t)(c_time - bup_dcu_rfd_drive_slave_fb_rx_tick)) > 12)){
+        mj_handle.in.bup_dcu_rfd.drive_slave_fb.state = MJ_MSG_OBSOLETE;
+    }
+
+    if((((int32_t)(c_time - bup_dcu_rrd_drive_slave_fb_rx_tick)) > 12)){
+        mj_handle.in.bup_dcu_rrd.drive_slave_fb.state = MJ_MSG_OBSOLETE;
+    }
+
+    if((((int32_t)(c_time - bup_dcu_rst_drive_slave_fb_rx_tick)) > 12)){
+        mj_handle.in.bup_dcu_rst.drive_slave_fb.state = MJ_MSG_OBSOLETE;
+    }
+
+    if((((int32_t)(c_time - dcu_drive_slave_fb_rx_tick)) > 12)){
+        mj_handle.in.dcu.drive_slave_fb.state = MJ_MSG_OBSOLETE;
     }
 
     if((((int32_t)(c_time - im_bro_im_bro_drivers_sens_rx_tick)) > 3)){
@@ -1655,6 +3234,16 @@ static void loop_fcn()
         if(mj_handle.in.aufd.bup_ctrl.upd_cb){mj_handle.in.aufd.bup_ctrl.upd_cb();}
         in_aufd_bup_ctrl_updated = 0;
     }
+    if(in_aufd_bup_multi_control_updated == 1)
+    {
+        if(mj_handle.in.aufd.bup_multi_control.upd_cb){mj_handle.in.aufd.bup_multi_control.upd_cb();}
+        in_aufd_bup_multi_control_updated = 0;
+    }
+    if(in_mon_bup_multi_control_updated == 1)
+    {
+        if(mj_handle.in.mon.bup_multi_control.upd_cb){mj_handle.in.mon.bup_multi_control.upd_cb();}
+        in_mon_bup_multi_control_updated = 0;
+    }
     if(in_mon_bup_srv_ctrl_updated == 1)
     {
         if(mj_handle.in.mon.bup_srv_ctrl.upd_cb){mj_handle.in.mon.bup_srv_ctrl.upd_cb();}
@@ -1669,6 +3258,66 @@ static void loop_fcn()
     {
         if(mj_handle.in.mon.cmd_req.upd_cb){mj_handle.in.mon.cmd_req.upd_cb();}
         in_mon_cmd_req_updated = 0;
+    }
+    if(in_bup_dcu_lfd_drive_master_ctrl_updated == 1)
+    {
+        if(mj_handle.in.bup_dcu_lfd.drive_master_ctrl.upd_cb){mj_handle.in.bup_dcu_lfd.drive_master_ctrl.upd_cb();}
+        in_bup_dcu_lfd_drive_master_ctrl_updated = 0;
+    }
+    if(in_bup_dcu_lrd_drive_master_ctrl_updated == 1)
+    {
+        if(mj_handle.in.bup_dcu_lrd.drive_master_ctrl.upd_cb){mj_handle.in.bup_dcu_lrd.drive_master_ctrl.upd_cb();}
+        in_bup_dcu_lrd_drive_master_ctrl_updated = 0;
+    }
+    if(in_bup_dcu_rfd_drive_master_ctrl_updated == 1)
+    {
+        if(mj_handle.in.bup_dcu_rfd.drive_master_ctrl.upd_cb){mj_handle.in.bup_dcu_rfd.drive_master_ctrl.upd_cb();}
+        in_bup_dcu_rfd_drive_master_ctrl_updated = 0;
+    }
+    if(in_bup_dcu_rrd_drive_master_ctrl_updated == 1)
+    {
+        if(mj_handle.in.bup_dcu_rrd.drive_master_ctrl.upd_cb){mj_handle.in.bup_dcu_rrd.drive_master_ctrl.upd_cb();}
+        in_bup_dcu_rrd_drive_master_ctrl_updated = 0;
+    }
+    if(in_bup_dcu_rst_drive_master_ctrl_updated == 1)
+    {
+        if(mj_handle.in.bup_dcu_rst.drive_master_ctrl.upd_cb){mj_handle.in.bup_dcu_rst.drive_master_ctrl.upd_cb();}
+        in_bup_dcu_rst_drive_master_ctrl_updated = 0;
+    }
+    if(in_dcu_drive_master_ctrl_updated == 1)
+    {
+        if(mj_handle.in.dcu.drive_master_ctrl.upd_cb){mj_handle.in.dcu.drive_master_ctrl.upd_cb();}
+        in_dcu_drive_master_ctrl_updated = 0;
+    }
+    if(in_bup_dcu_lfd_drive_slave_fb_updated == 1)
+    {
+        if(mj_handle.in.bup_dcu_lfd.drive_slave_fb.upd_cb){mj_handle.in.bup_dcu_lfd.drive_slave_fb.upd_cb();}
+        in_bup_dcu_lfd_drive_slave_fb_updated = 0;
+    }
+    if(in_bup_dcu_lrd_drive_slave_fb_updated == 1)
+    {
+        if(mj_handle.in.bup_dcu_lrd.drive_slave_fb.upd_cb){mj_handle.in.bup_dcu_lrd.drive_slave_fb.upd_cb();}
+        in_bup_dcu_lrd_drive_slave_fb_updated = 0;
+    }
+    if(in_bup_dcu_rfd_drive_slave_fb_updated == 1)
+    {
+        if(mj_handle.in.bup_dcu_rfd.drive_slave_fb.upd_cb){mj_handle.in.bup_dcu_rfd.drive_slave_fb.upd_cb();}
+        in_bup_dcu_rfd_drive_slave_fb_updated = 0;
+    }
+    if(in_bup_dcu_rrd_drive_slave_fb_updated == 1)
+    {
+        if(mj_handle.in.bup_dcu_rrd.drive_slave_fb.upd_cb){mj_handle.in.bup_dcu_rrd.drive_slave_fb.upd_cb();}
+        in_bup_dcu_rrd_drive_slave_fb_updated = 0;
+    }
+    if(in_bup_dcu_rst_drive_slave_fb_updated == 1)
+    {
+        if(mj_handle.in.bup_dcu_rst.drive_slave_fb.upd_cb){mj_handle.in.bup_dcu_rst.drive_slave_fb.upd_cb();}
+        in_bup_dcu_rst_drive_slave_fb_updated = 0;
+    }
+    if(in_dcu_drive_slave_fb_updated == 1)
+    {
+        if(mj_handle.in.dcu.drive_slave_fb.upd_cb){mj_handle.in.dcu.drive_slave_fb.upd_cb();}
+        in_dcu_drive_slave_fb_updated = 0;
     }
     if(in_im_bro_im_bro_drivers_sens_updated == 1)
     {
@@ -1768,6 +3417,9 @@ mj_status_t mj_bup_dcu_lst_prm_init(mj_bup_dcu_lst_t ** ptr){
     const uint8_t default_com_if_bro_bup_data_mcast[] = { 0x32,0x33,0x39,0x2e,0x32,0x30,0x30,0x2e,0x31,0x30,0x2e,0x31,0x3a,0x34,0x39,0x30,0x30,0x32, 0x00};
     memcpy(&(_bup_dcu_lst_prm.com_if_bro_bup_data_mcast), default_com_if_bro_bup_data_mcast, sizeof(default_com_if_bro_bup_data_mcast) > 32 ? 32 : sizeof(default_com_if_bro_bup_data_mcast));
     /* prms[p] */
+    const uint8_t default_com_if_bup_internal_mcast[] = { 0x32,0x33,0x39,0x2e,0x32,0x30,0x30,0x2e,0x31,0x31,0x2e,0x31,0x3a,0x34,0x39,0x30,0x30,0x32, 0x00};
+    memcpy(&(_bup_dcu_lst_prm.com_if_bup_internal_mcast), default_com_if_bup_internal_mcast, sizeof(default_com_if_bup_internal_mcast) > 32 ? 32 : sizeof(default_com_if_bup_internal_mcast));
+    /* prms[p] */
     const uint8_t default_com_if_bro_bup_srv_mcast[] = { 0x32,0x33,0x39,0x2e,0x32,0x30,0x30,0x2e,0x31,0x30,0x30,0x2e,0x31,0x3a,0x34,0x39,0x30,0x30,0x31, 0x00};
     memcpy(&(_bup_dcu_lst_prm.com_if_bro_bup_srv_mcast), default_com_if_bro_bup_srv_mcast, sizeof(default_com_if_bro_bup_srv_mcast) > 32 ? 32 : sizeof(default_com_if_bro_bup_srv_mcast));
     /* prms[p] */
@@ -1789,6 +3441,7 @@ mj_status_t mj_bup_dcu_lst_prm_init(mj_bup_dcu_lst_t ** ptr){
     _bup_dcu_lst_prm.ptp_ki = 0.0;
     _bup_dcu_lst_prm.ptp_kd = 0.0;
     _bup_dcu_lst_prm.ohp_lvl = 0.0;
+    _bup_dcu_lst_prm.ohp_hyst = 5.0;
     _bup_dcu_lst_prm.el_zero = 0.0;
     _bup_dcu_lst_prm.pole_pairs = 0;
     _bup_dcu_lst_prm.ph_resistance = 0.0;
@@ -1814,8 +3467,24 @@ mj_status_t mj_bup_dcu_lst_prm_init(mj_bup_dcu_lst_t ** ptr){
     _bup_dcu_lst_prm.load_speed_kf = 0.0;
     _bup_dcu_lst_prm.load_speed_err_lim = 0.0;
     _bup_dcu_lst_prm.load_speed_out_lim = 0.0;
+    _bup_dcu_lst_prm.load_speed_int_lim = 0.0;
     _bup_dcu_lst_prm.load_speed_out_rate_lim = 0.0;
     _bup_dcu_lst_prm.load_speed_err_rate_lim = 0.0;
+    _bup_dcu_lst_prm.load_speed_flt_fc = 0;
+    _bup_dcu_lst_prm.rotor_speed_flt_fc = 0;
+    _bup_dcu_lst_prm.load_ang_kp = 0.0;
+    _bup_dcu_lst_prm.load_ang_ki = 0.0;
+    _bup_dcu_lst_prm.load_ang_kb = 0.0;
+    _bup_dcu_lst_prm.load_ang_kt = 0.0;
+    _bup_dcu_lst_prm.load_ang_kf = 0.0;
+    _bup_dcu_lst_prm.load_ang_rev = 0;
+    _bup_dcu_lst_prm.load_ang_kd = 0.0;
+    _bup_dcu_lst_prm.load_ang_err_lim = 0.0;
+    _bup_dcu_lst_prm.load_ang_out_lim = 0.0;
+    _bup_dcu_lst_prm.load_ang_out_rate_lim = 0.0;
+    _bup_dcu_lst_prm.load_ang_err_rate_lim = 0.0;
+    _bup_dcu_lst_prm.load_ang_dz = 0.0;
+    _bup_dcu_lst_prm.load_ang_dz_en = 0;
     _bup_dcu_lst_prm.rotor_speed_kp = 0.0;
     _bup_dcu_lst_prm.rotor_speed_ki = 0.0;
     _bup_dcu_lst_prm.rotor_speed_kb = 0.0;
@@ -1823,8 +3492,30 @@ mj_status_t mj_bup_dcu_lst_prm_init(mj_bup_dcu_lst_t ** ptr){
     _bup_dcu_lst_prm.rotor_speed_kf = 0.0;
     _bup_dcu_lst_prm.rotor_speed_err_lim = 0.0;
     _bup_dcu_lst_prm.rotor_speed_out_lim = 0.0;
+    _bup_dcu_lst_prm.rotor_speed_int_lim = 0.0;
     _bup_dcu_lst_prm.rotor_speed_out_rate_lim = 0.0;
     _bup_dcu_lst_prm.rotor_speed_err_rate_lim = 0.0;
+    _bup_dcu_lst_prm.rotor_speed_master_common_kp = 0.0;
+    _bup_dcu_lst_prm.rotor_speed_master_common_ki = 0.0;
+    _bup_dcu_lst_prm.rotor_speed_master_common_kb = 0.0;
+    _bup_dcu_lst_prm.rotor_speed_master_common_kt = 0.0;
+    _bup_dcu_lst_prm.rotor_speed_master_common_kf = 0.0;
+    _bup_dcu_lst_prm.rotor_speed_master_common_err_lim = 0.0;
+    _bup_dcu_lst_prm.rotor_speed_master_common_out_lim = 0.0;
+    _bup_dcu_lst_prm.rotor_speed_master_common_int_lim = 0.0;
+    _bup_dcu_lst_prm.rotor_speed_master_common_out_rate_lim = 0.0;
+    _bup_dcu_lst_prm.rotor_speed_master_common_err_rate_lim = 0.0;
+    _bup_dcu_lst_prm.rotor_speed_master_diff_kp = 0.0;
+    _bup_dcu_lst_prm.rotor_speed_master_diff_ki = 0.0;
+    _bup_dcu_lst_prm.rotor_speed_master_diff_kb = 0.0;
+    _bup_dcu_lst_prm.rotor_speed_master_diff_kt = 0.0;
+    _bup_dcu_lst_prm.rotor_speed_master_diff_kf = 0.0;
+    _bup_dcu_lst_prm.rotor_speed_master_diff_err_lim = 0.0;
+    _bup_dcu_lst_prm.rotor_speed_master_diff_out_lim = 0.0;
+    _bup_dcu_lst_prm.rotor_speed_master_diff_int_lim = 0.0;
+    _bup_dcu_lst_prm.rotor_speed_master_diff_out_rate_lim = 0.0;
+    _bup_dcu_lst_prm.rotor_speed_master_diff_err_rate_lim = 0.0;
+    _bup_dcu_lst_prm.rotor_speed_role = 0;
     _bup_dcu_lst_prm.rotor_ang_kp = 0.0;
     _bup_dcu_lst_prm.rotor_ang_ki = 0.0;
     _bup_dcu_lst_prm.rotor_ang_kb = 0.0;
@@ -1834,6 +3525,8 @@ mj_status_t mj_bup_dcu_lst_prm_init(mj_bup_dcu_lst_t ** ptr){
     _bup_dcu_lst_prm.rotor_ang_out_lim = 0.0;
     _bup_dcu_lst_prm.rotor_ang_out_rate_lim = 0.0;
     _bup_dcu_lst_prm.rotor_ang_err_rate_lim = 0.0;
+    _bup_dcu_lst_prm.rotor_ang_dz = 0.0;
+    _bup_dcu_lst_prm.rotor_ang_dz_en = 0;
     /* prms[p] */
     const uint8_t default_factory_date[] = { 0x8d,0x85,0x92,0x20,0x88,0x8d,0x94,0x8e,0x90,0x8c,0x80,0x96,0x88,0x88,0x21, 0x00};
     memcpy(&(_bup_dcu_lst_prm.factory_date), default_factory_date, sizeof(default_factory_date) > 32 ? 32 : sizeof(default_factory_date));
@@ -1877,6 +3570,11 @@ mj_status_t mj_bup_dcu_lst_init(mj_drv_interface_t *drv, mj_bup_dcu_lst_t ** ptr
     if (mj_str_if_to_int(mj_handle.prm.ptr->com_if_bro_bup_srv_mcast, &bro_bup_srv_mcast_ip_be, &bro_bup_srv_mcast_port_be) != 0){
         return MJ_UDP4_CB_FAIL;
     }
+    uint32_t bup_internal_mcast_ip_be = BUP_INTERNAL_MCAST_IP;
+    uint16_t bup_internal_mcast_port_be = 0x6abf;
+    if (mj_str_if_to_int(mj_handle.prm.ptr->com_if_bup_internal_mcast, &bup_internal_mcast_ip_be, &bup_internal_mcast_port_be) != 0){
+        return MJ_UDP4_CB_FAIL;
+    }
     uint32_t im_bro_drive_mcast_ip_be = IM_BRO_DRIVE_MCAST_IP;
     uint16_t im_bro_drive_mcast_port_be = 0x69bf;
     if (mj_str_if_to_int(mj_handle.prm.ptr->com_if_im_bro_drive_mcast, &im_bro_drive_mcast_ip_be, &im_bro_drive_mcast_port_be) != 0){
@@ -1898,6 +3596,9 @@ mj_status_t mj_bup_dcu_lst_init(mj_drv_interface_t *drv, mj_bup_dcu_lst_t ** ptr
     if (p_drv->udp4.register_callback(bro_bup_srv_mcast_ip_be, bro_bup_srv_mcast_port_be, bro_bup_srv_mcast_cb) != MJ_OK){
         return MJ_UDP4_CB_FAIL;
     }
+    if (p_drv->udp4.register_callback(bup_internal_mcast_ip_be, bup_internal_mcast_port_be, bup_internal_mcast_cb) != MJ_OK){
+        return MJ_UDP4_CB_FAIL;
+    }
     if (p_drv->udp4.register_callback(im_bro_drive_mcast_ip_be, im_bro_drive_mcast_port_be, im_bro_drive_mcast_cb) != MJ_OK){
         return MJ_UDP4_CB_FAIL;
     }
@@ -1909,10 +3610,12 @@ mj_status_t mj_bup_dcu_lst_init(mj_drv_interface_t *drv, mj_bup_dcu_lst_t ** ptr
     group_addr[1] = 0;
     group_addr[2] = bro_bup_srv_mcast_ip_be; // bro_bup_srv_mcast
     group_addr[3] = 0;
-    group_addr[4] = im_bro_drive_mcast_ip_be; // im_bro_drive_mcast
+    group_addr[4] = bup_internal_mcast_ip_be; // bup_internal_mcast
     group_addr[5] = 0;
-    group_addr[6] = srv_mcast_req_ip_be; // srv_mcast_req
+    group_addr[6] = im_bro_drive_mcast_ip_be; // im_bro_drive_mcast
     group_addr[7] = 0;
+    group_addr[8] = srv_mcast_req_ip_be; // srv_mcast_req
+    group_addr[9] = 0;
 
     /* OUT */
     /** bup_state */
@@ -1991,6 +3694,48 @@ mj_status_t mj_bup_dcu_lst_init(mj_drv_interface_t *drv, mj_bup_dcu_lst_t ** ptr
             mj_handle.out.dcu_tel.tx_enable = true;
         }else{
             p_drv->udp4.free((uint8_t *)mj_handle.out.dcu_tel.msg);
+            return MJ_INTEGRITY_FAIL;
+        }
+    }else{
+        return MJ_UDP4_ALOC_FAIL;
+    }
+
+    /** drive_master_ctrl */
+    if ((mj_handle.out.drive_master_ctrl.msg = (drive_master_ctrl_msg_t *)p_drv->udp4.alloc(sizeof(drive_master_ctrl_msg_t))))
+    {
+        if(drive_master_ctrl_type_check(mj_handle.out.drive_master_ctrl.msg) == MJ_CHECK_OK)
+        {
+            out_drive_master_ctrl_pkt = p_drv->udp4.create_out_pkt(ethInt,bup_internal_mcast_ip_be, bup_internal_mcast_port_be, 0x00,(uint8_t*)mj_handle.out.drive_master_ctrl.msg, sizeof(drive_master_ctrl_msg_t));
+            if (out_drive_master_ctrl_pkt == NULL){return MJ_UDP4_PKT_FAIL;}
+            mj_handle.out.drive_master_ctrl.msg->hdr.src = self_dev_id;
+            mj_handle.out.drive_master_ctrl.msg->hdr.cnt = 0;
+            mj_handle.out.drive_master_ctrl.msg->hdr.id = ID_DRIVE_MASTER_CTRL;
+            mj_handle.out.drive_master_ctrl.msg->hdr.dst = BRO30_ALL;
+            mj_handle.out.drive_master_ctrl.lock = out_drive_master_ctrl_lock_fcn;
+            mj_handle.out.drive_master_ctrl.tx_enable = true;
+        }else{
+            p_drv->udp4.free((uint8_t *)mj_handle.out.drive_master_ctrl.msg);
+            return MJ_INTEGRITY_FAIL;
+        }
+    }else{
+        return MJ_UDP4_ALOC_FAIL;
+    }
+
+    /** drive_slave_fb */
+    if ((mj_handle.out.drive_slave_fb.msg = (drive_slave_fb_msg_t *)p_drv->udp4.alloc(sizeof(drive_slave_fb_msg_t))))
+    {
+        if(drive_slave_fb_type_check(mj_handle.out.drive_slave_fb.msg) == MJ_CHECK_OK)
+        {
+            out_drive_slave_fb_pkt = p_drv->udp4.create_out_pkt(ethInt,bup_internal_mcast_ip_be, bup_internal_mcast_port_be, 0x00,(uint8_t*)mj_handle.out.drive_slave_fb.msg, sizeof(drive_slave_fb_msg_t));
+            if (out_drive_slave_fb_pkt == NULL){return MJ_UDP4_PKT_FAIL;}
+            mj_handle.out.drive_slave_fb.msg->hdr.src = self_dev_id;
+            mj_handle.out.drive_slave_fb.msg->hdr.cnt = 0;
+            mj_handle.out.drive_slave_fb.msg->hdr.id = ID_DRIVE_SLAVE_FB;
+            mj_handle.out.drive_slave_fb.msg->hdr.dst = BRO30_ALL;
+            mj_handle.out.drive_slave_fb.lock = out_drive_slave_fb_lock_fcn;
+            mj_handle.out.drive_slave_fb.tx_enable = true;
+        }else{
+            p_drv->udp4.free((uint8_t *)mj_handle.out.drive_slave_fb.msg);
             return MJ_INTEGRITY_FAIL;
         }
     }else{
@@ -2103,6 +3848,27 @@ mj_status_t mj_bup_dcu_lst_init(mj_drv_interface_t *drv, mj_bup_dcu_lst_t ** ptr
         return MJ_UDP4_ALOC_FAIL;
     }
 
+    if ((mj_handle.in.aufd.bup_multi_control.msg = (bup_drv_multi_control_msg_t *)p_drv->udp4.alloc(sizeof(bup_drv_multi_control_msg_t)))){
+        if(bup_drv_multi_control_type_check(mj_handle.in.aufd.bup_multi_control.msg) == MJ_CHECK_OK){
+            mj_handle.in.aufd.bup_multi_control.msg->hdr.src = BRO30_NONE;
+            mj_handle.in.aufd.bup_multi_control.msg->hdr.dst = BRO30_NONE;
+            mj_handle.in.aufd.bup_multi_control.msg->hdr.cnt = 0;
+            mj_handle.in.aufd.bup_multi_control.msg->hdr.id = 0;
+            mj_handle.in.aufd.bup_multi_control.lock = in_aufd_bup_multi_control_lock_fcn;
+            mj_handle.in.aufd.bup_multi_control.copy = in_aufd_bup_multi_control_copy_fcn;
+            mj_handle.in.aufd.bup_multi_control.upd_cb = NULL;
+            mj_handle.in.aufd.bup_multi_control.irq = NULL;
+            mj_handle.in.aufd.bup_multi_control.state = MJ_MSG_OBSOLETE;
+            mj_handle.in.aufd.bup_multi_control.total = &in_aufd_bup_multi_control_total;
+            mj_handle.in.aufd.bup_multi_control.miss = &in_aufd_bup_multi_control_miss;
+        }else{
+            p_drv->udp4.free((uint8_t *)mj_handle.in.aufd.bup_multi_control.msg);
+            return MJ_INTEGRITY_FAIL;
+        }
+    }else{
+        return MJ_UDP4_ALOC_FAIL;
+    }
+
     if ((mj_handle.in.aufd.cmd_req.msg = (command_request_msg_t *)p_drv->udp4.alloc(sizeof(command_request_msg_t)))){
         if(command_request_type_check(mj_handle.in.aufd.cmd_req.msg) == MJ_CHECK_OK){
             mj_handle.in.aufd.cmd_req.msg->hdr.src = BRO30_NONE;
@@ -2166,6 +3932,258 @@ mj_status_t mj_bup_dcu_lst_init(mj_drv_interface_t *drv, mj_bup_dcu_lst_t ** ptr
         return MJ_UDP4_ALOC_FAIL;
     }
 
+    if ((mj_handle.in.bup_dcu_lfd.drive_master_ctrl.msg = (drive_master_ctrl_msg_t *)p_drv->udp4.alloc(sizeof(drive_master_ctrl_msg_t)))){
+        if(drive_master_ctrl_type_check(mj_handle.in.bup_dcu_lfd.drive_master_ctrl.msg) == MJ_CHECK_OK){
+            mj_handle.in.bup_dcu_lfd.drive_master_ctrl.msg->hdr.src = BRO30_NONE;
+            mj_handle.in.bup_dcu_lfd.drive_master_ctrl.msg->hdr.dst = BRO30_NONE;
+            mj_handle.in.bup_dcu_lfd.drive_master_ctrl.msg->hdr.cnt = 0;
+            mj_handle.in.bup_dcu_lfd.drive_master_ctrl.msg->hdr.id = 0;
+            mj_handle.in.bup_dcu_lfd.drive_master_ctrl.lock = in_bup_dcu_lfd_drive_master_ctrl_lock_fcn;
+            mj_handle.in.bup_dcu_lfd.drive_master_ctrl.copy = in_bup_dcu_lfd_drive_master_ctrl_copy_fcn;
+            mj_handle.in.bup_dcu_lfd.drive_master_ctrl.upd_cb = NULL;
+            mj_handle.in.bup_dcu_lfd.drive_master_ctrl.irq = NULL;
+            mj_handle.in.bup_dcu_lfd.drive_master_ctrl.state = MJ_MSG_OBSOLETE;
+            mj_handle.in.bup_dcu_lfd.drive_master_ctrl.total = &in_bup_dcu_lfd_drive_master_ctrl_total;
+            mj_handle.in.bup_dcu_lfd.drive_master_ctrl.miss = &in_bup_dcu_lfd_drive_master_ctrl_miss;
+        }else{
+            p_drv->udp4.free((uint8_t *)mj_handle.in.bup_dcu_lfd.drive_master_ctrl.msg);
+            return MJ_INTEGRITY_FAIL;
+        }
+    }else{
+        return MJ_UDP4_ALOC_FAIL;
+    }
+
+    if ((mj_handle.in.bup_dcu_lfd.drive_slave_fb.msg = (drive_slave_fb_msg_t *)p_drv->udp4.alloc(sizeof(drive_slave_fb_msg_t)))){
+        if(drive_slave_fb_type_check(mj_handle.in.bup_dcu_lfd.drive_slave_fb.msg) == MJ_CHECK_OK){
+            mj_handle.in.bup_dcu_lfd.drive_slave_fb.msg->hdr.src = BRO30_NONE;
+            mj_handle.in.bup_dcu_lfd.drive_slave_fb.msg->hdr.dst = BRO30_NONE;
+            mj_handle.in.bup_dcu_lfd.drive_slave_fb.msg->hdr.cnt = 0;
+            mj_handle.in.bup_dcu_lfd.drive_slave_fb.msg->hdr.id = 0;
+            mj_handle.in.bup_dcu_lfd.drive_slave_fb.lock = in_bup_dcu_lfd_drive_slave_fb_lock_fcn;
+            mj_handle.in.bup_dcu_lfd.drive_slave_fb.copy = in_bup_dcu_lfd_drive_slave_fb_copy_fcn;
+            mj_handle.in.bup_dcu_lfd.drive_slave_fb.upd_cb = NULL;
+            mj_handle.in.bup_dcu_lfd.drive_slave_fb.irq = NULL;
+            mj_handle.in.bup_dcu_lfd.drive_slave_fb.state = MJ_MSG_OBSOLETE;
+            mj_handle.in.bup_dcu_lfd.drive_slave_fb.total = &in_bup_dcu_lfd_drive_slave_fb_total;
+            mj_handle.in.bup_dcu_lfd.drive_slave_fb.miss = &in_bup_dcu_lfd_drive_slave_fb_miss;
+        }else{
+            p_drv->udp4.free((uint8_t *)mj_handle.in.bup_dcu_lfd.drive_slave_fb.msg);
+            return MJ_INTEGRITY_FAIL;
+        }
+    }else{
+        return MJ_UDP4_ALOC_FAIL;
+    }
+
+    if ((mj_handle.in.bup_dcu_lrd.drive_master_ctrl.msg = (drive_master_ctrl_msg_t *)p_drv->udp4.alloc(sizeof(drive_master_ctrl_msg_t)))){
+        if(drive_master_ctrl_type_check(mj_handle.in.bup_dcu_lrd.drive_master_ctrl.msg) == MJ_CHECK_OK){
+            mj_handle.in.bup_dcu_lrd.drive_master_ctrl.msg->hdr.src = BRO30_NONE;
+            mj_handle.in.bup_dcu_lrd.drive_master_ctrl.msg->hdr.dst = BRO30_NONE;
+            mj_handle.in.bup_dcu_lrd.drive_master_ctrl.msg->hdr.cnt = 0;
+            mj_handle.in.bup_dcu_lrd.drive_master_ctrl.msg->hdr.id = 0;
+            mj_handle.in.bup_dcu_lrd.drive_master_ctrl.lock = in_bup_dcu_lrd_drive_master_ctrl_lock_fcn;
+            mj_handle.in.bup_dcu_lrd.drive_master_ctrl.copy = in_bup_dcu_lrd_drive_master_ctrl_copy_fcn;
+            mj_handle.in.bup_dcu_lrd.drive_master_ctrl.upd_cb = NULL;
+            mj_handle.in.bup_dcu_lrd.drive_master_ctrl.irq = NULL;
+            mj_handle.in.bup_dcu_lrd.drive_master_ctrl.state = MJ_MSG_OBSOLETE;
+            mj_handle.in.bup_dcu_lrd.drive_master_ctrl.total = &in_bup_dcu_lrd_drive_master_ctrl_total;
+            mj_handle.in.bup_dcu_lrd.drive_master_ctrl.miss = &in_bup_dcu_lrd_drive_master_ctrl_miss;
+        }else{
+            p_drv->udp4.free((uint8_t *)mj_handle.in.bup_dcu_lrd.drive_master_ctrl.msg);
+            return MJ_INTEGRITY_FAIL;
+        }
+    }else{
+        return MJ_UDP4_ALOC_FAIL;
+    }
+
+    if ((mj_handle.in.bup_dcu_lrd.drive_slave_fb.msg = (drive_slave_fb_msg_t *)p_drv->udp4.alloc(sizeof(drive_slave_fb_msg_t)))){
+        if(drive_slave_fb_type_check(mj_handle.in.bup_dcu_lrd.drive_slave_fb.msg) == MJ_CHECK_OK){
+            mj_handle.in.bup_dcu_lrd.drive_slave_fb.msg->hdr.src = BRO30_NONE;
+            mj_handle.in.bup_dcu_lrd.drive_slave_fb.msg->hdr.dst = BRO30_NONE;
+            mj_handle.in.bup_dcu_lrd.drive_slave_fb.msg->hdr.cnt = 0;
+            mj_handle.in.bup_dcu_lrd.drive_slave_fb.msg->hdr.id = 0;
+            mj_handle.in.bup_dcu_lrd.drive_slave_fb.lock = in_bup_dcu_lrd_drive_slave_fb_lock_fcn;
+            mj_handle.in.bup_dcu_lrd.drive_slave_fb.copy = in_bup_dcu_lrd_drive_slave_fb_copy_fcn;
+            mj_handle.in.bup_dcu_lrd.drive_slave_fb.upd_cb = NULL;
+            mj_handle.in.bup_dcu_lrd.drive_slave_fb.irq = NULL;
+            mj_handle.in.bup_dcu_lrd.drive_slave_fb.state = MJ_MSG_OBSOLETE;
+            mj_handle.in.bup_dcu_lrd.drive_slave_fb.total = &in_bup_dcu_lrd_drive_slave_fb_total;
+            mj_handle.in.bup_dcu_lrd.drive_slave_fb.miss = &in_bup_dcu_lrd_drive_slave_fb_miss;
+        }else{
+            p_drv->udp4.free((uint8_t *)mj_handle.in.bup_dcu_lrd.drive_slave_fb.msg);
+            return MJ_INTEGRITY_FAIL;
+        }
+    }else{
+        return MJ_UDP4_ALOC_FAIL;
+    }
+
+    if ((mj_handle.in.bup_dcu_rfd.drive_master_ctrl.msg = (drive_master_ctrl_msg_t *)p_drv->udp4.alloc(sizeof(drive_master_ctrl_msg_t)))){
+        if(drive_master_ctrl_type_check(mj_handle.in.bup_dcu_rfd.drive_master_ctrl.msg) == MJ_CHECK_OK){
+            mj_handle.in.bup_dcu_rfd.drive_master_ctrl.msg->hdr.src = BRO30_NONE;
+            mj_handle.in.bup_dcu_rfd.drive_master_ctrl.msg->hdr.dst = BRO30_NONE;
+            mj_handle.in.bup_dcu_rfd.drive_master_ctrl.msg->hdr.cnt = 0;
+            mj_handle.in.bup_dcu_rfd.drive_master_ctrl.msg->hdr.id = 0;
+            mj_handle.in.bup_dcu_rfd.drive_master_ctrl.lock = in_bup_dcu_rfd_drive_master_ctrl_lock_fcn;
+            mj_handle.in.bup_dcu_rfd.drive_master_ctrl.copy = in_bup_dcu_rfd_drive_master_ctrl_copy_fcn;
+            mj_handle.in.bup_dcu_rfd.drive_master_ctrl.upd_cb = NULL;
+            mj_handle.in.bup_dcu_rfd.drive_master_ctrl.irq = NULL;
+            mj_handle.in.bup_dcu_rfd.drive_master_ctrl.state = MJ_MSG_OBSOLETE;
+            mj_handle.in.bup_dcu_rfd.drive_master_ctrl.total = &in_bup_dcu_rfd_drive_master_ctrl_total;
+            mj_handle.in.bup_dcu_rfd.drive_master_ctrl.miss = &in_bup_dcu_rfd_drive_master_ctrl_miss;
+        }else{
+            p_drv->udp4.free((uint8_t *)mj_handle.in.bup_dcu_rfd.drive_master_ctrl.msg);
+            return MJ_INTEGRITY_FAIL;
+        }
+    }else{
+        return MJ_UDP4_ALOC_FAIL;
+    }
+
+    if ((mj_handle.in.bup_dcu_rfd.drive_slave_fb.msg = (drive_slave_fb_msg_t *)p_drv->udp4.alloc(sizeof(drive_slave_fb_msg_t)))){
+        if(drive_slave_fb_type_check(mj_handle.in.bup_dcu_rfd.drive_slave_fb.msg) == MJ_CHECK_OK){
+            mj_handle.in.bup_dcu_rfd.drive_slave_fb.msg->hdr.src = BRO30_NONE;
+            mj_handle.in.bup_dcu_rfd.drive_slave_fb.msg->hdr.dst = BRO30_NONE;
+            mj_handle.in.bup_dcu_rfd.drive_slave_fb.msg->hdr.cnt = 0;
+            mj_handle.in.bup_dcu_rfd.drive_slave_fb.msg->hdr.id = 0;
+            mj_handle.in.bup_dcu_rfd.drive_slave_fb.lock = in_bup_dcu_rfd_drive_slave_fb_lock_fcn;
+            mj_handle.in.bup_dcu_rfd.drive_slave_fb.copy = in_bup_dcu_rfd_drive_slave_fb_copy_fcn;
+            mj_handle.in.bup_dcu_rfd.drive_slave_fb.upd_cb = NULL;
+            mj_handle.in.bup_dcu_rfd.drive_slave_fb.irq = NULL;
+            mj_handle.in.bup_dcu_rfd.drive_slave_fb.state = MJ_MSG_OBSOLETE;
+            mj_handle.in.bup_dcu_rfd.drive_slave_fb.total = &in_bup_dcu_rfd_drive_slave_fb_total;
+            mj_handle.in.bup_dcu_rfd.drive_slave_fb.miss = &in_bup_dcu_rfd_drive_slave_fb_miss;
+        }else{
+            p_drv->udp4.free((uint8_t *)mj_handle.in.bup_dcu_rfd.drive_slave_fb.msg);
+            return MJ_INTEGRITY_FAIL;
+        }
+    }else{
+        return MJ_UDP4_ALOC_FAIL;
+    }
+
+    if ((mj_handle.in.bup_dcu_rrd.drive_master_ctrl.msg = (drive_master_ctrl_msg_t *)p_drv->udp4.alloc(sizeof(drive_master_ctrl_msg_t)))){
+        if(drive_master_ctrl_type_check(mj_handle.in.bup_dcu_rrd.drive_master_ctrl.msg) == MJ_CHECK_OK){
+            mj_handle.in.bup_dcu_rrd.drive_master_ctrl.msg->hdr.src = BRO30_NONE;
+            mj_handle.in.bup_dcu_rrd.drive_master_ctrl.msg->hdr.dst = BRO30_NONE;
+            mj_handle.in.bup_dcu_rrd.drive_master_ctrl.msg->hdr.cnt = 0;
+            mj_handle.in.bup_dcu_rrd.drive_master_ctrl.msg->hdr.id = 0;
+            mj_handle.in.bup_dcu_rrd.drive_master_ctrl.lock = in_bup_dcu_rrd_drive_master_ctrl_lock_fcn;
+            mj_handle.in.bup_dcu_rrd.drive_master_ctrl.copy = in_bup_dcu_rrd_drive_master_ctrl_copy_fcn;
+            mj_handle.in.bup_dcu_rrd.drive_master_ctrl.upd_cb = NULL;
+            mj_handle.in.bup_dcu_rrd.drive_master_ctrl.irq = NULL;
+            mj_handle.in.bup_dcu_rrd.drive_master_ctrl.state = MJ_MSG_OBSOLETE;
+            mj_handle.in.bup_dcu_rrd.drive_master_ctrl.total = &in_bup_dcu_rrd_drive_master_ctrl_total;
+            mj_handle.in.bup_dcu_rrd.drive_master_ctrl.miss = &in_bup_dcu_rrd_drive_master_ctrl_miss;
+        }else{
+            p_drv->udp4.free((uint8_t *)mj_handle.in.bup_dcu_rrd.drive_master_ctrl.msg);
+            return MJ_INTEGRITY_FAIL;
+        }
+    }else{
+        return MJ_UDP4_ALOC_FAIL;
+    }
+
+    if ((mj_handle.in.bup_dcu_rrd.drive_slave_fb.msg = (drive_slave_fb_msg_t *)p_drv->udp4.alloc(sizeof(drive_slave_fb_msg_t)))){
+        if(drive_slave_fb_type_check(mj_handle.in.bup_dcu_rrd.drive_slave_fb.msg) == MJ_CHECK_OK){
+            mj_handle.in.bup_dcu_rrd.drive_slave_fb.msg->hdr.src = BRO30_NONE;
+            mj_handle.in.bup_dcu_rrd.drive_slave_fb.msg->hdr.dst = BRO30_NONE;
+            mj_handle.in.bup_dcu_rrd.drive_slave_fb.msg->hdr.cnt = 0;
+            mj_handle.in.bup_dcu_rrd.drive_slave_fb.msg->hdr.id = 0;
+            mj_handle.in.bup_dcu_rrd.drive_slave_fb.lock = in_bup_dcu_rrd_drive_slave_fb_lock_fcn;
+            mj_handle.in.bup_dcu_rrd.drive_slave_fb.copy = in_bup_dcu_rrd_drive_slave_fb_copy_fcn;
+            mj_handle.in.bup_dcu_rrd.drive_slave_fb.upd_cb = NULL;
+            mj_handle.in.bup_dcu_rrd.drive_slave_fb.irq = NULL;
+            mj_handle.in.bup_dcu_rrd.drive_slave_fb.state = MJ_MSG_OBSOLETE;
+            mj_handle.in.bup_dcu_rrd.drive_slave_fb.total = &in_bup_dcu_rrd_drive_slave_fb_total;
+            mj_handle.in.bup_dcu_rrd.drive_slave_fb.miss = &in_bup_dcu_rrd_drive_slave_fb_miss;
+        }else{
+            p_drv->udp4.free((uint8_t *)mj_handle.in.bup_dcu_rrd.drive_slave_fb.msg);
+            return MJ_INTEGRITY_FAIL;
+        }
+    }else{
+        return MJ_UDP4_ALOC_FAIL;
+    }
+
+    if ((mj_handle.in.bup_dcu_rst.drive_master_ctrl.msg = (drive_master_ctrl_msg_t *)p_drv->udp4.alloc(sizeof(drive_master_ctrl_msg_t)))){
+        if(drive_master_ctrl_type_check(mj_handle.in.bup_dcu_rst.drive_master_ctrl.msg) == MJ_CHECK_OK){
+            mj_handle.in.bup_dcu_rst.drive_master_ctrl.msg->hdr.src = BRO30_NONE;
+            mj_handle.in.bup_dcu_rst.drive_master_ctrl.msg->hdr.dst = BRO30_NONE;
+            mj_handle.in.bup_dcu_rst.drive_master_ctrl.msg->hdr.cnt = 0;
+            mj_handle.in.bup_dcu_rst.drive_master_ctrl.msg->hdr.id = 0;
+            mj_handle.in.bup_dcu_rst.drive_master_ctrl.lock = in_bup_dcu_rst_drive_master_ctrl_lock_fcn;
+            mj_handle.in.bup_dcu_rst.drive_master_ctrl.copy = in_bup_dcu_rst_drive_master_ctrl_copy_fcn;
+            mj_handle.in.bup_dcu_rst.drive_master_ctrl.upd_cb = NULL;
+            mj_handle.in.bup_dcu_rst.drive_master_ctrl.irq = NULL;
+            mj_handle.in.bup_dcu_rst.drive_master_ctrl.state = MJ_MSG_OBSOLETE;
+            mj_handle.in.bup_dcu_rst.drive_master_ctrl.total = &in_bup_dcu_rst_drive_master_ctrl_total;
+            mj_handle.in.bup_dcu_rst.drive_master_ctrl.miss = &in_bup_dcu_rst_drive_master_ctrl_miss;
+        }else{
+            p_drv->udp4.free((uint8_t *)mj_handle.in.bup_dcu_rst.drive_master_ctrl.msg);
+            return MJ_INTEGRITY_FAIL;
+        }
+    }else{
+        return MJ_UDP4_ALOC_FAIL;
+    }
+
+    if ((mj_handle.in.bup_dcu_rst.drive_slave_fb.msg = (drive_slave_fb_msg_t *)p_drv->udp4.alloc(sizeof(drive_slave_fb_msg_t)))){
+        if(drive_slave_fb_type_check(mj_handle.in.bup_dcu_rst.drive_slave_fb.msg) == MJ_CHECK_OK){
+            mj_handle.in.bup_dcu_rst.drive_slave_fb.msg->hdr.src = BRO30_NONE;
+            mj_handle.in.bup_dcu_rst.drive_slave_fb.msg->hdr.dst = BRO30_NONE;
+            mj_handle.in.bup_dcu_rst.drive_slave_fb.msg->hdr.cnt = 0;
+            mj_handle.in.bup_dcu_rst.drive_slave_fb.msg->hdr.id = 0;
+            mj_handle.in.bup_dcu_rst.drive_slave_fb.lock = in_bup_dcu_rst_drive_slave_fb_lock_fcn;
+            mj_handle.in.bup_dcu_rst.drive_slave_fb.copy = in_bup_dcu_rst_drive_slave_fb_copy_fcn;
+            mj_handle.in.bup_dcu_rst.drive_slave_fb.upd_cb = NULL;
+            mj_handle.in.bup_dcu_rst.drive_slave_fb.irq = NULL;
+            mj_handle.in.bup_dcu_rst.drive_slave_fb.state = MJ_MSG_OBSOLETE;
+            mj_handle.in.bup_dcu_rst.drive_slave_fb.total = &in_bup_dcu_rst_drive_slave_fb_total;
+            mj_handle.in.bup_dcu_rst.drive_slave_fb.miss = &in_bup_dcu_rst_drive_slave_fb_miss;
+        }else{
+            p_drv->udp4.free((uint8_t *)mj_handle.in.bup_dcu_rst.drive_slave_fb.msg);
+            return MJ_INTEGRITY_FAIL;
+        }
+    }else{
+        return MJ_UDP4_ALOC_FAIL;
+    }
+
+    if ((mj_handle.in.dcu.drive_master_ctrl.msg = (drive_master_ctrl_msg_t *)p_drv->udp4.alloc(sizeof(drive_master_ctrl_msg_t)))){
+        if(drive_master_ctrl_type_check(mj_handle.in.dcu.drive_master_ctrl.msg) == MJ_CHECK_OK){
+            mj_handle.in.dcu.drive_master_ctrl.msg->hdr.src = BRO30_NONE;
+            mj_handle.in.dcu.drive_master_ctrl.msg->hdr.dst = BRO30_NONE;
+            mj_handle.in.dcu.drive_master_ctrl.msg->hdr.cnt = 0;
+            mj_handle.in.dcu.drive_master_ctrl.msg->hdr.id = 0;
+            mj_handle.in.dcu.drive_master_ctrl.lock = in_dcu_drive_master_ctrl_lock_fcn;
+            mj_handle.in.dcu.drive_master_ctrl.copy = in_dcu_drive_master_ctrl_copy_fcn;
+            mj_handle.in.dcu.drive_master_ctrl.upd_cb = NULL;
+            mj_handle.in.dcu.drive_master_ctrl.irq = NULL;
+            mj_handle.in.dcu.drive_master_ctrl.state = MJ_MSG_OBSOLETE;
+            mj_handle.in.dcu.drive_master_ctrl.total = &in_dcu_drive_master_ctrl_total;
+            mj_handle.in.dcu.drive_master_ctrl.miss = &in_dcu_drive_master_ctrl_miss;
+        }else{
+            p_drv->udp4.free((uint8_t *)mj_handle.in.dcu.drive_master_ctrl.msg);
+            return MJ_INTEGRITY_FAIL;
+        }
+    }else{
+        return MJ_UDP4_ALOC_FAIL;
+    }
+
+    if ((mj_handle.in.dcu.drive_slave_fb.msg = (drive_slave_fb_msg_t *)p_drv->udp4.alloc(sizeof(drive_slave_fb_msg_t)))){
+        if(drive_slave_fb_type_check(mj_handle.in.dcu.drive_slave_fb.msg) == MJ_CHECK_OK){
+            mj_handle.in.dcu.drive_slave_fb.msg->hdr.src = BRO30_NONE;
+            mj_handle.in.dcu.drive_slave_fb.msg->hdr.dst = BRO30_NONE;
+            mj_handle.in.dcu.drive_slave_fb.msg->hdr.cnt = 0;
+            mj_handle.in.dcu.drive_slave_fb.msg->hdr.id = 0;
+            mj_handle.in.dcu.drive_slave_fb.lock = in_dcu_drive_slave_fb_lock_fcn;
+            mj_handle.in.dcu.drive_slave_fb.copy = in_dcu_drive_slave_fb_copy_fcn;
+            mj_handle.in.dcu.drive_slave_fb.upd_cb = NULL;
+            mj_handle.in.dcu.drive_slave_fb.irq = NULL;
+            mj_handle.in.dcu.drive_slave_fb.state = MJ_MSG_OBSOLETE;
+            mj_handle.in.dcu.drive_slave_fb.total = &in_dcu_drive_slave_fb_total;
+            mj_handle.in.dcu.drive_slave_fb.miss = &in_dcu_drive_slave_fb_miss;
+        }else{
+            p_drv->udp4.free((uint8_t *)mj_handle.in.dcu.drive_slave_fb.msg);
+            return MJ_INTEGRITY_FAIL;
+        }
+    }else{
+        return MJ_UDP4_ALOC_FAIL;
+    }
+
     if ((mj_handle.in.im_bro.im_bro_drivers_sens.msg = (drivers_sens_msg_t *)p_drv->udp4.alloc(sizeof(drivers_sens_msg_t)))){
         if(drivers_sens_type_check(mj_handle.in.im_bro.im_bro_drivers_sens.msg) == MJ_CHECK_OK){
             mj_handle.in.im_bro.im_bro_drivers_sens.msg->hdr.src = BRO30_NONE;
@@ -2181,6 +4199,27 @@ mj_status_t mj_bup_dcu_lst_init(mj_drv_interface_t *drv, mj_bup_dcu_lst_t ** ptr
             mj_handle.in.im_bro.im_bro_drivers_sens.miss = &in_im_bro_im_bro_drivers_sens_miss;
         }else{
             p_drv->udp4.free((uint8_t *)mj_handle.in.im_bro.im_bro_drivers_sens.msg);
+            return MJ_INTEGRITY_FAIL;
+        }
+    }else{
+        return MJ_UDP4_ALOC_FAIL;
+    }
+
+    if ((mj_handle.in.mon.bup_multi_control.msg = (bup_drv_multi_control_msg_t *)p_drv->udp4.alloc(sizeof(bup_drv_multi_control_msg_t)))){
+        if(bup_drv_multi_control_type_check(mj_handle.in.mon.bup_multi_control.msg) == MJ_CHECK_OK){
+            mj_handle.in.mon.bup_multi_control.msg->hdr.src = BRO30_NONE;
+            mj_handle.in.mon.bup_multi_control.msg->hdr.dst = BRO30_NONE;
+            mj_handle.in.mon.bup_multi_control.msg->hdr.cnt = 0;
+            mj_handle.in.mon.bup_multi_control.msg->hdr.id = 0;
+            mj_handle.in.mon.bup_multi_control.lock = in_mon_bup_multi_control_lock_fcn;
+            mj_handle.in.mon.bup_multi_control.copy = in_mon_bup_multi_control_copy_fcn;
+            mj_handle.in.mon.bup_multi_control.upd_cb = NULL;
+            mj_handle.in.mon.bup_multi_control.irq = NULL;
+            mj_handle.in.mon.bup_multi_control.state = MJ_MSG_OBSOLETE;
+            mj_handle.in.mon.bup_multi_control.total = &in_mon_bup_multi_control_total;
+            mj_handle.in.mon.bup_multi_control.miss = &in_mon_bup_multi_control_miss;
+        }else{
+            p_drv->udp4.free((uint8_t *)mj_handle.in.mon.bup_multi_control.msg);
             return MJ_INTEGRITY_FAIL;
         }
     }else{

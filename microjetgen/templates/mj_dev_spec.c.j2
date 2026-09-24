@@ -1,0 +1,503 @@
+{%set dev_name_low = mj.toLower(dev_name)%}
+#include "mj_{{dev_name_low}}_spec.h"
+
+#define IN_INT_COUNT {{len(in_int)}}
+
+static uint32_t group_addr[IN_INT_COUNT*2];
+
+{%set outMsg = sorted(mj._get_dev_output_spec(dev_name))%}
+{%set inMsg = sorted(mj._get_dev_input_spec(dev_name))%}
+{%set prms = mj.dev_parameters(dev_name)%}
+{%set devmacbytes = binascii.unhexlify(spec['MAC'].replace(':', ''))%}
+{%set dev_name_up = mj.toUpper(dev_name)%}
+{%set devIp  = dev_name_up + "_IP"%}
+static const uint8_t devMac[6] = { {%for b in devmacbytes%}{{hex(b)}}{%if not loop.last%},{% endif %}{% endfor %} };
+
+static uint32_t ticks = 0;
+static void *ethInt = NULL;
+static mj_drv_interface_t * p_drv = NULL;
+static uint16_t self_dev_id = {{mj.spec_name_up}}_{{dev_name_up}};
+
+static mj_{{dev_name_low}}_t mj_handle;
+
+{%set dev_src = sorted(mj.inputDev(dev_name))%}
+{%for d in dev_src%}
+{%set in_dev_m = sorted(mj.inputMsg(dev_name,d))%}
+{%set d_low = mj.toLower(d)%}
+{%for dm in in_dev_m%}
+{%set dm_low = mj.toLower(dm)%}
+static uint32_t {{d_low}}_{{dm}}_rx_tick = UINT32_MAX - {{mj.msg[dm]['period']*3/250 + 1}};
+static uint8_t  in_{{d_low}}_{{dm}}_lock_cnt = 0;
+static {{mj.msg[dm]['type']}}_msg_t* in_{{d_low}}_{{dm}}_delayed_ptr = NULL;
+static uint32_t {{d_low}}_{{dm}}_delayed_ts_s = 0;
+static uint32_t {{d_low}}_{{dm}}_delayed_ts_ns = 0;
+static uint8_t  in_{{d_low}}_{{dm}}_updated = 0;
+static uint32_t  in_{{d_low}}_{{dm}}_total = 0;
+static uint32_t  in_{{d_low}}_{{dm}}_miss = 0;
+static uint16_t  in_{{d_low}}_{{dm}}_last_cnt = 0;
+static mj_msg_state_t in_{{d_low}}_{{dm_low}}_lock_fcn(mj_msg_state_t state)
+{
+    if (state == MJ_MSG_LOCK)
+    {
+        if (in_{{d_low}}_{{dm_low}}_lock_cnt < 255)
+        {
+            in_{{d_low}}_{{dm_low}}_lock_cnt++;
+        }
+    }else{
+        if (in_{{d_low}}_{{dm}}_lock_cnt > 0)
+        {
+            if ((in_{{d_low}}_{{dm_low}}_lock_cnt == 1) && (in_{{d_low}}_{{dm_low}}_delayed_ptr))
+            {
+                uint8_t* old_buff = (uint8_t*)(mj_handle.in.{{d_low}}.{{dm_low}}.msg);
+                mj_handle.in.{{d_low}}.{{dm_low}}.msg = ({{mj.msg[dm]['type']}}_msg_t*)(in_{{d_low}}_{{dm_low}}_delayed_ptr);
+                mj_handle.in.{{d_low}}.{{dm_low}}.ts_s = {{d_low}}_{{dm}}_delayed_ts_s;
+                mj_handle.in.{{d_low}}.{{dm_low}}.ts_ns = {{d_low}}_{{dm}}_delayed_ts_ns;
+                {{d_low}}_{{dm_low}}_rx_tick = ticks;
+                mj_handle.in.{{d_low}}.{{dm_low}}.state = MJ_MSG_ACTUAL;
+                in_{{d_low}}_{{dm_low}}_updated = 1;
+                p_drv->udp4.free(old_buff);
+                in_{{d_low}}_{{dm_low}}_delayed_ptr = NULL;
+            }
+            in_{{d_low}}_{{dm_low}}_lock_cnt--;
+        }
+    }
+    return in_{{d_low}}_{{dm_low}}_lock_cnt > 0 ? MJ_MSG_LOCK : MJ_MSG_UNLOCK;
+}
+
+static void in_{{d_low}}_{{dm_low}}_copy_fcn(void *dst)
+{
+    in_{{d_low}}_{{dm_low}}_lock_fcn(MJ_MSG_LOCK);
+    memcpy(dst, (void *)(mj_handle.in.{{d_low}}.{{dm_low}}.msg), sizeof({{mj.msg[dm]['type']}}_msg_t));
+    in_{{d_low}}_{{dm_low}}_lock_fcn(MJ_MSG_UNLOCK);
+}
+
+{% endfor %}
+{% endfor %}
+
+{%for o in outMsg%}
+static void * out_{{o}}_pkt = NULL;
+{%if mj.msg[o]['period'] == 0%}
+static void out_{{o}}_tx_fcn(uint16_t dst)
+{
+    uint32_t _temp_ns = 0;
+    mj_handle.out.{{o}}.msg->hdr.ts_status = p_drv->timestamp(&mj_handle.out.{{o}}.msg->hdr.ts_s,&_temp_ns);
+    mj_handle.out.{{o}}.msg->hdr.ts_ns = _temp_ns;
+    mj_handle.out.{{o}}.msg->hdr.dst = dst;
+    mj_handle.out.{{o}}.msg->hdr.cnt++;
+    p_drv->udp4.tx(out_{{o}}_pkt,NULL);
+}
+{%else%}
+static {{mj.msg[o]['type']}}_msg_t * p_out_{{o}}_msg = NULL;
+static mj_msg_state_t out_{{o}}_lock_fcn(mj_msg_state_t state)
+{
+    mj_msg_state_t res = MJ_MSG_UNDEFINED;
+    if (state == MJ_MSG_LOCK)
+    {
+        if (p_out_{{o}}_msg == NULL)
+        {
+            if ((p_out_{{o}}_msg = ({{mj.msg[o]['type']}}_msg_t *)p_drv->udp4.alloc(sizeof({{mj.msg[o]['type']}}_msg_t))))
+            {
+                memcpy((void *)p_out_{{o}}_msg, (void *)(mj_handle.out.{{o}}.msg), sizeof({{mj.msg[o]['type']}}_msg_t));
+                p_drv->udp4.set_payload(out_{{o}}_pkt, (uint8_t *)p_out_{{o}}_msg);
+                res = MJ_MSG_LOCK;
+            }else{
+                res = MJ_MSG_UNLOCK;
+            }
+        }else{
+            res = MJ_MSG_LOCK;
+        }
+    }else{
+        res = MJ_MSG_LOCK;
+        if (p_out_{{o}}_msg)
+        {
+            p_drv->udp4.set_payload(out_{{o}}_pkt, (uint8_t *)mj_handle.out.{{o}}.msg);
+            p_drv->udp4.free((uint8_t *)p_out_{{o}}_msg);
+            p_out_{{o}}_msg = NULL;
+            res = MJ_MSG_UNLOCK;
+        }else{
+            res = MJ_MSG_UNLOCK;
+        }
+    }
+    return res;
+}
+{% endif %}
+
+{% endfor %}
+
+{%if len(prms) > 0%}
+static {{dev_name_low}}_prm_t _{{dev_name_low}}_prm;
+
+{%set d_prm = mj.devPrms(dev_name)%}
+mj_prm_status_t {{dev_name_low}}_prm_write(int id, void *data)
+{
+    switch (id){
+{%for p in d_prm%}
+        case PRM_{{mj.toUpper(d_prm[p])}}_{{mj.toUpper(p)}}:
+            memcpy(&(_{{dev_name_low}}_prm.{{p}}),data,sizeof(_{{dev_name_low}}_prm.{{p}}));
+            return MJ_PRM_OK;
+{%endfor%}
+        default:
+            return MJ_PRM_UNKNOW;
+    }
+}
+
+mj_prm_status_t {{dev_name_low}}_prm_read(int id, void *data)
+{
+    switch (id){
+{%for p in d_prm%}
+        case PRM_{{mj.toUpper(d_prm[p])}}_{{mj.toUpper(p)}}:
+            memcpy(data,&_{{dev_name_low}}_prm.{{p}},sizeof(_{{dev_name_low}}_prm.{{p}}));
+            return MJ_PRM_OK;
+{%endfor%}
+        default:
+            return MJ_PRM_UNKNOW;
+    }
+}
+
+static const uint32_t _prm_ids[{{len(d_prm)}}] = {
+{%for p in d_prm%}
+    PRM_{{mj.toUpper(d_prm[p])}}_{{mj.toUpper(p)}}{%if not loop.last%},{% endif %}
+
+{%endfor%}
+};
+
+static const uint32_t * {{dev_name_low}}_prm_list(uint32_t *size)
+{
+    *size = {{len(d_prm)}};
+    return _prm_ids;
+}
+
+{% endif %}
+{%set periods = mj.txPeriods(dev_name)%}
+{%for T in periods%}
+{%if T > 0%}
+static uint32_t _{{T}}_us_cnt = 0;
+static uint32_t _{{T}}_us_tick = {{mj.round(T/250.0)}};
+{% endif %}
+{% endfor %}
+
+static uint32_t *_join_ip = NULL;
+static volatile bool _send_join_done = true;
+static uint32_t _join_send_tick = 0;
+
+static void tick_fcn()
+{
+    uint32_t _temp_ns = 0;
+{%for T in periods%}
+{%if T > 0%}
+    /* Each {{T/1000}} ms  */
+    if (_{{T}}_us_tick >= {{mj.round(T/250.0)}})
+    {
+        _{{T}}_us_cnt++;
+{%for o in outMsg%}
+{%if mj.msg[o]['period'] == T%}
+        if (mj_handle.out.{{o}}.tx_enable){
+            mj_handle.out.{{o}}.msg->hdr.cnt = _{{T}}_us_cnt;
+            mj_handle.out.{{o}}.msg->hdr.ts_status = p_drv->timestamp(&mj_handle.out.{{o}}.msg->hdr.ts_s,&_temp_ns);
+            mj_handle.out.{{o}}.msg->hdr.ts_ns = _temp_ns;
+            p_drv->udp4.tx(out_{{o}}_pkt,NULL);
+        }
+{% endif %}
+{% endfor %}
+        _{{T}}_us_tick = 0;
+    }
+    _{{T}}_us_tick++;
+{% endif %}
+
+{% endfor %}
+    if (!_send_join_done && _join_ip) {
+        p_drv->udp4.join_group(ethInt, *_join_ip);
+        _join_send_tick = ticks;
+        _send_join_done = true;
+    }
+    p_drv->udp4.pool_tx();
+    ticks++;
+}
+
+{%for i in in_int%}
+
+static mj_msg_proc_res_t {{mj.toLower(i)}}_cb(uint8_t* data, uint16_t size, uint32_t ts_s, uint32_t ts_ns)
+{
+    mj_msg_header_t *hdr = (mj_msg_header_t*)data;
+    if ((hdr->dst == {{mj.spec_name_up}}_ALL) || (hdr->dst == self_dev_id))
+    {
+        uint8_t *old_buff = NULL;
+        switch (hdr->id)
+        {
+{%for o in inMsg%}
+{%set interface = mj.msg[o]['transport']%}
+{%set port = interface['port']%}
+{%set o_up = mj.toUpper(o)%}
+{%if interface == i%}
+{%set dev_src = sorted(mj.msgSources(o,dev_name))%}
+            // {{o}}
+            case ID_{{o_up}}:
+{%if len(dev_src) > 0%}
+                if (size == sizeof({{mj.msg[o]['type']}}_msg_t))
+                {
+                    switch (hdr->src)
+                    {
+{%for d in dev_src%}
+{%set d_up = mj.toUpper(d)%}
+{%set d_low = mj.toLower(d)%}
+                        // {{o}} from {{d}}
+                        case {{mj.spec_name_up}}_{{d_up}}:
+                            if (in_{{d_low}}_{{o}}_lock_cnt == 0)
+                            {
+                                old_buff = (uint8_t*)mj_handle.in.{{d_low}}.{{o}}.msg;
+                                mj_handle.in.{{d_low}}.{{o}}.msg = ({{mj.msg[o]['type']}}_msg_t *)data;
+                                mj_handle.in.{{d_low}}.{{o}}.ts_s  = ts_s;
+                                mj_handle.in.{{d_low}}.{{o}}.ts_ns = ts_ns;
+                                in_{{d_low}}_{{o}}_updated = 1;
+                                in_{{d_low}}_{{o}}_total++;
+                                uint16_t cnt_diff = (mj_handle.in.{{d_low}}.{{o}}.msg->hdr.cnt - in_{{d_low}}_{{o}}_last_cnt);
+                                if (cnt_diff > 1)
+                                {
+                                    in_{{d_low}}_{{o}}_miss += cnt_diff;
+                                }
+                                in_{{d_low}}_{{o}}_last_cnt = mj_handle.in.{{d_low}}.{{o}}.msg->hdr.cnt;
+                                {{d_low}}_{{o}}_rx_tick = ticks;
+                                mj_handle.in.{{d_low}}.{{o}}.state = MJ_MSG_ACTUAL;
+                                p_drv->udp4.free(old_buff);
+                            }else{
+                                if (in_{{d_low}}_{{o}}_delayed_ptr == NULL)
+                                {
+                                    in_{{d_low}}_{{o}}_delayed_ptr = ({{mj.msg[o]['type']}}_msg_t *)data;
+                                    {{d_low}}_{{o}}_delayed_ts_s = ts_s;
+                                    {{d_low}}_{{o}}_delayed_ts_s = ts_ns;;
+                                }else{
+                                    return MJ_REJECT_OVF;
+                                }
+                            }
+                            if (mj_handle.in.{{d_low}}.{{o}}.irq){
+                                mj_handle.in.{{d_low}}.{{o}}.irq(data);
+                            }
+                            return MJ_ACCEPT;
+{% endfor %}
+                        default:
+                            return MJ_REJECT_SRC;
+                    }
+                }else{
+                    return MJ_REJECT_SIZE;
+                }
+            break;
+{% endif %}
+{% endif %}
+{% endfor %}
+            default:
+                return MJ_REJECT_ID;    
+        }
+    }
+    return MJ_REJECT_DST; 
+}
+
+{% endfor %}
+
+static void loop_fcn()
+{
+    uint32_t c_time = ticks;
+{%for o in inMsg%}
+{%set o_low = mj.toLower(o)%}
+{%set dev_src = sorted(mj.msgSources(o,dev_name))%}
+{%if len(dev_src) > 0%}
+{%for d in dev_src%}
+{%set d_low = mj.toLower(d)%}
+
+{% if 'timeout' in mj.msg[o].keys()%}
+{%set timeout = mj.msg[o]['timeout']%}
+{%else%}
+{% if mj.msg[o]['period']!=0 %}
+{%set timeout = mj.msg[o]['period']*3%}
+{%else%}
+{%set timeout = 1000000%}
+{% endif %}
+{% endif %}
+    if((((int32_t)(c_time - {{d_low}}_{{o_low}}_rx_tick)) > {{mj.round(timeout/250)}})){
+        mj_handle.in.{{d_low}}.{{o}}.state = MJ_MSG_OBSOLETE;
+    }
+{% endfor %}
+{% endif %}
+{% endfor %}
+
+{%for o in inMsg%}
+{%set o_low = mj.toLower(o)%}
+{%set dev_src = sorted(mj.msgSources(o,dev_name))%}
+{%if len(dev_src) > 0%}
+{%for d in dev_src%}
+{%set d_low = mj.toLower(d)%}
+    if(in_{{d_low}}_{{o_low}}_updated == 1)
+    {
+        if(mj_handle.in.{{d_low}}.{{o}}.upd_cb){mj_handle.in.{{d_low}}.{{o_low}}.upd_cb();}
+        in_{{d_low}}_{{o_low}}_updated = 0;
+{% if o == 'prm_req' %}
+        {{mj.spec_name_low}}_prm_id_k prmId = mj_handle.in.{{d_low}}.{{o}}.msg->id;
+        parameter_request_type_k rtype = mj_handle.in.{{d_low}}.{{o}}.msg->type;
+        bool is_prm_writed = false;
+        if (rtype == PARAMETER_REQUEST_TYPE_WRITE){
+            if ({{dev_name_low}}_prm_write(prmId, mj_handle.in.{{d_low}}.{{o}}.msg->val) == MJ_PRM_OK){
+                is_prm_writed = true;
+            }
+        }
+        mj_handle.out.prm_ans.msg->id = prmId;
+        if ({{dev_name_low}}_prm_read(prmId, mj_handle.out.prm_ans.msg->val) == MJ_PRM_OK){
+            mj_handle.out.prm_ans.msg->ans = PARAMETER_STATUS_OK;
+        } else {
+            mj_handle.out.prm_ans.msg->ans = PARAMETER_STATUS_UNKNOWPRM;
+        }
+        if (is_prm_writed && mj_handle.prm.upd_cb){
+            mj_handle.prm.upd_cb(prmId);
+        }
+        mj_handle.out.prm_ans.tx(mj_handle.in.{{d_low}}.{{o}}.msg->hdr.src);
+{% endif %}
+    }
+{% endfor %}
+{% endif %}
+{% endfor %}
+
+if (_send_join_done) {
+    if (_join_ip) {
+        for(int i = 0; i < IN_INT_COUNT; i++) {
+            if ((*_join_ip) == group_addr[i*2]) {
+                group_addr[i*2+1] = _join_send_tick;
+            }
+        }
+        _join_ip = NULL;
+    }else{
+        for(int i = 0; i < IN_INT_COUNT; i++) {
+            if ((ticks - group_addr[i*2+1]) > MJ_IPMCAST_PERIOD_TICK) {
+                _join_ip = &group_addr[i*2];
+                _send_join_done = false;
+                break;
+            }
+        }
+    }
+}
+}
+
+mj_status_t mj_{{dev_name_low}}_prm_init(mj_{{dev_name_low}}_t ** ptr){
+    {%if len(prms) > 0%}
+    /* PRM */
+{%for p in prms%}
+{%if 'string' in mj.spec['parameters'][p]["type"]%}
+    /* prms[p] */
+    const uint8_t default_{{p}}[] = { {{mj.utf8_to_cp866_c_array(prms[p]['val'])}}, 0x00};
+    memcpy(&(_{{dev_name_low}}_prm.{{p}}), default_{{p}}, sizeof(default_{{p}}) > 32 ? 32 : sizeof(default_{{p}}));
+{%else%}
+    _{{dev_name_low}}_prm.{{p}} = {{prms[p]['val']}};
+{%endif%}
+{% endfor %}
+    mj_handle.prm.ptr = &_{{dev_name_low}}_prm;
+    mj_handle.prm.read = {{dev_name_low}}_prm_read;
+    mj_handle.prm.write = {{dev_name_low}}_prm_write;
+    mj_handle.prm.list = {{dev_name_low}}_prm_list;
+    *ptr = &mj_handle;
+    return MJ_OK;
+{% endif %}
+}
+
+mj_status_t mj_{{dev_name_low}}_init(mj_drv_interface_t *drv, mj_{{dev_name_low}}_t ** ptr)
+{
+    //memset(&mj_handle,0,sizeof(mj_handle));
+    if (mj_handle.prm.ptr == NULL){
+        mj_{{dev_name_low}}_prm_init(ptr);
+    }
+    self_dev_id = mj_handle.prm.ptr->dev_id;
+    p_drv = drv;
+    ethInt = p_drv->udp4.create_interface(devMac, {{devIp}});
+    if (ethInt == NULL){return MJ_ETH_FAIL;};
+
+{% set all_int = mj.allInterfaces(dev_name)%}
+{%for i in all_int%}
+    uint32_t {{i}}_ip_be = {{mj.toUpper(i)}}_IP;
+{%set port = mj.interfaces[i]['port']%}
+    uint16_t {{i}}_port_be = {{mj.portConvert(port)}};
+    if (mj_str_if_to_int(mj_handle.prm.ptr->com_if_{{i}}, &{{i}}_ip_be, &{{i}}_port_be) != 0){
+        return MJ_UDP4_CB_FAIL;
+    }
+{% endfor %}
+{%for i in in_int%}
+    if (p_drv->udp4.register_callback({{i}}_ip_be, {{i}}_port_be, {{mj.toLower(i)}}_cb) != MJ_OK){
+        return MJ_UDP4_CB_FAIL;
+    }
+{% endfor %}
+
+{%for i in in_int%}
+{%set ip = mj.interfaces[i]['IP']%}
+    group_addr[{{loop.index0*2}}] = {{i}}_ip_be; // {{i}}
+    group_addr[{{loop.index0*2+1}}] = 0;
+{% endfor %}
+
+    /* OUT */
+{%for o in outMsg%}
+{%set interface = mj.interfaces[mj.msg[o].transport]%}
+{%set o_low = mj.toLower(o)%}
+{%set o_up = mj.toUpper(o)%}
+{%set port = interface['port']%}
+    /** {{o}} */
+    if ((mj_handle.out.{{o_low}}.msg = ({{mj.msg[o]['type']}}_msg_t *)p_drv->udp4.alloc(sizeof({{mj.msg[o]['type']}}_msg_t))))
+    {
+        if({{mj.msg[o]['type']}}_type_check(mj_handle.out.{{o_low}}.msg) == MJ_CHECK_OK)
+        {
+            out_{{o}}_pkt = p_drv->udp4.create_out_pkt(ethInt,{{mj.msg[o].transport}}_ip_be, {{mj.msg[o].transport}}_port_be, 0x00,(uint8_t*)mj_handle.out.{{o_low}}.msg, sizeof({{mj.msg[o]['type']}}_msg_t));
+            if (out_{{o}}_pkt == NULL){return MJ_UDP4_PKT_FAIL;}
+            mj_handle.out.{{o_low}}.msg->hdr.src = self_dev_id;
+            mj_handle.out.{{o_low}}.msg->hdr.cnt = 0;
+            mj_handle.out.{{o_low}}.msg->hdr.id = ID_{{o_up}};
+{%if mj.getMsgPrioriry(o)%}
+            p_drv->udp4.set_dscp(out_{{o}}_pkt,{{mj.getMsgPrioriry(o)}});
+{%endif%}
+{%if mj.msg[o]['period'] == 0%}
+            mj_handle.out.{{o_low}}.msg->hdr.dst = {{mj.spec_name_up}}_NONE;
+            mj_handle.out.{{o_low}}.tx = out_{{o}}_tx_fcn;
+{%else%}
+            mj_handle.out.{{o_low}}.msg->hdr.dst = {{mj.spec_name_up}}_ALL;
+            mj_handle.out.{{o_low}}.lock = out_{{o}}_lock_fcn;
+            mj_handle.out.{{o_low}}.tx_enable = true;
+{%endif%}
+        }else{
+            p_drv->udp4.free((uint8_t *)mj_handle.out.{{o_low}}.msg);
+            return MJ_INTEGRITY_FAIL;
+        }
+    }else{
+        return MJ_UDP4_ALOC_FAIL;
+    }
+
+{% endfor %}
+
+    /* IN */
+{%set dev_src = sorted(mj.inputDev(dev_name))%}
+{%for d in dev_src%}
+{%set in_dev_m = sorted(mj.inputMsg(dev_name,d))%}
+{%set d_low = mj.toLower(d)%}
+{%for dm in in_dev_m%}
+{%set dm_low = mj.toLower(dm)%}
+    if ((mj_handle.in.{{d_low}}.{{dm_low}}.msg = ({{mj.msg[dm]['type']}}_msg_t *)p_drv->udp4.alloc(sizeof({{mj.msg[dm]['type']}}_msg_t)))){
+        if({{mj.msg[dm]['type']}}_type_check(mj_handle.in.{{d_low}}.{{dm_low}}.msg) == MJ_CHECK_OK){
+            mj_handle.in.{{d_low}}.{{dm_low}}.msg->hdr.src = {{mj.spec_name_up}}_NONE;
+            mj_handle.in.{{d_low}}.{{dm_low}}.msg->hdr.dst = {{mj.spec_name_up}}_NONE;
+            mj_handle.in.{{d_low}}.{{dm_low}}.msg->hdr.cnt = 0;
+            mj_handle.in.{{d_low}}.{{dm_low}}.msg->hdr.id = 0;
+            mj_handle.in.{{d_low}}.{{dm_low}}.lock = in_{{d_low}}_{{dm_low}}_lock_fcn;
+            mj_handle.in.{{d_low}}.{{dm_low}}.copy = in_{{d_low}}_{{dm_low}}_copy_fcn;
+            mj_handle.in.{{d_low}}.{{dm_low}}.upd_cb = NULL;
+            mj_handle.in.{{d_low}}.{{dm_low}}.irq = NULL;
+            mj_handle.in.{{d_low}}.{{dm_low}}.state = MJ_MSG_OBSOLETE;
+            mj_handle.in.{{d_low}}.{{dm_low}}.total = &in_{{d_low}}_{{dm}}_total;
+            mj_handle.in.{{d_low}}.{{dm_low}}.miss = &in_{{d_low}}_{{dm}}_miss;
+        }else{
+            p_drv->udp4.free((uint8_t *)mj_handle.in.{{d_low}}.{{dm_low}}.msg);
+            return MJ_INTEGRITY_FAIL;
+        }
+    }else{
+        return MJ_UDP4_ALOC_FAIL;
+    }
+
+{% endfor %}
+{% endfor %}
+
+    mj_handle.tick = tick_fcn;
+    mj_handle.loop = loop_fcn;
+    *ptr = &mj_handle;
+
+    return MJ_OK;
+}

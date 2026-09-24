@@ -1,0 +1,79 @@
+#include "mjutils.h"
+
+{% for e in mj.idl.enums %}
+const char* {{e.basename}}_str(int32_t val) {
+    switch(val) {
+{% for v in e.values %}
+        case {{mj.toUpper(e.basename)}}_{{mj.toUpper(v.name)}}: return "{{v.name}}";
+{% endfor %}
+        default: return "???";
+    }
+}
+
+{% endfor %}
+{%set prms = mj.parameters()%}
+{%if len(prms) > 0%}
+const char* mj_get_prm_name(int32_t val)
+{
+    switch(val) {
+{% for p in prms %}
+        case PRM_{{mj.toUpper(prms[p]['type'])}}_{{mj.toUpper(p)}}: return "{{p}}";
+{% endfor %}
+        default: return "???";
+    }
+}
+{%endif%}
+
+const char* mj_get_dev_name(int32_t val)
+{
+    switch(val) {
+{% for dev in mj.devs %}
+        case {{mj.spec_name_up}}_{{mj.toUpper(dev)}}: return "{{dev}}";
+{% endfor %}
+        case 0xFFFF: return "ALL";
+        case 0: return "NONE";
+        default: return "???";
+    }
+}
+
+const char* mj_get_msg_name(int32_t val)
+{
+    switch(val) {
+{% for m in mj.msg %}
+        case ID_{{mj.toUpper(m)}}: return "{{m}}";
+{% endfor %}
+        default: return "???";
+    }
+}
+
+int mj_str_if_to_int(const char* str, uint32_t *ip, uint16_t *port)
+{
+    unsigned int b1, b2, b3, b4, p;
+    if (!str || !ip || !port){
+        return -1;
+    }
+
+    if (sscanf(str, "%u.%u.%u.%u:%u", &b4, &b3, &b2, &b1, &p) != 5){
+        return -2;
+    }
+
+    if (b1 > 255 || b2 > 255 || b3 > 255 || b4 > 255 || p > 65535)
+    {
+        return -3;
+    }
+
+    *ip = (b1 << 24) | (b2 << 16) | (b3 << 8) | b4;
+    *port = (uint16_t)(((p & 0xFF) << 8) | (p >> 8));
+    return 0;
+}
+
+int mj_int_if_to_str(uint32_t ip, uint16_t port, char* buf, size_t buf_len)
+{
+    unsigned int b1, b2, b3, b4;
+    b1 = (ip >> 24) & 0xFF;
+    b2 = (ip >> 16) & 0xFF;
+    b3 = (ip >> 8) & 0xFF;
+    b4 = (ip) & 0xFF;
+    snprintf(buf, buf_len, "%u.%u.%u.%u:%u",b1,b2,b3,b4,port);
+    return 0;
+}

@@ -20,6 +20,8 @@ typedef struct bup_dcu_lrd_prm{
      char com_if_bro_bup_ctrl_mcast[32];
      /** com_if_bro_bup_data_mcast [-] */
      char com_if_bro_bup_data_mcast[32];
+     /** com_if_bup_internal_mcast [-] */
+     char com_if_bup_internal_mcast[32];
      /** com_if_bro_bup_srv_mcast [-] */
      char com_if_bro_bup_srv_mcast[32];
      /** com_if_im_bro_drive_mcast [-] */
@@ -56,6 +58,8 @@ typedef struct bup_dcu_lrd_prm{
      float ptp_kd;
      /** ohp_lvl [C] */
      float ohp_lvl;
+     /** ohp_hyst [C] */
+     float ohp_hyst;
      /** el_zero [rad] */
      float el_zero;
      /** pole_pairs [-] */
@@ -106,10 +110,42 @@ typedef struct bup_dcu_lrd_prm{
      float load_speed_err_lim;
      /** load_speed_out_lim [-] */
      float load_speed_out_lim;
+     /** load_speed_int_lim [-] */
+     float load_speed_int_lim;
      /** load_speed_out_rate_lim [-] */
      float load_speed_out_rate_lim;
      /** load_speed_err_rate_lim [-] */
      float load_speed_err_rate_lim;
+     /** load_speed_flt_fc [-] */
+     float load_speed_flt_fc;
+     /** rotor_speed_flt_fc [-] */
+     float rotor_speed_flt_fc;
+     /** load_ang_kp [-] */
+     float load_ang_kp;
+     /** load_ang_ki [-] */
+     float load_ang_ki;
+     /** load_ang_kb [-] */
+     float load_ang_kb;
+     /** load_ang_kt [-] */
+     float load_ang_kt;
+     /** load_ang_kf [-] */
+     float load_ang_kf;
+     /** load_ang_rev [-] */
+     bool load_ang_rev;
+     /** load_ang_kd [-] */
+     float load_ang_kd;
+     /** load_ang_err_lim [-] */
+     float load_ang_err_lim;
+     /** load_ang_out_lim [-] */
+     float load_ang_out_lim;
+     /** load_ang_out_rate_lim [-] */
+     float load_ang_out_rate_lim;
+     /** load_ang_err_rate_lim [-] */
+     float load_ang_err_rate_lim;
+     /** load_ang_dz [rad] */
+     float load_ang_dz;
+     /** load_ang_dz_en [-] */
+     bool load_ang_dz_en;
      /** rotor_speed_kp [-] */
      float rotor_speed_kp;
      /** rotor_speed_ki [-] */
@@ -124,10 +160,54 @@ typedef struct bup_dcu_lrd_prm{
      float rotor_speed_err_lim;
      /** rotor_speed_out_lim [-] */
      float rotor_speed_out_lim;
+     /** rotor_speed_int_lim [-] */
+     float rotor_speed_int_lim;
      /** rotor_speed_out_rate_lim [-] */
      float rotor_speed_out_rate_lim;
      /** rotor_speed_err_rate_lim [-] */
      float rotor_speed_err_rate_lim;
+     /** rotor_speed_master_common_kp [-] */
+     float rotor_speed_master_common_kp;
+     /** rotor_speed_master_common_ki [-] */
+     float rotor_speed_master_common_ki;
+     /** rotor_speed_master_common_kb [-] */
+     float rotor_speed_master_common_kb;
+     /** rotor_speed_master_common_kt [-] */
+     float rotor_speed_master_common_kt;
+     /** rotor_speed_master_common_kf [-] */
+     float rotor_speed_master_common_kf;
+     /** rotor_speed_master_common_err_lim [-] */
+     float rotor_speed_master_common_err_lim;
+     /** rotor_speed_master_common_out_lim [-] */
+     float rotor_speed_master_common_out_lim;
+     /** rotor_speed_master_common_int_lim [-] */
+     float rotor_speed_master_common_int_lim;
+     /** rotor_speed_master_common_out_rate_lim [-] */
+     float rotor_speed_master_common_out_rate_lim;
+     /** rotor_speed_master_common_err_rate_lim [-] */
+     float rotor_speed_master_common_err_rate_lim;
+     /** rotor_speed_master_diff_kp [-] */
+     float rotor_speed_master_diff_kp;
+     /** rotor_speed_master_diff_ki [-] */
+     float rotor_speed_master_diff_ki;
+     /** rotor_speed_master_diff_kb [-] */
+     float rotor_speed_master_diff_kb;
+     /** rotor_speed_master_diff_kt [-] */
+     float rotor_speed_master_diff_kt;
+     /** rotor_speed_master_diff_kf [-] */
+     float rotor_speed_master_diff_kf;
+     /** rotor_speed_master_diff_err_lim [-] */
+     float rotor_speed_master_diff_err_lim;
+     /** rotor_speed_master_diff_out_lim [-] */
+     float rotor_speed_master_diff_out_lim;
+     /** rotor_speed_master_diff_int_lim [-] */
+     float rotor_speed_master_diff_int_lim;
+     /** rotor_speed_master_diff_out_rate_lim [-] */
+     float rotor_speed_master_diff_out_rate_lim;
+     /** rotor_speed_master_diff_err_rate_lim [-] */
+     float rotor_speed_master_diff_err_rate_lim;
+     /** rotor_speed_role [-] */
+     int rotor_speed_role;
      /** rotor_ang_kp [-] */
      float rotor_ang_kp;
      /** rotor_ang_ki [-] */
@@ -146,6 +226,10 @@ typedef struct bup_dcu_lrd_prm{
      float rotor_ang_out_rate_lim;
      /** rotor_ang_err_rate_lim [-] */
      float rotor_ang_err_rate_lim;
+     /** rotor_ang_dz [rad] */
+     float rotor_ang_dz;
+     /** rotor_ang_dz_en [-] */
+     bool rotor_ang_dz_en;
      /** factory_date [-] */
      char factory_date[32];
      /** factory_number [-] */
@@ -175,6 +259,20 @@ typedef struct mj_bup_dcu_lrd
                     uint32_t ts_s;
                     uint32_t ts_ns;
                } bup_ctrl;
+               /** bup_multi_control from aufd*/
+               struct
+               {
+                    bup_drv_multi_control_msg_t *msg;
+                    void (*copy)(void *dst);
+                    void (*upd_cb)(void);
+                    void (*irq)(void *);
+                    mj_msg_state_t (*lock)(mj_msg_state_t state);
+                    mj_msg_state_t state;
+                    uint32_t *total;
+                    uint32_t *miss;
+                    uint32_t ts_s;
+                    uint32_t ts_ns;
+               } bup_multi_control;
                /** cmd_req from aufd*/
                struct
                {
@@ -218,6 +316,192 @@ typedef struct mj_bup_dcu_lrd
                     uint32_t ts_ns;
                } prm_req;
           } aufd;
+          /** Messages from bup_dcu_lfd device*/
+          struct {
+               /** drive_master_ctrl from bup_dcu_lfd*/
+               struct
+               {
+                    drive_master_ctrl_msg_t *msg;
+                    void (*copy)(void *dst);
+                    void (*upd_cb)(void);
+                    void (*irq)(void *);
+                    mj_msg_state_t (*lock)(mj_msg_state_t state);
+                    mj_msg_state_t state;
+                    uint32_t *total;
+                    uint32_t *miss;
+                    uint32_t ts_s;
+                    uint32_t ts_ns;
+               } drive_master_ctrl;
+               /** drive_slave_fb from bup_dcu_lfd*/
+               struct
+               {
+                    drive_slave_fb_msg_t *msg;
+                    void (*copy)(void *dst);
+                    void (*upd_cb)(void);
+                    void (*irq)(void *);
+                    mj_msg_state_t (*lock)(mj_msg_state_t state);
+                    mj_msg_state_t state;
+                    uint32_t *total;
+                    uint32_t *miss;
+                    uint32_t ts_s;
+                    uint32_t ts_ns;
+               } drive_slave_fb;
+          } bup_dcu_lfd;
+          /** Messages from bup_dcu_lst device*/
+          struct {
+               /** drive_master_ctrl from bup_dcu_lst*/
+               struct
+               {
+                    drive_master_ctrl_msg_t *msg;
+                    void (*copy)(void *dst);
+                    void (*upd_cb)(void);
+                    void (*irq)(void *);
+                    mj_msg_state_t (*lock)(mj_msg_state_t state);
+                    mj_msg_state_t state;
+                    uint32_t *total;
+                    uint32_t *miss;
+                    uint32_t ts_s;
+                    uint32_t ts_ns;
+               } drive_master_ctrl;
+               /** drive_slave_fb from bup_dcu_lst*/
+               struct
+               {
+                    drive_slave_fb_msg_t *msg;
+                    void (*copy)(void *dst);
+                    void (*upd_cb)(void);
+                    void (*irq)(void *);
+                    mj_msg_state_t (*lock)(mj_msg_state_t state);
+                    mj_msg_state_t state;
+                    uint32_t *total;
+                    uint32_t *miss;
+                    uint32_t ts_s;
+                    uint32_t ts_ns;
+               } drive_slave_fb;
+          } bup_dcu_lst;
+          /** Messages from bup_dcu_rfd device*/
+          struct {
+               /** drive_master_ctrl from bup_dcu_rfd*/
+               struct
+               {
+                    drive_master_ctrl_msg_t *msg;
+                    void (*copy)(void *dst);
+                    void (*upd_cb)(void);
+                    void (*irq)(void *);
+                    mj_msg_state_t (*lock)(mj_msg_state_t state);
+                    mj_msg_state_t state;
+                    uint32_t *total;
+                    uint32_t *miss;
+                    uint32_t ts_s;
+                    uint32_t ts_ns;
+               } drive_master_ctrl;
+               /** drive_slave_fb from bup_dcu_rfd*/
+               struct
+               {
+                    drive_slave_fb_msg_t *msg;
+                    void (*copy)(void *dst);
+                    void (*upd_cb)(void);
+                    void (*irq)(void *);
+                    mj_msg_state_t (*lock)(mj_msg_state_t state);
+                    mj_msg_state_t state;
+                    uint32_t *total;
+                    uint32_t *miss;
+                    uint32_t ts_s;
+                    uint32_t ts_ns;
+               } drive_slave_fb;
+          } bup_dcu_rfd;
+          /** Messages from bup_dcu_rrd device*/
+          struct {
+               /** drive_master_ctrl from bup_dcu_rrd*/
+               struct
+               {
+                    drive_master_ctrl_msg_t *msg;
+                    void (*copy)(void *dst);
+                    void (*upd_cb)(void);
+                    void (*irq)(void *);
+                    mj_msg_state_t (*lock)(mj_msg_state_t state);
+                    mj_msg_state_t state;
+                    uint32_t *total;
+                    uint32_t *miss;
+                    uint32_t ts_s;
+                    uint32_t ts_ns;
+               } drive_master_ctrl;
+               /** drive_slave_fb from bup_dcu_rrd*/
+               struct
+               {
+                    drive_slave_fb_msg_t *msg;
+                    void (*copy)(void *dst);
+                    void (*upd_cb)(void);
+                    void (*irq)(void *);
+                    mj_msg_state_t (*lock)(mj_msg_state_t state);
+                    mj_msg_state_t state;
+                    uint32_t *total;
+                    uint32_t *miss;
+                    uint32_t ts_s;
+                    uint32_t ts_ns;
+               } drive_slave_fb;
+          } bup_dcu_rrd;
+          /** Messages from bup_dcu_rst device*/
+          struct {
+               /** drive_master_ctrl from bup_dcu_rst*/
+               struct
+               {
+                    drive_master_ctrl_msg_t *msg;
+                    void (*copy)(void *dst);
+                    void (*upd_cb)(void);
+                    void (*irq)(void *);
+                    mj_msg_state_t (*lock)(mj_msg_state_t state);
+                    mj_msg_state_t state;
+                    uint32_t *total;
+                    uint32_t *miss;
+                    uint32_t ts_s;
+                    uint32_t ts_ns;
+               } drive_master_ctrl;
+               /** drive_slave_fb from bup_dcu_rst*/
+               struct
+               {
+                    drive_slave_fb_msg_t *msg;
+                    void (*copy)(void *dst);
+                    void (*upd_cb)(void);
+                    void (*irq)(void *);
+                    mj_msg_state_t (*lock)(mj_msg_state_t state);
+                    mj_msg_state_t state;
+                    uint32_t *total;
+                    uint32_t *miss;
+                    uint32_t ts_s;
+                    uint32_t ts_ns;
+               } drive_slave_fb;
+          } bup_dcu_rst;
+          /** Messages from dcu device*/
+          struct {
+               /** drive_master_ctrl from dcu*/
+               struct
+               {
+                    drive_master_ctrl_msg_t *msg;
+                    void (*copy)(void *dst);
+                    void (*upd_cb)(void);
+                    void (*irq)(void *);
+                    mj_msg_state_t (*lock)(mj_msg_state_t state);
+                    mj_msg_state_t state;
+                    uint32_t *total;
+                    uint32_t *miss;
+                    uint32_t ts_s;
+                    uint32_t ts_ns;
+               } drive_master_ctrl;
+               /** drive_slave_fb from dcu*/
+               struct
+               {
+                    drive_slave_fb_msg_t *msg;
+                    void (*copy)(void *dst);
+                    void (*upd_cb)(void);
+                    void (*irq)(void *);
+                    mj_msg_state_t (*lock)(mj_msg_state_t state);
+                    mj_msg_state_t state;
+                    uint32_t *total;
+                    uint32_t *miss;
+                    uint32_t ts_s;
+                    uint32_t ts_ns;
+               } drive_slave_fb;
+          } dcu;
           /** Messages from im_bro device*/
           struct {
                /** im_bro_drivers_sens from im_bro*/
@@ -237,6 +521,20 @@ typedef struct mj_bup_dcu_lrd
           } im_bro;
           /** Messages from mon device*/
           struct {
+               /** bup_multi_control from mon*/
+               struct
+               {
+                    bup_drv_multi_control_msg_t *msg;
+                    void (*copy)(void *dst);
+                    void (*upd_cb)(void);
+                    void (*irq)(void *);
+                    mj_msg_state_t (*lock)(mj_msg_state_t state);
+                    mj_msg_state_t state;
+                    uint32_t *total;
+                    uint32_t *miss;
+                    uint32_t ts_s;
+                    uint32_t ts_ns;
+               } bup_multi_control;
                /** bup_srv_ctrl from mon*/
                struct
                {
@@ -325,6 +623,20 @@ typedef struct mj_bup_dcu_lrd
                mj_msg_state_t (*lock)(mj_msg_state_t state);
                bool tx_enable;
           } dcu_tel;
+          /** drive_master_ctrl */
+          struct 
+          {
+               drive_master_ctrl_msg_t *msg;
+               mj_msg_state_t (*lock)(mj_msg_state_t state);
+               bool tx_enable;
+          } drive_master_ctrl;
+          /** drive_slave_fb */
+          struct 
+          {
+               drive_slave_fb_msg_t *msg;
+               mj_msg_state_t (*lock)(mj_msg_state_t state);
+               bool tx_enable;
+          } drive_slave_fb;
           /** formular */
           struct 
           {

@@ -1,0 +1,109 @@
+#ifndef {{mj.toUpper(dev_name)}}_DEV_SPEC_H
+#define {{mj.toUpper(dev_name)}}_DEV_SPEC_H
+{%set dev_name_low = mj.toLower(dev_name)%}
+
+#include "mjsysspec.h"
+#include "mjutils.h"
+
+#ifdef __cplusplus
+ extern "C" {
+#endif
+{%set dev_name_up = mj.toUpper(dev_name)%}
+
+{%set outMsg = sorted(mj._get_dev_output_spec(dev_name))%}
+{%set inMsg = sorted(mj._get_dev_input_spec(dev_name))%}
+{%set prms = mj.dev_parameters(dev_name)%}
+{%set devIp  = mj.ip4Convert(spec['IP'])%}
+
+{%if len(prms) > 0%}
+typedef struct {{mj.toLower(dev_name)}}_prm{
+{%for p in prms%}
+     /** {{p}} [{{mj.spec['parameters'][p]["unit"]}}] */
+{%if 'string' in mj.spec['parameters'][p]["type"]%}
+     char {{p}}[32];
+{%else%}
+     {{mj.spec['parameters'][p]["type"]}} {{p}};
+{%endif%}
+{% endfor %}
+} {{mj.toLower(dev_name)}}_prm_t;
+{%endif%}
+
+typedef struct mj_{{mj.toLower(dev_name)}}
+{
+{%if len(inMsg) > 0%}
+     /** {{dev_name}} input messages */
+     struct
+     {
+{%set dev_src = sorted(mj.inputDev(dev_name))%}
+{%for d in dev_src%}
+{%set in_dev_m = sorted(mj.inputMsg(dev_name,d))%}
+{% if len(in_dev_m) > 0 %}
+          /** Messages from {{d}} device*/
+          struct {
+{%for dm in in_dev_m%}
+               /** {{dm}} from {{d}}*/
+               struct
+               {
+                    {{mj.msg[dm]['type']}}_msg_t *msg;
+                    void (*copy)(void *dst);
+                    void (*upd_cb)(void);
+                    void (*irq)(void *);
+                    mj_msg_state_t (*lock)(mj_msg_state_t state);
+                    mj_msg_state_t state;
+                    uint32_t *total;
+                    uint32_t *miss;
+                    uint32_t ts_s;
+                    uint32_t ts_ns;
+               } {{dm}};
+{% endfor %}
+          } {{mj.toLower(d)}};
+{% endif %}
+{% endfor %}
+     } in;
+{% endif %}
+
+{%if len(outMsg) > 0%}
+     /** {{dev_name}} output messages */
+     struct 
+     {
+{%for o in outMsg%}
+          /** {{o}} */
+          struct 
+          {
+               {{mj.msg[o]['type']}}_msg_t *msg;
+{%if mj.msg[o]['period'] == 0%}
+               void (*tx)(uint16_t);
+{%else%}
+               mj_msg_state_t (*lock)(mj_msg_state_t state);
+               bool tx_enable;
+{%endif%}
+          } {{o}};
+{% endfor %}
+     } out;
+{% endif %}
+{%if len(prms) > 0%}
+     /** {{dev_name}} parameters */
+     struct
+     {
+          {{mj.toLower(dev_name)}}_prm_t *ptr;
+          mj_prm_status_t  (*write)(int id, void *data);
+          mj_prm_status_t  (*read)(int id, void *data);
+          const uint32_t * (*list)(uint32_t *size);
+          void (*upd_cb)(int id);
+     } prm;
+{% endif %}
+     /** Communication loop fcn shold be call in main loop */
+     void (*loop)(void);
+     /** Communication tic function. must be called once per 250us */
+     void (*tick)(void);
+}mj_{{mj.toLower(dev_name)}}_t;
+
+/** MicroJet librarary initialization, should be run once.
+ *  Return MJ_OK if all check are passed and all initialization is done coorectly otherwise return MJ_FAIL
+ */
+mj_status_t mj_{{mj.toLower(dev_name)}}_init(mj_drv_interface_t *drv, mj_{{mj.toLower(dev_name)}}_t ** ptr);
+
+#ifdef __cplusplus
+}
+#endif
+#endif /* {{mj.toUpper(dev_name)}}_DEV_SPEC_H */

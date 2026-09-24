@@ -8,6 +8,7 @@
 #include "park_vec.idl"
 #include "rotor_brake_state.idl"
 #include "pid_state.idl"
+#include "hall_sensor.idl"
 
 @doc('Теелеметрия модуля управления приводом БУП')
 struct dcu_telemetry
@@ -117,4 +118,7 @@ struct dcu_telemetry
     @doc('Включение драйвера затворов')
     @alias('relay_signal_state')
     int8 en_gate;
+
+    @doc('Логические уровни датчиков Холла')
+    hall_sensor hall;
 };

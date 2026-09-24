@@ -1,0 +1,53 @@
+\begin{landscape}
+\section{Параметры устройств}
+В данном разделе приведены параметры для всех устрйоств, взаимодействующих по Ethernet в соответствии с протоколом MicroJet.
+Для каждого параметра указаны:
+\begin{enumerate}
+\item название;
+\item уникальный идентификатор в шестацеричной системе исчисления;
+\item тип;
+\item размер в байтах;
+\item значение по умолчанию;
+\item единица измерения;
+\item описание.
+\end{enumerate}
+Единица измерения каждого парамтера совпадает с идиницей измерения, указанной в 
+Для чтения, записи парамеров работы устройств предназначены сообщения:
+\begin{itemize}
+\item prm\_req - для запроса чтения/записи;
+\item prm\_ans - ответ на запрос с текущим значением параметра.
+\end{itemize}
+При записи или чтении параметров используется LittleEndian порядк байт в соответствии с размером парметра.
+{%set prms_ids = mj.parameters()%}
+{%set active_devs = mj.get_active_dev(["ext_proto"])%}
+{%for dev in sorted(active_devs)%}
+{%set prms = mj.spec['devices'][dev]['parameters']%}
+{%if len(prms) > 0 and (not ('hide_prm' in mj.spec['devices'][dev]['flag']))%}
+\subsection{ {{mj.spec['devices'][dev]['des']}}~({{mj.spec['devices'][dev]['shortname']}}) }
+\begin{longtblr}[
+caption = {Параметры {{mj.spec['devices'][dev]['shortname']}}},
+entry = {Short Caption},
+label = {tb:param:{{mj.spec['devices'][dev]['shortname']}} },
+remark{Примечание} = {a - название, б - уникальный идентификатор, в - тип, г - размер в байтах, д - значение по умолчанию, е - единица измерения, ж - описание},
+]{
+	colspec = {l l l l c l X[-1]},
+    width = \linewidth,
+	rowhead = 1, rowfoot = 0,
+	%row{odd} = {gray9}, row{even} = {brown9},
+	%row{1-2} = {purple7}, row{Z} = {blue7},
+	hlines,vlines
+}
+\SetCell{c}{а} & \SetCell{c}{б}  & \SetCell{c}{в} & \SetCell{c}{г} & \SetCell{c}{д} & \SetCell{c}{е} & \SetCell{c}{ж}\\
+{%for p in prms%}
+    {{"\\texttt{" + mj.texEscape(p)+"}"}} & {{"\\texttt{" + prms_ids[p]['id']+"}"}}  &
+    {{mj.spec['parameters'][p]["type"]}} & {{mj.getParamTypeSize(mj.spec['parameters'][p]["type"])}} &
+    {{mj.compactVal(mj.spec['devices'][dev]['parameters'][p],mj.spec['parameters'][p]["type"])}} & {{mj.toTexUnit(mj.spec['parameters'][p]["unit"])}} &
+    {{mj.spec['parameters'][p]["des"]}} 
+    \\
+{% endfor %}
+\end{longtblr}
+{%else%}
+Параметры отсутствуют
+{%endif%}
+{% endfor %}
+\end{landscape}

@@ -25,6 +25,11 @@
             "IP":"239.200.10.1",
             "port":49002
         },
+        "bup_internal_mcast":
+        {
+            "IP":"239.200.11.1",
+            "port":49002
+        },
         "bro_bup_srv_mcast":
         {
             "IP":"239.200.100.1",
@@ -112,21 +117,33 @@
             "des": "Состояние привода БУП",
             "period": 0
         },
+        "drive_slave_fb":
+        {
+            "transport":"bup_internal_mcast",
+            "type": "drive_slave_fb",
+            "des": "Обратная связь от подчиненного привода",
+            "period": 1000
+        },
+        "drive_master_ctrl":
+        {
+            "transport":"bup_internal_mcast",
+            "type": "drive_master_ctrl",
+            "des": "Управление подчиненного привода",
+            "period": 1000
+        },
         "bup_ctrl":
         {
             "transport":"bro_bup_ctrl_mcast",
             "type": "bup_drv_control",
             "des": "Управление одним приводом БУП",
-            "period": 0,
-            "timeout":100000
+            "period": 20000
         },
         "bup_multi_control":
         {
             "transport":"bro_bup_ctrl_mcast",
             "type": "bup_drv_multi_control",
             "des": "Управление несколькими приводами БУП одним пакетом",
-            "period": 0,
-            "timeout":100000
+            "period": 20000
         },
         "bup_srv_ctrl":
         {
@@ -186,6 +203,7 @@
         "drv_zero":{"type":"float","unit":"rad"},
 
         "ohp_lvl":{"type":"float","unit":"C"},
+        "ohp_hyst":{"type":"float","unit":"C"},
         "el_zero":{"type":"float","unit":"rad"},
         "pole_pairs":{"type":"int","unit":"-"},
         "ph_resistance":{"type":"float","unit":"-"},
@@ -206,7 +224,8 @@
         "curr_out_lim":{"type":"float","unit":"-"},
         "curr_out_rate_lim":{"type":"float","unit":"-"},
         "curr_err_rate_lim":{"type":"float","unit":"-"},
-
+        "load_speed_flt_fc":{"type":"float","unit":"-"},
+        "rotor_speed_flt_fc":{"type":"float","unit":"-"},
         "load_speed_kp":{"type":"float","unit":"-"},
         "load_speed_ki":{"type":"float","unit":"-"},
         "load_speed_kb":{"type":"float","unit":"-"},
@@ -214,8 +233,23 @@
         "load_speed_kf":{"type":"float","unit":"-"},
         "load_speed_err_lim":{"type":"float","unit":"-"},
         "load_speed_out_lim":{"type":"float","unit":"-"},
+        "load_speed_int_lim":{"type":"float","unit":"-"},
         "load_speed_out_rate_lim":{"type":"float","unit":"-"},
         "load_speed_err_rate_lim":{"type":"float","unit":"-"},
+
+        "load_ang_rev":{"type":"bool","unit":"-"},
+        "load_ang_kp":{"type":"float","unit":"-"},
+        "load_ang_ki":{"type":"float","unit":"-"},
+        "load_ang_kb":{"type":"float","unit":"-"},
+        "load_ang_kt":{"type":"float","unit":"-"},
+        "load_ang_kf":{"type":"float","unit":"-"},
+        "load_ang_kd":{"type":"float","unit":"-"},
+        "load_ang_err_lim":{"type":"float","unit":"-"},
+        "load_ang_out_lim":{"type":"float","unit":"-"},
+        "load_ang_out_rate_lim":{"type":"float","unit":"-"},
+        "load_ang_err_rate_lim":{"type":"float","unit":"-"},
+        "load_ang_dz":{"type":"float","unit":"rad"},
+        "load_ang_dz_en":{"type":"bool","unit":"-"},
 
         "rotor_speed_kp":{"type":"float","unit":"-"},
         "rotor_speed_ki":{"type":"float","unit":"-"},
@@ -224,8 +258,33 @@
         "rotor_speed_kf":{"type":"float","unit":"-"},
         "rotor_speed_err_lim":{"type":"float","unit":"-"},
         "rotor_speed_out_lim":{"type":"float","unit":"-"},
+        "rotor_speed_int_lim":{"type":"float","unit":"-"},
         "rotor_speed_out_rate_lim":{"type":"float","unit":"-"},
         "rotor_speed_err_rate_lim":{"type":"float","unit":"-"},
+
+        "rotor_speed_master_common_kp":{"type":"float","unit":"-"},
+        "rotor_speed_master_common_ki":{"type":"float","unit":"-"},
+        "rotor_speed_master_common_kb":{"type":"float","unit":"-"},
+        "rotor_speed_master_common_kt":{"type":"float","unit":"-"},
+        "rotor_speed_master_common_kf":{"type":"float","unit":"-"},
+        "rotor_speed_master_common_err_lim":{"type":"float","unit":"-"},
+        "rotor_speed_master_common_out_lim":{"type":"float","unit":"-"},
+        "rotor_speed_master_common_int_lim":{"type":"float","unit":"-"},
+        "rotor_speed_master_common_out_rate_lim":{"type":"float","unit":"-"},
+        "rotor_speed_master_common_err_rate_lim":{"type":"float","unit":"-"},
+
+        "rotor_speed_master_diff_kp":{"type":"float","unit":"-"},
+        "rotor_speed_master_diff_ki":{"type":"float","unit":"-"},
+        "rotor_speed_master_diff_kb":{"type":"float","unit":"-"},
+        "rotor_speed_master_diff_kt":{"type":"float","unit":"-"},
+        "rotor_speed_master_diff_kf":{"type":"float","unit":"-"},
+        "rotor_speed_master_diff_err_lim":{"type":"float","unit":"-"},
+        "rotor_speed_master_diff_out_lim":{"type":"float","unit":"-"},
+        "rotor_speed_master_diff_int_lim":{"type":"float","unit":"-"},
+        "rotor_speed_master_diff_out_rate_lim":{"type":"float","unit":"-"},
+        "rotor_speed_master_diff_err_rate_lim":{"type":"float","unit":"-"},
+
+        "rotor_speed_role":{"type":"int","unit":"-"},
 
         "rotor_ang_kp":{"type":"float","unit":"-"},
         "rotor_ang_ki":{"type":"float","unit":"-"},
@@ -236,6 +295,8 @@
         "rotor_ang_out_lim":{"type":"float","unit":"-"},
         "rotor_ang_out_rate_lim":{"type":"float","unit":"-"},
         "rotor_ang_err_rate_lim":{"type":"float","unit":"-"},
+        "rotor_ang_dz":{"type":"float","unit":"rad"},
+        "rotor_ang_dz_en":{"type":"bool","unit":"-"},
 
         "im_mode":{"type":"bool","unit":"-"},
 
@@ -254,7 +315,7 @@
             "parent":"",
             "shortname": "АУФД",
             "des": "Автомат управления функциями движения",
-            "IP":"10.104.0.1",
+            "IP":"192.168.8.16",
             "MAC":"02:00:00:00:00:01",
             "parameters":{
                 "service_mode":0,
@@ -286,7 +347,7 @@
             "flag":["ext_proto", "no_lib"],
             "shortname": "МУП",
             "des": "Модуль управления приводом",
-            "IP":"10.102.0.1",
+            "IP":"192.168.8.210",
             "MAC":"02:00:00:00:00:01",
             "parameters":{
                 "service_mode":0,
@@ -310,6 +371,7 @@
                 "ptp_kd": 0.0,
 
                 "ohp_lvl": 0.0,
+                "ohp_hyst": 5.0,
                 "el_zero": 0.0,
                 "pole_pairs": 0,
                 "ph_resistance": 0.0,
@@ -337,8 +399,24 @@
                 "load_speed_kf": 0.0,
                 "load_speed_err_lim": 0.0,
                 "load_speed_out_lim": 0.0,
+                "load_speed_int_lim": 0.0,
                 "load_speed_out_rate_lim": 0.0,
                 "load_speed_err_rate_lim": 0.0,
+                "load_speed_flt_fc":0,
+                "rotor_speed_flt_fc":0,
+                "load_ang_kp": 0.0,
+                "load_ang_ki": 0.0,
+                "load_ang_kb": 0.0,
+                "load_ang_kt": 0.0,
+                "load_ang_kf": 0.0,
+                "load_ang_rev":0,
+                "load_ang_kd": 0.0,
+                "load_ang_err_lim": 0.0,
+                "load_ang_out_lim": 0.0,
+                "load_ang_out_rate_lim": 0.0,
+                "load_ang_err_rate_lim": 0.0,
+                "load_ang_dz": 0.0,
+                "load_ang_dz_en": 0,
 
                 "rotor_speed_kp": 0.0,
                 "rotor_speed_ki": 0.0,
@@ -347,8 +425,33 @@
                 "rotor_speed_kf": 0.0,
                 "rotor_speed_err_lim": 0.0,
                 "rotor_speed_out_lim": 0.0,
+                "rotor_speed_int_lim":0.0,
                 "rotor_speed_out_rate_lim": 0.0,
                 "rotor_speed_err_rate_lim": 0.0,
+
+                "rotor_speed_master_common_kp": 0.0,
+                "rotor_speed_master_common_ki": 0.0,
+                "rotor_speed_master_common_kb": 0.0,
+                "rotor_speed_master_common_kt": 0.0,
+                "rotor_speed_master_common_kf": 0.0,
+                "rotor_speed_master_common_err_lim": 0.0,
+                "rotor_speed_master_common_out_lim": 0.0,
+                "rotor_speed_master_common_int_lim":0.0,
+                "rotor_speed_master_common_out_rate_lim": 0.0,
+                "rotor_speed_master_common_err_rate_lim": 0.0,
+
+                "rotor_speed_master_diff_kp": 0.0,
+                "rotor_speed_master_diff_ki": 0.0,
+                "rotor_speed_master_diff_kb": 0.0,
+                "rotor_speed_master_diff_kt": 0.0,
+                "rotor_speed_master_diff_kf": 0.0,
+                "rotor_speed_master_diff_err_lim": 0.0,
+                "rotor_speed_master_diff_out_lim": 0.0,
+                "rotor_speed_master_diff_int_lim":0.0,
+                "rotor_speed_master_diff_out_rate_lim": 0.0,
+                "rotor_speed_master_diff_err_rate_lim": 0.0,
+
+                "rotor_speed_role":0,
 
                 "rotor_ang_kp": 0.0,
                 "rotor_ang_ki": 0.0,
@@ -359,6 +462,8 @@
                 "rotor_ang_out_lim": 0.0,
                 "rotor_ang_out_rate_lim": 0.0,
                 "rotor_ang_err_rate_lim": 0.0,
+                "rotor_ang_dz": 0.0,
+                "rotor_ang_dz_en": 0,
 
                 "factory_date":"НЕТ ИНФОРМАЦИИ!",
                 "factory_number":"НЕТ ИНФОРМАЦИИ!",
@@ -373,7 +478,9 @@
                 "msg_ans":{},
                 "dbg":{},
                 "ptp_state":{},
-                "formular":{}
+                "formular":{},
+                "drive_slave_fb":{},
+                "drive_master_ctrl":{}
             },
             "in":
             {
@@ -381,48 +488,51 @@
                 "msg_req":{},
                 "cmd_req":{},
                 "bup_ctrl":{},
-                "bup_srv_ctrl":{},                
-                "im_bro_drivers_sens":{}
+                "bup_srv_ctrl":{},
+                "bup_multi_control":{},                
+                "im_bro_drivers_sens":{},
+                "drive_slave_fb":{},
+                "drive_master_ctrl":{}
             }
         },
         "bup_dcu_lfd":{
             "parent":"dcu",
-            "IP":"10.102.0.2",
+            "IP":"192.168.8.11",
             "MAC":"02:00:00:00:00:01",
             "shortname": "МУП.ТЛП",
             "des": "Модуль управления левым передним тяговым приводом"
         },
         "bup_dcu_rfd":{
             "parent":"dcu",
-            "IP":"10.102.0.3",
+            "IP":"192.168.8.10",
             "MAC":"02:00:00:00:00:01",
             "shortname": "МУП.ТПП",
             "des": "Модуль управления правым передним тяговым приводом"            
         },
         "bup_dcu_lrd":{
             "parent":"dcu",
-            "IP":"10.102.0.4",
+            "IP":"192.168.8.13",
             "MAC":"02:00:00:00:00:01",
             "shortname": "МУП.ТЛЗ",
             "des": "Модуль управления левым задним тяговым приводом"
         },
         "bup_dcu_rrd":{
             "parent":"dcu",
-            "IP":"10.102.0.5",
+            "IP":"192.168.8.12",
             "MAC":"02:00:00:00:00:01",
             "shortname": "МУП.ТПЗ",
             "des": "Модуль управления правым задним тяговым приводом"
         },
         "bup_dcu_lst":{
             "parent":"dcu",
-            "IP":"10.102.0.6",
+            "IP":"192.168.8.15",
             "MAC":"02:00:00:00:00:01",
             "shortname": "МУП.РЛ",
             "des": "Модуль управления левым рулевым приводом"
         },
         "bup_dcu_rst":{
             "parent":"dcu",
-            "IP":"10.102.0.7",
+            "IP":"192.168.8.14",
             "MAC":"02:00:00:00:00:01",
             "shortname": "МУП.РП",
             "des": "Модуль управления правым рулевым приводом"
@@ -430,7 +540,7 @@
         "mon":{
             "shortname": "СПО",
             "des": "Сервисное програмное обеспечение",
-            "IP":"10.191.0.1",
+            "IP":"192.168.8.201",
             "MAC":"02:00:00:00:00:08",
             "parameters":{
                 "service_mode":0
@@ -440,7 +550,8 @@
                 "prm_req":{},
                 "msg_req":{},
                 "cmd_req":{},
-                "bup_srv_ctrl":{}
+                "bup_srv_ctrl":{},
+                "bup_multi_control":{}
             },
             "in":
             {
@@ -453,7 +564,10 @@
                 "formular":{},
                 "prm_ans":{},
                 "msg_ans":{},
-                "im_bro_drivers_sens":{}
+                "bup_multi_control":{},
+                "im_bro_drivers_sens":{},
+                "drive_master_ctrl":{},
+                "drive_slave_fb":{}
             }
         },
         "im_bro":{

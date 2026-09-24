@@ -1,0 +1,5 @@
+@doc('Обратная связь от подчиненного привода')
+struct drive_slave_fb
+{
+    float rotor_speed;
+};

@@ -180,13 +180,15 @@ typedef struct mj_aufd
           struct 
           {
                bup_drv_control_msg_t *msg;
-               void (*tx)(uint16_t);
+               mj_msg_state_t (*lock)(mj_msg_state_t state);
+               bool tx_enable;
           } bup_ctrl;
           /** bup_multi_control */
           struct 
           {
                bup_drv_multi_control_msg_t *msg;
-               void (*tx)(uint16_t);
+               mj_msg_state_t (*lock)(mj_msg_state_t state);
+               bool tx_enable;
           } bup_multi_control;
           /** cmd_ans */
           struct 

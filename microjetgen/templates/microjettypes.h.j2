@@ -1,0 +1,118 @@
+#ifndef MICROJET_{{mj.spec_name_up}}_TYPES_H
+#define MICROJET_{{mj.spec_name_up}}_TYPES_H
+
+#include "microjet.h"
+
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
+{% for e in mj.sortedEnums() %}
+/**
+ * {{e.des}}
+ */
+{%set base_upper = mj.toUpper(e.basename)%}
+typedef enum {{e.basename}}
+{
+{% for v in e.values %}
+    /** {{v.des}} */
+    {{base_upper}}_{{v.name}} = {{v.value}},
+{% endfor %}
+    /** Stub */
+    {{base_upper}}_SIZE_STUB = INT32_MIN
+} {{e.basename}}_k;
+
+{% endfor %}
+
+{% for s in mj.topSortedStruct() %}
+/**
+ * {{s.des}}
+ */
+typedef struct {{s.basename}}
+{
+{% for m in s.members %}
+{%if m.type.is_enum %}
+    /** {{m.des}} */
+    {{m.type.name}}_k {{m.basename}};
+{%elif m.type.is_struct %}
+    /** {{m.des}} */
+    {{m.type.name}}_t {{m.name}};
+{%elif m.type.is_primitive %}
+    /** {{m.des}} */
+{% if m._alias%}
+    /** alias: {{m._alias}}_t */
+{%endif%}
+    {{m.type.basetype}} {{m.basename}};
+{%elif m.type.is_array %}
+    /** {{m.des}} */
+{%if m.type.type.is_primitive %}
+    {{m.type.type.basetype}} {{m.basename}}[{{m.type.size}}];
+{%else%}
+    {{m.type.type.basename}}_t {{m.basename}}[{{m.type.size}}];
+{%endif%}
+{%elif m.type.is_sequence %}
+    //** SEQUENCE GENERATION NOT SUPPORTED */
+{%else%}
+    //** UNKNOW TYPE */
+{%endif%}
+{% endfor %}
+} {{s.basename}}_t;
+
+{% endfor %}
+
+{%set msg_types_set = mj.msgTypes()%}
+
+{%for mt in msg_types_set%}
+{%set s = mj.idl.struct_by_name(mt)%}
+typedef struct {{(mt)}}_msg{
+    /** Header */
+    struct{
+        uint16_t src;
+        uint16_t dst;
+        uint16_t id;
+        uint16_t cnt;
+        uint32_t ts_s;
+        union{
+            struct{
+                uint32_t ts_ns:30;
+                uint32_t ts_status:2;
+            };
+            uint32_t ts_low;
+        };
+    } hdr;
+{% for m in s.members %}
+{%if m.type.is_enum %}
+    /** {{m.des}} */
+    {{m.type.name}}_k {{m.basename}};
+{% endif %}
+{%if m.type.is_struct %}
+    /** {{m.des}} */
+    {{m.type.name}}_t {{m.name}};
+{% endif %}
+{%if m.type.is_primitive %}
+    /** {{m.des}}*/
+{%if m._alias == ''%}
+{% else %}
+    /** alias: {{m._alias}}_t */
+{% endif %}
+    {{m.type.basetype}} {{m.basename}};
+{%elif m.type.is_array %}
+    /** {{m.des}} */
+{%if m.type.type.is_primitive %}
+    {{m.type.type.basetype}} {{m.basename}}[{{m.type.size}}];
+{%else%}
+    {{m.type.type.basename}}_t {{m.basename}}[{{m.type.size}}];
+{%endif%}
+{% endif %}
+{% endfor %}
+} {{mt}}_msg_t;
+{% endfor %}
+
+{%for mt in msg_types_set%}
+mj_check_result_t {{mt}}_type_check({{mt}}_msg_t * ptr);
+{% endfor %}
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* MICROJET_{{mj.spec_name_up}}_TYPES_H */

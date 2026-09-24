@@ -1,0 +1,149 @@
+p_foo = Proto("microjet", "MicroJet")
+dev_types = {
+{%for dev in sorted(mj.devs)%}
+    [{{mj.devHash(dev,True)}}] = "{{dev}}",
+{%endfor%}
+    [65535] = "ALL",
+    [0] = "NONE",
+}
+
+msg_types = {
+{%for m in mj.msg%}
+	[{{mj.msgHash(mj.msg[m]['type'],m,True)}}] = "{{m}}"{%if not loop.last %},{%else%} {%endif%}
+
+{% endfor %}
+}
+
+time_state_types = {[0] = "FreeRun", [1] = "Step", [2] = "Lock", [3] = "Unknow"}
+
+-- Заголовки протокола
+local f_hdr_src = ProtoField.uint16("SRC",
+                      "Source ID", base.HEX, dev_types)
+
+local f_hdr_dst    = ProtoField.uint16("DST",
+                      "Destination ID",    base.HEX , dev_types)
+
+local f_hdr_id   = ProtoField.uint16("mj.hdr.ID", "ID", base.HEX, msg_types)
+
+local f_hdr_cnt   = ProtoField.uint16("mj.hdr.CNT", "CNT", base.DEC)
+
+local f_hdr_ts_s   = ProtoField.uint32("mj.hdr.time_sec", "Timestamp second", base.DEC)
+local f_hdr_ts_state   = ProtoField.uint32("mj.hdr.time_sec", "Timestamp state", base.HEX,time_state_types,0xC0000000)
+local f_hdr_ts_ns   = ProtoField.uint32("mj.hdr.time_nansec", "Timestamp nanosecond", base.DEC, nil, 0x3FFFFFFF)
+
+{%for m in sorted(mj.msg)%}
+{% set msg_list = mj.structSerialize(mj.msg[m]['type'],'',8,'') %}
+{% for e in msg_list %}
+{%if e['stype'] == 'struct'%}
+{%set s_type = "\\hyperlink{ hyp_type_"+e['type']+" }{\\textbf{" + mj.texEscape(e['type'])+"}}"%}
+{%else%}
+{%if e['stype'] == 'enum'%}
+{%set s_type = "\\hyperlink{ hyp_en_"+e['type']+" }{\\textsl{" + mj.texEscape(e['type'])+"}}"%}
+{%else%}
+{%if e['type'] == "float"%}
+local {{m}}__{{mj.luaEscape(e['path'][1:])}} = ProtoField.float("mj.{{m}}.{{e['path'][1:]}}", "{{e['path'][1:]}}")
+{%endif%}
+{%if e['type'] == "octet"%}
+local {{m}}__{{mj.luaEscape(e['path'][1:])}} = ProtoField.uint8("mj.{{m}}.{{e['path'][1:]}}", "{{e['path'][1:]}}", base.DEC)
+{%endif%}
+{%if e['type'] == "int8"%}
+local {{m}}__{{mj.luaEscape(e['path'][1:])}} = ProtoField.int8("mj.{{m}}.{{e['path'][1:]}}", "{{e['path'][1:]}}", base.DEC)
+{%endif%}
+{%if e['type'] == "double"%}
+local {{m}}__{{mj.luaEscape(e['path'][1:])}} = ProtoField.bouble("mj.{{m}}.{{e['path'][1:]}}", "{{e['path'][1:]}}")
+{%endif%}
+{%if e['type'] == "short"%}
+local {{m}}__{{mj.luaEscape(e['path'][1:])}} = ProtoField.int16("mj.{{m}}.{{e['path'][1:]}}", "{{e['path'][1:]}}")
+{%endif%}
+{%if e['type'] == "unsigned short"%}
+local {{m}}__{{mj.luaEscape(e['path'][1:])}} = ProtoField.uint16("mj.{{m}}.{{e['path'][1:]}}", "{{e['path'][1:]}}")
+{%endif%}
+{%if e['type'] == "long"%}
+local {{m}}__{{mj.luaEscape(e['path'][1:])}} = ProtoField.int32("mj.{{m}}.{{e['path'][1:]}}", "{{e['path'][1:]}}")
+{%endif%}
+{%if e['type'] == "unsigned long"%}
+local {{m}}__{{mj.luaEscape(e['path'][1:])}} = ProtoField.uint32("mj.{{m}}.{{e['path'][1:]}}", "{{e['path'][1:]}}")
+{%endif%}
+{%if e['type'] == "long long"%}
+local {{m}}__{{mj.luaEscape(e['path'][1:])}} = ProtoField.int64("mj.{{m}}.{{e['path'][1:]}}", "{{e['path'][1:]}}")
+{%endif%}
+{%if e['type'] == "unsigned long long"%}
+local {{m}}__{{mj.luaEscape(e['path'][1:])}} = ProtoField.uint64("mj.{{m}}.{{e['path'][1:]}}", "{{e['path'][1:]}}")
+{%endif%}
+{%if e['type'] == "boolean"%}
+local {{m}}__{{mj.luaEscape(e['path'][1:])}} = ProtoField.bool("mj.{{m}}.{{e['path'][1:]}}", "{{e['path'][1:]}}")
+{%endif%}
+{%endif%}
+{%endif%}
+{% endfor %}
+{% endfor %}
+
+-- Регистрируем все поля протокола
+p_foo.fields = { f_hdr_src,     f_hdr_dst,         f_hdr_id,  f_hdr_cnt, f_hdr_ts_s, f_hdr_ts_state, f_hdr_ts_ns,
+{%for m in sorted(mj.msg)%}
+{% set msg_list = mj.structSerialize(mj.msg[m]['type'],'',8,'') %}
+{% for e in msg_list %}
+{%if e['stype'] == 'struct'%}
+{%set s_type = "\\hyperlink{ hyp_type_"+e['type']+" }{\\textbf{" + mj.texEscape(e['type'])+"}}"%}
+{%else%}
+{%if e['stype'] == 'enum'%}
+{%set s_type = "\\hyperlink{ hyp_en_"+e['type']+" }{\\textsl{" + mj.texEscape(e['type'])+"}}"%}
+{%else%}
+{%if e['stype'] == "base"%}
+    {{m}}__{{mj.luaEscape(e['path'][1:])}},
+{%endif%}
+{%endif%}
+{%endif%}
+{% endfor %}
+{% endfor %}
+}
+
+-- Собственно функция диссектора для протокола FOO
+function p_foo.dissector(buf, pinfo, tree)
+    if buf:len() == 0 then return end
+    local id = buf(4,2):le_uint()
+    local dev = buf(0,2):le_uint()
+    local dest = buf(2,2):le_uint()
+    local msg_type_str = msg_types[id]
+    local dev_type_str = dev_types[dev]
+    local dest_type_str = dev_types[dest]
+
+    pinfo.cols.protocol = p_foo.name       -- в колонке Protocol будет название протокола 
+
+    if msg_type_str == nil then msg_type_str = "Unknown" end
+    if msg_type_str == nil then msg_type_str = "Unknown" end
+    pinfo.cols.info = msg_type_str .. " from " .. dev_type_str .. " to " .. dest_type_str
+    subtree = tree:add(p_foo, buf(0))      -- создаем поддерево
+    subtree:add_le(f_hdr_src, buf(0,2))   -- начинаем добавлять поля
+    subtree:add_le(f_hdr_dst,  buf(2,2))
+    subtree:add_le(f_hdr_id,  buf(4,2))
+    subtree:add_le(f_hdr_cnt,  buf(6,2))
+    subtree:add_le(f_hdr_ts_s,  buf(8,4))
+    subtree:add_le(f_hdr_ts_ns,  buf(12,4))
+    subtree:add_le(f_hdr_ts_state,  buf(12,4))
+
+{%for m in sorted(mj.msg)%}
+    if id == {{mj.msgHash(mj.msg[m]['type'],m,True)}} then
+{% set msg_list = mj.structSerialize(mj.msg[m]['type'],'',16,'') %}
+{% for e in msg_list %}
+{%if e['stype'] == 'struct'%}
+{%set s_type = "\\hyperlink{ hyp_type_"+e['type']+" }{\\textbf{" + mj.texEscape(e['type'])+"}}"%}
+{%else%}
+{%if e['stype'] == 'enum'%}
+{%set s_type = "\\hyperlink{ hyp_en_"+e['type']+" }{\\textsl{" + mj.texEscape(e['type'])+"}}"%}
+{%else%}
+{%if e['stype'] == "base"%}
+    subtree:add_le({{m}}__{{mj.luaEscape(e['path'][1:])}},  buf({{e['offset']}},{{e['size']}}))
+{%endif%}
+{%endif%}
+{%endif%}
+{% endfor %}
+    return
+    end
+{% endfor %}
+
+end
+
+-- регистрируем диссектор на UDP порт 35000
+local udp_dissector_table = DissectorTable.get("udp.port")
+udp_dissector_table:add(49001, p_foo)

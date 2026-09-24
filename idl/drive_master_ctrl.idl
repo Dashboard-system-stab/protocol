@@ -1,0 +1,5 @@
+@doc('Управление подчиненным приводом от мастера')
+struct drive_master_ctrl
+{
+    float current;
+};

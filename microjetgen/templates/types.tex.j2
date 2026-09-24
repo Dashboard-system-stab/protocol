@@ -1,0 +1,20 @@
+\section{Типы данных}
+{%for type in sorted(mj.get_active_structs(["ext_proto"]))%}
+\hypertarget{ {{"hyp_type_"+type}} }{\subsection{ {{mj.texEscape(mj.structDes(type))}} ({{mj.texEscape(type)}}) }}
+\begin{longtblr}[caption={Структура {{mj.texEscape(type)}} },label ={tb:st:{{(type)}} },remark{<<O>>, <<S>>} = {смещение и размер поля, байт}]{colspec= {l l l l X[-1,l]},width = \linewidth,rowhead = 1, rowfoot = 0,hlines,vlines}
+\SetCell{c}{O} & \SetCell{c}{S} & \SetCell{c}{Имя} & \SetCell{c}{Тип} & \SetCell{c}{Описание} \\\hline
+{% set msg_list = mj.structSerialize(type,'',0,'',1) %}
+{% for e in msg_list %}
+{%if e['stype'] == 'struct'%}
+{%set s_type = "\\hyperlink{hyp_type_"+e['type']+"}{\\textbf{" + mj.texEscape(e['type'])+"}}"%}
+{%else%}
+{%if e['stype'] == 'enum'%}
+{%set s_type = "\\hyperlink{ hyp_en_"+e['type']+" }{\\textsl{" + mj.texEscape(e['type'])+"}}"%}
+{%else%}
+{%set s_type = mj.texEscape(e['type'])%}
+{%endif%}
+{%endif%}
+{{e['offset']}} & {{e['size']}} & {{mj.texEscape(e['path'][1:])}} & {{s_type}} & {{mj.texEscape(e['des'])}} \\
+{% endfor %}
+\end{longtblr}
+{% endfor %}

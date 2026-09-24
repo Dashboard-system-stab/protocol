@@ -1,0 +1,50 @@
+\begin{landscape}
+\begin{longtblr}[
+caption = {Cписок сообщений, формируемых СВ и ДТО на канале Ethernet},
+entry = {Short Caption},
+label = {tb:comm},
+remark{Примечание} = {I - входящее, O - исходящее сообщение},
+{%set actice_devs = mj.get_active_dev(["ext_proto"])%}
+{%set active_msg = mj.get_active_msg(["ext_proto"])%}
+]{
+	colspec = {l X[-1] {%for dev in actice_devs%} c {%endfor%}},
+    width = \linewidth,
+	rowhead = 2, rowfoot = 0,
+	%row{odd} = {gray9}, row{even} = {brown9},
+	%row{1-2} = {purple7}, row{Z} = {blue7},
+	hlines,vlines
+}
+\SetCell[c=2]{c}{Сообщение} & & \SetCell[c={{len(actice_devs)}}]{c}{Устройство} {%for i in range(1,len(actice_devs))%} & {%endfor%}\\
+\SetCell{c}{Имя} & \SetCell{c}{Описание} {%for dev in actice_devs%} & \rotatebox[origin=c]{90}{ {{mj.texEscape(mj.devs[dev]['shortname'])}} } {%endfor%} \\
+\hline
+{%for m in sorted(active_msg)%}
+{{loop.index}} \hyperlink{hyp_msg_{{m}} }{ {{"\\texttt{"+mj.texEscape(m)+"}"}} } & {{mj.msg[m]['des']}} {%for dev in actice_devs%} & {% if m in mj.devs[dev]['in']%}{\small I}{%endif%}{% if m in mj.devs[dev]['out']%}{\small O}{%endif%}{%endfor%} \\
+{%endfor%}
+\end{longtblr}
+\end{landscape}
+Развернутое описание сообщений из таблицы~\ref{tb:comm} представлено в разделе~\ref{sec:msgdes}. \hypertarget{hyp_dev_id_list}Расшифровка аббревиатур устройств представлена в таблице~\ref{tb:dev_id}.
+
+\begin{longtblr}[
+caption = {Уникальные идентификаторы устройств},
+entry = {Short Caption},
+label = {tb:dev_id},
+remark{Примечание} = {Адрес каждого устройства является уникальным. Последний октет адреса устройства от 1 до 254},
+]{
+	colspec = {l l l X[-1]},
+    width = \linewidth,
+	rowhead = 1, rowfoot = 0,
+	hlines,vlines
+}
+\SetCell{c}{Устрйоство} & \SetCell{c}{ID} & \SetCell{c}{Адрес} & \SetCell{c}{Описание} \\
+{%for dev in sorted(actice_devs)%}
+{{mj.texEscape(mj.devs[dev]['shortname'])}} & {{mj.devHash(dev)}} & & {{mj.texEscape(mj.devs[dev]['des'])}} \\
+{%endfor%}
+\end{longtblr}
+
+Для обмена сообщениями по умолчанию используются групповые интерфейсы:
+\begin{itemize}
+{%for i in sorted(mj.allGroupAddr(["ext_proto"]))%}
+	\item {{"\\texttt{"+mj.texEscape(i)+"}"}}{%if not loop.last%};{% endif %}{%if loop.last%}.{% endif %}
+{%endfor%}
+\end{itemize}
+Адреса интерфесов могут быть изменены через соответствующие параметры устройств.

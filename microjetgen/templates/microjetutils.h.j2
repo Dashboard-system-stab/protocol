@@ -1,0 +1,26 @@
+#ifndef __H_MJUTILS_H
+#define __H_MJUTILS_H
+#include "mjsysspec.h"
+
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
+{% for e in mj.idl.enums %}
+const char* {{e.basename}}_str(int32_t val);
+{% endfor %}
+
+{%set prms = mj.parameters()%}
+{%if len(prms) > 0%}
+const char* mj_get_prm_name(int32_t val);
+{%endif%}
+const char* mj_get_dev_name(int32_t val);
+const char* mj_get_msg_name(int32_t val);
+#ifdef __cplusplus
+}
+#endif
+
+int mj_str_if_to_int(const char* str, uint32_t *ip, uint16_t *port);
+int mj_int_if_to_str(uint32_t ip, uint16_t port, char* buf, size_t buf_len);
+
+#endif /** __H_MJUTILS_H */

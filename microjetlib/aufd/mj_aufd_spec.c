@@ -375,25 +375,73 @@ static void in_mon_msg_req_copy_fcn(void *dst)
 
 
 static void * out_bup_ctrl_pkt = NULL;
-static void out_bup_ctrl_tx_fcn(uint16_t dst)
+static bup_drv_control_msg_t * p_out_bup_ctrl_msg = NULL;
+static mj_msg_state_t out_bup_ctrl_lock_fcn(mj_msg_state_t state)
 {
-    uint32_t _temp_ns = 0;
-    mj_handle.out.bup_ctrl.msg->hdr.ts_status = p_drv->timestamp(&mj_handle.out.bup_ctrl.msg->hdr.ts_s,&_temp_ns);
-    mj_handle.out.bup_ctrl.msg->hdr.ts_ns = _temp_ns;
-    mj_handle.out.bup_ctrl.msg->hdr.dst = dst;
-    mj_handle.out.bup_ctrl.msg->hdr.cnt++;
-    p_drv->udp4.tx(out_bup_ctrl_pkt,NULL);
+    mj_msg_state_t res = MJ_MSG_UNDEFINED;
+    if (state == MJ_MSG_LOCK)
+    {
+        if (p_out_bup_ctrl_msg == NULL)
+        {
+            if ((p_out_bup_ctrl_msg = (bup_drv_control_msg_t *)p_drv->udp4.alloc(sizeof(bup_drv_control_msg_t))))
+            {
+                memcpy((void *)p_out_bup_ctrl_msg, (void *)(mj_handle.out.bup_ctrl.msg), sizeof(bup_drv_control_msg_t));
+                p_drv->udp4.set_payload(out_bup_ctrl_pkt, (uint8_t *)p_out_bup_ctrl_msg);
+                res = MJ_MSG_LOCK;
+            }else{
+                res = MJ_MSG_UNLOCK;
+            }
+        }else{
+            res = MJ_MSG_LOCK;
+        }
+    }else{
+        res = MJ_MSG_LOCK;
+        if (p_out_bup_ctrl_msg)
+        {
+            p_drv->udp4.set_payload(out_bup_ctrl_pkt, (uint8_t *)mj_handle.out.bup_ctrl.msg);
+            p_drv->udp4.free((uint8_t *)p_out_bup_ctrl_msg);
+            p_out_bup_ctrl_msg = NULL;
+            res = MJ_MSG_UNLOCK;
+        }else{
+            res = MJ_MSG_UNLOCK;
+        }
+    }
+    return res;
 }
 
 static void * out_bup_multi_control_pkt = NULL;
-static void out_bup_multi_control_tx_fcn(uint16_t dst)
+static bup_drv_multi_control_msg_t * p_out_bup_multi_control_msg = NULL;
+static mj_msg_state_t out_bup_multi_control_lock_fcn(mj_msg_state_t state)
 {
-    uint32_t _temp_ns = 0;
-    mj_handle.out.bup_multi_control.msg->hdr.ts_status = p_drv->timestamp(&mj_handle.out.bup_multi_control.msg->hdr.ts_s,&_temp_ns);
-    mj_handle.out.bup_multi_control.msg->hdr.ts_ns = _temp_ns;
-    mj_handle.out.bup_multi_control.msg->hdr.dst = dst;
-    mj_handle.out.bup_multi_control.msg->hdr.cnt++;
-    p_drv->udp4.tx(out_bup_multi_control_pkt,NULL);
+    mj_msg_state_t res = MJ_MSG_UNDEFINED;
+    if (state == MJ_MSG_LOCK)
+    {
+        if (p_out_bup_multi_control_msg == NULL)
+        {
+            if ((p_out_bup_multi_control_msg = (bup_drv_multi_control_msg_t *)p_drv->udp4.alloc(sizeof(bup_drv_multi_control_msg_t))))
+            {
+                memcpy((void *)p_out_bup_multi_control_msg, (void *)(mj_handle.out.bup_multi_control.msg), sizeof(bup_drv_multi_control_msg_t));
+                p_drv->udp4.set_payload(out_bup_multi_control_pkt, (uint8_t *)p_out_bup_multi_control_msg);
+                res = MJ_MSG_LOCK;
+            }else{
+                res = MJ_MSG_UNLOCK;
+            }
+        }else{
+            res = MJ_MSG_LOCK;
+        }
+    }else{
+        res = MJ_MSG_LOCK;
+        if (p_out_bup_multi_control_msg)
+        {
+            p_drv->udp4.set_payload(out_bup_multi_control_pkt, (uint8_t *)mj_handle.out.bup_multi_control.msg);
+            p_drv->udp4.free((uint8_t *)p_out_bup_multi_control_msg);
+            p_out_bup_multi_control_msg = NULL;
+            res = MJ_MSG_UNLOCK;
+        }else{
+            res = MJ_MSG_UNLOCK;
+        }
+    }
+    return res;
 }
 
 static void * out_cmd_ans_pkt = NULL;
@@ -564,6 +612,8 @@ static const uint32_t * aufd_prm_list(uint32_t *size)
     return _prm_ids;
 }
 
+static uint32_t _20000_us_cnt = 0;
+static uint32_t _20000_us_tick = 80;
 
 static uint32_t *_join_ip = NULL;
 static volatile bool _send_join_done = true;
@@ -572,6 +622,26 @@ static uint32_t _join_send_tick = 0;
 static void tick_fcn()
 {
     uint32_t _temp_ns = 0;
+
+    /* Each 20.0 ms  */
+    if (_20000_us_tick >= 80)
+    {
+        _20000_us_cnt++;
+        if (mj_handle.out.bup_ctrl.tx_enable){
+            mj_handle.out.bup_ctrl.msg->hdr.cnt = _20000_us_cnt;
+            mj_handle.out.bup_ctrl.msg->hdr.ts_status = p_drv->timestamp(&mj_handle.out.bup_ctrl.msg->hdr.ts_s,&_temp_ns);
+            mj_handle.out.bup_ctrl.msg->hdr.ts_ns = _temp_ns;
+            p_drv->udp4.tx(out_bup_ctrl_pkt,NULL);
+        }
+        if (mj_handle.out.bup_multi_control.tx_enable){
+            mj_handle.out.bup_multi_control.msg->hdr.cnt = _20000_us_cnt;
+            mj_handle.out.bup_multi_control.msg->hdr.ts_status = p_drv->timestamp(&mj_handle.out.bup_multi_control.msg->hdr.ts_s,&_temp_ns);
+            mj_handle.out.bup_multi_control.msg->hdr.ts_ns = _temp_ns;
+            p_drv->udp4.tx(out_bup_multi_control_pkt,NULL);
+        }
+        _20000_us_tick = 0;
+    }
+    _20000_us_tick++;
 
     if (!_send_join_done && _join_ip) {
         p_drv->udp4.join_group(ethInt, *_join_ip);
@@ -1089,8 +1159,9 @@ mj_status_t mj_aufd_init(mj_drv_interface_t *drv, mj_aufd_t ** ptr)
             mj_handle.out.bup_ctrl.msg->hdr.src = self_dev_id;
             mj_handle.out.bup_ctrl.msg->hdr.cnt = 0;
             mj_handle.out.bup_ctrl.msg->hdr.id = ID_BUP_CTRL;
-            mj_handle.out.bup_ctrl.msg->hdr.dst = BRO30_NONE;
-            mj_handle.out.bup_ctrl.tx = out_bup_ctrl_tx_fcn;
+            mj_handle.out.bup_ctrl.msg->hdr.dst = BRO30_ALL;
+            mj_handle.out.bup_ctrl.lock = out_bup_ctrl_lock_fcn;
+            mj_handle.out.bup_ctrl.tx_enable = true;
         }else{
             p_drv->udp4.free((uint8_t *)mj_handle.out.bup_ctrl.msg);
             return MJ_INTEGRITY_FAIL;
@@ -1109,8 +1180,9 @@ mj_status_t mj_aufd_init(mj_drv_interface_t *drv, mj_aufd_t ** ptr)
             mj_handle.out.bup_multi_control.msg->hdr.src = self_dev_id;
             mj_handle.out.bup_multi_control.msg->hdr.cnt = 0;
             mj_handle.out.bup_multi_control.msg->hdr.id = ID_BUP_MULTI_CONTROL;
-            mj_handle.out.bup_multi_control.msg->hdr.dst = BRO30_NONE;
-            mj_handle.out.bup_multi_control.tx = out_bup_multi_control_tx_fcn;
+            mj_handle.out.bup_multi_control.msg->hdr.dst = BRO30_ALL;
+            mj_handle.out.bup_multi_control.lock = out_bup_multi_control_lock_fcn;
+            mj_handle.out.bup_multi_control.tx_enable = true;
         }else{
             p_drv->udp4.free((uint8_t *)mj_handle.out.bup_multi_control.msg);
             return MJ_INTEGRITY_FAIL;

@@ -1,0 +1,51 @@
+{%for m in sorted(mj.get_active_msg(["ext_proto"]))%}
+{%set m_id = mj.msgHash(mj.msg[m]['type'],m)%}
+\hypertarget{hyp_msg_{{m}} }{\subsection{{'{'+mj.msg[m]['des']+'~('+mj.texEscape(m)+')}'}} }
+Параметры сообщения:
+\begin{enumerate}
+	\item ID: {{m_id}};
+    \item адрес назначения: {{mj.spec['interfaces'][mj.msg[m]['transport']]['IP']}};
+	\item порт назначения: {{mj.spec['interfaces'][mj.msg[m]['transport']]['port']}}
+    \item период: {{mj.msg[m]['period']}}~мкс.
+\end{enumerate}
+\begin{longtblr}[
+caption = {Структура сообщения {{mj.texEscape(m)}} },
+label = {tb:msg:{{m}} },
+remark{<<O>>, <<S>>} = {смещение и размер поля, байт},
+]{
+	colspec = {l l l l X[-1,l]},
+    width = \linewidth,
+	rowhead = 1, rowfoot = 0,
+	%row{odd} = {gray9}, row{even} = {brown9},
+	%row{1-2} = {purple7}, row{Z} = {blue7},
+	hlines,vlines
+}
+\SetCell{c}{O} & \SetCell{c}{S} & \SetCell{c}{Имя} & \SetCell{c}{Тип} & \SetCell{c}{Описание} \\
+\hline
+\texttt{0} & \texttt{2} & \hyperlink{hyp_dev_id_list}{\texttt{SRC}}  & unsigned short & Отправитель сообщения \\
+\texttt{2} & \texttt{2} & \hyperlink{hyp_dev_id_list}{\texttt{DST}}  & unsigned short & Получатель сообщения \\
+\texttt{4} & \texttt{2} & \texttt{ID}   & unsigned short & Идентификатор: {{m_id}} \\
+\texttt{6} & \texttt{2} & \texttt{CNT}  & unsigned short & Счетчик \\
+\texttt{8} & \texttt{4} & \texttt{TS\_S}   & unsigned long & Время, секунды\\
+\texttt{12} & \texttt{4} & \texttt{TS\_NS}  & unsigned long & Время, наносекунды \\
+{% set msg_list = mj.structSerialize(mj.msg[m]['type'],'',16,'',1) %}
+{% for e in msg_list %}
+{%if e['stype'] == 'struct'%}
+{%set s_type = "\\hyperlink{ hyp_type_"+e['type']+" }{\\textbf{" + mj.texEscape(e['type'])+"}}"%}
+{%elif e['stype'] == 'enum'%}
+{%set s_type = "\\hyperlink{ hyp_en_"+e['type']+" }{\\textsl{" + mj.texEscape(e['type'])+"}}"%}
+{%else%}
+{%if e['alias'] == ''%}
+{%set s_type = mj.texEscape(e['type'])%}
+{%else%}
+{%if e['alias_type'] == 'enum'%}
+{%set s_type = "\\hyperlink{ hyp_en_"+e['alias']+" }{\\textsl{" + mj.texEscape(e['alias'])+"}}"%}
+{%else%}
+{%set s_type = mj.texEscape(e['alias'])%}
+{%endif%}
+{%endif%}
+{%endif%}
+{{"\\texttt{"+e['offset'].__str__()+"}"}} & {{"\\texttt{"+e['size'].__str__()+"}"}} & {{"\\texttt{"+mj.texEscape(e['path'][1:])+"}"}}  &  {{s_type}} & {{mj.texEscape(e['des'])}} \\
+{% endfor %}
+\end{longtblr}
+{% endfor %}

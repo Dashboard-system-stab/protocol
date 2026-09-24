@@ -1,6 +1,7 @@
 
 #include "signaltree.h"
 
+static TreeNode *aufd_bup_multi_control_ptr = 0;
 static TreeNode *aufd_cmd_ans_ptr = 0;
 static TreeNode *aufd_formular_ptr = 0;
 static TreeNode *aufd_msg_ans_ptr = 0;
@@ -9,6 +10,8 @@ static TreeNode *bup_dcu_lfd_bup_state_ptr = 0;
 static TreeNode *bup_dcu_lfd_cmd_ans_ptr = 0;
 static TreeNode *bup_dcu_lfd_dbg_ptr = 0;
 static TreeNode *bup_dcu_lfd_dcu_tel_ptr = 0;
+static TreeNode *bup_dcu_lfd_drive_master_ctrl_ptr = 0;
+static TreeNode *bup_dcu_lfd_drive_slave_fb_ptr = 0;
 static TreeNode *bup_dcu_lfd_formular_ptr = 0;
 static TreeNode *bup_dcu_lfd_msg_ans_ptr = 0;
 static TreeNode *bup_dcu_lfd_prm_ans_ptr = 0;
@@ -17,6 +20,8 @@ static TreeNode *bup_dcu_lrd_bup_state_ptr = 0;
 static TreeNode *bup_dcu_lrd_cmd_ans_ptr = 0;
 static TreeNode *bup_dcu_lrd_dbg_ptr = 0;
 static TreeNode *bup_dcu_lrd_dcu_tel_ptr = 0;
+static TreeNode *bup_dcu_lrd_drive_master_ctrl_ptr = 0;
+static TreeNode *bup_dcu_lrd_drive_slave_fb_ptr = 0;
 static TreeNode *bup_dcu_lrd_formular_ptr = 0;
 static TreeNode *bup_dcu_lrd_msg_ans_ptr = 0;
 static TreeNode *bup_dcu_lrd_prm_ans_ptr = 0;
@@ -25,6 +30,8 @@ static TreeNode *bup_dcu_lst_bup_state_ptr = 0;
 static TreeNode *bup_dcu_lst_cmd_ans_ptr = 0;
 static TreeNode *bup_dcu_lst_dbg_ptr = 0;
 static TreeNode *bup_dcu_lst_dcu_tel_ptr = 0;
+static TreeNode *bup_dcu_lst_drive_master_ctrl_ptr = 0;
+static TreeNode *bup_dcu_lst_drive_slave_fb_ptr = 0;
 static TreeNode *bup_dcu_lst_formular_ptr = 0;
 static TreeNode *bup_dcu_lst_msg_ans_ptr = 0;
 static TreeNode *bup_dcu_lst_prm_ans_ptr = 0;
@@ -33,6 +40,8 @@ static TreeNode *bup_dcu_rfd_bup_state_ptr = 0;
 static TreeNode *bup_dcu_rfd_cmd_ans_ptr = 0;
 static TreeNode *bup_dcu_rfd_dbg_ptr = 0;
 static TreeNode *bup_dcu_rfd_dcu_tel_ptr = 0;
+static TreeNode *bup_dcu_rfd_drive_master_ctrl_ptr = 0;
+static TreeNode *bup_dcu_rfd_drive_slave_fb_ptr = 0;
 static TreeNode *bup_dcu_rfd_formular_ptr = 0;
 static TreeNode *bup_dcu_rfd_msg_ans_ptr = 0;
 static TreeNode *bup_dcu_rfd_prm_ans_ptr = 0;
@@ -41,6 +50,8 @@ static TreeNode *bup_dcu_rrd_bup_state_ptr = 0;
 static TreeNode *bup_dcu_rrd_cmd_ans_ptr = 0;
 static TreeNode *bup_dcu_rrd_dbg_ptr = 0;
 static TreeNode *bup_dcu_rrd_dcu_tel_ptr = 0;
+static TreeNode *bup_dcu_rrd_drive_master_ctrl_ptr = 0;
+static TreeNode *bup_dcu_rrd_drive_slave_fb_ptr = 0;
 static TreeNode *bup_dcu_rrd_formular_ptr = 0;
 static TreeNode *bup_dcu_rrd_msg_ans_ptr = 0;
 static TreeNode *bup_dcu_rrd_prm_ans_ptr = 0;
@@ -49,6 +60,8 @@ static TreeNode *bup_dcu_rst_bup_state_ptr = 0;
 static TreeNode *bup_dcu_rst_cmd_ans_ptr = 0;
 static TreeNode *bup_dcu_rst_dbg_ptr = 0;
 static TreeNode *bup_dcu_rst_dcu_tel_ptr = 0;
+static TreeNode *bup_dcu_rst_drive_master_ctrl_ptr = 0;
+static TreeNode *bup_dcu_rst_drive_slave_fb_ptr = 0;
 static TreeNode *bup_dcu_rst_formular_ptr = 0;
 static TreeNode *bup_dcu_rst_msg_ans_ptr = 0;
 static TreeNode *bup_dcu_rst_prm_ans_ptr = 0;
@@ -57,6 +70,8 @@ static TreeNode *dcu_bup_state_ptr = 0;
 static TreeNode *dcu_cmd_ans_ptr = 0;
 static TreeNode *dcu_dbg_ptr = 0;
 static TreeNode *dcu_dcu_tel_ptr = 0;
+static TreeNode *dcu_drive_master_ctrl_ptr = 0;
+static TreeNode *dcu_drive_slave_fb_ptr = 0;
 static TreeNode *dcu_formular_ptr = 0;
 static TreeNode *dcu_msg_ans_ptr = 0;
 static TreeNode *dcu_prm_ans_ptr = 0;
@@ -64,6 +79,7 @@ static TreeNode *dcu_ptp_state_ptr = 0;
 static TreeNode *im_bro_im_bro_drivers_sens_ptr = 0;
 static TreeNode *im_bro_prm_ans_ptr = 0;
 
+static TreeNode *bup_multi_control_ptr = 0;
 static TreeNode *bup_srv_ctrl_ptr = 0;
 static TreeNode *cmd_req_ptr = 0;
 static TreeNode *msg_req_ptr = 0;
@@ -173,6 +189,9 @@ static QVariant prm2QVariant(uint32_t id, uint8_t* val, size_t size)
         case 0x12DB50AA:
             return QVariant(*(float*)val);
  
+        case 0xB67F1E8:
+            return QVariant(*(float*)val);
+ 
         case 0xA57FD22E:
             return QVariant(*(float*)val);
  
@@ -227,6 +246,12 @@ static QVariant prm2QVariant(uint32_t id, uint8_t* val, size_t size)
         case 0x6EFAD7A0:
             return QVariant(*(float*)val);
  
+        case 0x47B4E0EE:
+            return QVariant(*(float*)val);
+ 
+        case 0xE4CCE479:
+            return QVariant(*(float*)val);
+ 
         case 0x44EE1601:
             return QVariant(*(float*)val);
  
@@ -248,11 +273,53 @@ static QVariant prm2QVariant(uint32_t id, uint8_t* val, size_t size)
         case 0x9DDB3C32:
             return QVariant(*(float*)val);
  
+        case 0xB815CE97:
+            return QVariant(*(float*)val);
+ 
         case 0x4608CFD6:
             return QVariant(*(float*)val);
  
         case 0x697055A4:
             return QVariant(*(float*)val);
+ 
+        case 0x96EC79E6:
+            return QVariant(*(bool*)val);
+ 
+        case 0x380A69BE:
+            return QVariant(*(float*)val);
+ 
+        case 0x1C9C8B96:
+            return QVariant(*(float*)val);
+ 
+        case 0x8A30CBEA:
+            return QVariant(*(float*)val);
+ 
+        case 0xA768C0A5:
+            return QVariant(*(float*)val);
+ 
+        case 0x155262F1:
+            return QVariant(*(float*)val);
+ 
+        case 0xDAE373A7:
+            return QVariant(*(float*)val);
+ 
+        case 0x15AB5439:
+            return QVariant(*(float*)val);
+ 
+        case 0x5277826D:
+            return QVariant(*(float*)val);
+ 
+        case 0xC6B60F77:
+            return QVariant(*(float*)val);
+ 
+        case 0xE9CE9505:
+            return QVariant(*(float*)val);
+ 
+        case 0x665CAA19:
+            return QVariant(*(float*)val);
+ 
+        case 0x69B9B702:
+            return QVariant(*(bool*)val);
  
         case 0x53930154:
             return QVariant(*(float*)val);
@@ -275,11 +342,77 @@ static QVariant prm2QVariant(uint32_t id, uint8_t* val, size_t size)
         case 0xE58A9A8B:
             return QVariant(*(float*)val);
  
+        case 0xC044682E:
+            return QVariant(*(float*)val);
+ 
         case 0x86EE36E2:
             return QVariant(*(float*)val);
  
         case 0xA996AC90:
             return QVariant(*(float*)val);
+ 
+        case 0xE4BC057D:
+            return QVariant(*(float*)val);
+ 
+        case 0xC02AE755:
+            return QVariant(*(float*)val);
+ 
+        case 0x5686A729:
+            return QVariant(*(float*)val);
+ 
+        case 0x7BDEAC66:
+            return QVariant(*(float*)val);
+ 
+        case 0xC9E40E32:
+            return QVariant(*(float*)val);
+ 
+        case 0x2073EC66:
+            return QVariant(*(float*)val);
+ 
+        case 0x67AF3A32:
+            return QVariant(*(float*)val);
+ 
+        case 0x4261C897:
+            return QVariant(*(float*)val);
+ 
+        case 0x53169F2D:
+            return QVariant(*(float*)val);
+ 
+        case 0x7C6E055F:
+            return QVariant(*(float*)val);
+ 
+        case 0x56EE8F6:
+            return QVariant(*(float*)val);
+ 
+        case 0x21F80ADE:
+            return QVariant(*(float*)val);
+ 
+        case 0xB7544AA2:
+            return QVariant(*(float*)val);
+ 
+        case 0x9A0C41ED:
+            return QVariant(*(float*)val);
+ 
+        case 0x2836E3B9:
+            return QVariant(*(float*)val);
+ 
+        case 0xC995954D:
+            return QVariant(*(float*)val);
+ 
+        case 0x8E494319:
+            return QVariant(*(float*)val);
+ 
+        case 0xAB87B1BC:
+            return QVariant(*(float*)val);
+ 
+        case 0xE37276C4:
+            return QVariant(*(float*)val);
+ 
+        case 0xCC0AECB6:
+            return QVariant(*(float*)val);
+ 
+        case 0xE8701AA:
+            return QVariant(*(int*)val);
  
         case 0xBF7D3892:
             return QVariant(*(float*)val);
@@ -307,6 +440,12 @@ static QVariant prm2QVariant(uint32_t id, uint8_t* val, size_t size)
  
         case 0x7B224FA:
             return QVariant(*(float*)val);
+ 
+        case 0x7121BD4C:
+            return QVariant(*(float*)val);
+ 
+        case 0x7EC4A057:
+            return QVariant(*(bool*)val);
  
         case 0xE54327C5:
             return QVariant(*(bool*)val);
@@ -345,6 +484,10 @@ static QVariant prm2QVariant(uint32_t id, uint8_t* val, size_t size)
             return QVariant(cp866ToQString((char *)val,size));
  
         case 0x6F0DA7DD:
+            val[size-1] = 0;
+            return QVariant(cp866ToQString((char *)val,size));
+ 
+        case 0x5BF96276:
             val[size-1] = 0;
             return QVariant(cp866ToQString((char *)val,size));
  
@@ -460,6 +603,12 @@ static void QVariant2prm(uint32_t id, uint8_t* val, size_t size, QVariant data)
         memcpy(val,&(val_),sizeof(float));
  
     } else 
+    if (id == 0xB67F1E8)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
     if (id == 0xA57FD22E)
     {
         float val_ = data.value<float>();
@@ -568,6 +717,18 @@ static void QVariant2prm(uint32_t id, uint8_t* val, size_t size, QVariant data)
         memcpy(val,&(val_),sizeof(float));
  
     } else 
+    if (id == 0x47B4E0EE)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0xE4CCE479)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
     if (id == 0x44EE1601)
     {
         float val_ = data.value<float>();
@@ -610,6 +771,12 @@ static void QVariant2prm(uint32_t id, uint8_t* val, size_t size, QVariant data)
         memcpy(val,&(val_),sizeof(float));
  
     } else 
+    if (id == 0xB815CE97)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
     if (id == 0x4608CFD6)
     {
         float val_ = data.value<float>();
@@ -620,6 +787,84 @@ static void QVariant2prm(uint32_t id, uint8_t* val, size_t size, QVariant data)
     {
         float val_ = data.value<float>();
         memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x96EC79E6)
+    {
+        bool val_ = data.value<bool>();
+        memcpy(val,&(val_),sizeof(bool));
+ 
+    } else 
+    if (id == 0x380A69BE)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x1C9C8B96)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x8A30CBEA)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0xA768C0A5)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x155262F1)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0xDAE373A7)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x15AB5439)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x5277826D)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0xC6B60F77)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0xE9CE9505)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x665CAA19)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x69B9B702)
+    {
+        bool val_ = data.value<bool>();
+        memcpy(val,&(val_),sizeof(bool));
  
     } else 
     if (id == 0x53930154)
@@ -664,6 +909,12 @@ static void QVariant2prm(uint32_t id, uint8_t* val, size_t size, QVariant data)
         memcpy(val,&(val_),sizeof(float));
  
     } else 
+    if (id == 0xC044682E)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
     if (id == 0x86EE36E2)
     {
         float val_ = data.value<float>();
@@ -674,6 +925,132 @@ static void QVariant2prm(uint32_t id, uint8_t* val, size_t size, QVariant data)
     {
         float val_ = data.value<float>();
         memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0xE4BC057D)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0xC02AE755)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x5686A729)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x7BDEAC66)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0xC9E40E32)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x2073EC66)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x67AF3A32)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x4261C897)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x53169F2D)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x7C6E055F)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x56EE8F6)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x21F80ADE)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0xB7544AA2)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x9A0C41ED)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x2836E3B9)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0xC995954D)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x8E494319)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0xAB87B1BC)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0xE37276C4)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0xCC0AECB6)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0xE8701AA)
+    {
+        int val_ = data.value<int>();
+        memcpy(val,&(val_),sizeof(int));
  
     } else 
     if (id == 0xBF7D3892)
@@ -728,6 +1105,18 @@ static void QVariant2prm(uint32_t id, uint8_t* val, size_t size, QVariant data)
     {
         float val_ = data.value<float>();
         memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x7121BD4C)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x7EC4A057)
+    {
+        bool val_ = data.value<bool>();
+        memcpy(val,&(val_),sizeof(bool));
  
     } else 
     if (id == 0xE54327C5)
@@ -796,6 +1185,12 @@ static void QVariant2prm(uint32_t id, uint8_t* val, size_t size, QVariant data)
         memcpy(val,(void *)(byte_str.data()), (size_t)(byte_str.size()) > size ? size : byte_str.size());
  
     } else 
+    if (id == 0x5BF96276)
+    {
+        QByteArray byte_str = qStringToCP866(data.toString());
+        memcpy(val,(void *)(byte_str.data()), (size_t)(byte_str.size()) > size ? size : byte_str.size());
+ 
+    } else 
     if (id == 0x6F720C87)
     {
         QByteArray byte_str = qStringToCP866(data.toString());
@@ -834,6 +1229,48 @@ node->devIDs = devIDs;
 node->devList = devList;
 TreeNode * aufd_node = node->add("aufd",[](){return QVariant();});
 aufd_node->isDev = true;
+aufd_bup_multi_control_ptr = node->lch()->add("bup_multi_control",[](){return QVariant(mj->in.aufd.bup_multi_control.msg->hdr.cnt);});
+aufd_bup_multi_control_ptr->state = []()->int32_t{return mj->in.aufd.bup_multi_control.state;};
+aufd_bup_multi_control_ptr->msgId = ID_BUP_MULTI_CONTROL;
+aufd_bup_multi_control_ptr->add("time",[](){return QVariant(static_cast<double>(mj->in.aufd.bup_multi_control.msg->hdr.ts_s)+static_cast<double>(mj->in.aufd.bup_multi_control.msg->hdr.ts_ns)/1e9);});
+
+node->lch()->lch()->add("lfd",[](){return QVariant();});
+node->lch()->lch()->lch()->add("mode",[](){return QVariant((int32_t)(mj->in.aufd.bup_multi_control.msg->lfd.mode));},[](){return (drv_ctrl_mode_str(mj->in.aufd.bup_multi_control.msg->lfd.mode));});
+node->lch()->lch()->lch()->add("angle",[](){return QVariant(mj->in.aufd.bup_multi_control.msg->lfd.angle);});
+node->lch()->lch()->lch()->add("speed",[](){return QVariant(mj->in.aufd.bup_multi_control.msg->lfd.speed);});
+node->lch()->lch()->lch()->add("voltage",[](){return QVariant(mj->in.aufd.bup_multi_control.msg->lfd.voltage);});
+node->lch()->lch()->lch()->add("current",[](){return QVariant(mj->in.aufd.bup_multi_control.msg->lfd.current);});
+node->lch()->lch()->add("lrd",[](){return QVariant();});
+node->lch()->lch()->lch()->add("mode",[](){return QVariant((int32_t)(mj->in.aufd.bup_multi_control.msg->lrd.mode));},[](){return (drv_ctrl_mode_str(mj->in.aufd.bup_multi_control.msg->lrd.mode));});
+node->lch()->lch()->lch()->add("angle",[](){return QVariant(mj->in.aufd.bup_multi_control.msg->lrd.angle);});
+node->lch()->lch()->lch()->add("speed",[](){return QVariant(mj->in.aufd.bup_multi_control.msg->lrd.speed);});
+node->lch()->lch()->lch()->add("voltage",[](){return QVariant(mj->in.aufd.bup_multi_control.msg->lrd.voltage);});
+node->lch()->lch()->lch()->add("current",[](){return QVariant(mj->in.aufd.bup_multi_control.msg->lrd.current);});
+node->lch()->lch()->add("lst",[](){return QVariant();});
+node->lch()->lch()->lch()->add("mode",[](){return QVariant((int32_t)(mj->in.aufd.bup_multi_control.msg->lst.mode));},[](){return (drv_ctrl_mode_str(mj->in.aufd.bup_multi_control.msg->lst.mode));});
+node->lch()->lch()->lch()->add("angle",[](){return QVariant(mj->in.aufd.bup_multi_control.msg->lst.angle);});
+node->lch()->lch()->lch()->add("speed",[](){return QVariant(mj->in.aufd.bup_multi_control.msg->lst.speed);});
+node->lch()->lch()->lch()->add("voltage",[](){return QVariant(mj->in.aufd.bup_multi_control.msg->lst.voltage);});
+node->lch()->lch()->lch()->add("current",[](){return QVariant(mj->in.aufd.bup_multi_control.msg->lst.current);});
+node->lch()->lch()->add("rfd",[](){return QVariant();});
+node->lch()->lch()->lch()->add("mode",[](){return QVariant((int32_t)(mj->in.aufd.bup_multi_control.msg->rfd.mode));},[](){return (drv_ctrl_mode_str(mj->in.aufd.bup_multi_control.msg->rfd.mode));});
+node->lch()->lch()->lch()->add("angle",[](){return QVariant(mj->in.aufd.bup_multi_control.msg->rfd.angle);});
+node->lch()->lch()->lch()->add("speed",[](){return QVariant(mj->in.aufd.bup_multi_control.msg->rfd.speed);});
+node->lch()->lch()->lch()->add("voltage",[](){return QVariant(mj->in.aufd.bup_multi_control.msg->rfd.voltage);});
+node->lch()->lch()->lch()->add("current",[](){return QVariant(mj->in.aufd.bup_multi_control.msg->rfd.current);});
+node->lch()->lch()->add("rrd",[](){return QVariant();});
+node->lch()->lch()->lch()->add("mode",[](){return QVariant((int32_t)(mj->in.aufd.bup_multi_control.msg->rrd.mode));},[](){return (drv_ctrl_mode_str(mj->in.aufd.bup_multi_control.msg->rrd.mode));});
+node->lch()->lch()->lch()->add("angle",[](){return QVariant(mj->in.aufd.bup_multi_control.msg->rrd.angle);});
+node->lch()->lch()->lch()->add("speed",[](){return QVariant(mj->in.aufd.bup_multi_control.msg->rrd.speed);});
+node->lch()->lch()->lch()->add("voltage",[](){return QVariant(mj->in.aufd.bup_multi_control.msg->rrd.voltage);});
+node->lch()->lch()->lch()->add("current",[](){return QVariant(mj->in.aufd.bup_multi_control.msg->rrd.current);});
+node->lch()->lch()->add("rst",[](){return QVariant();});
+node->lch()->lch()->lch()->add("mode",[](){return QVariant((int32_t)(mj->in.aufd.bup_multi_control.msg->rst.mode));},[](){return (drv_ctrl_mode_str(mj->in.aufd.bup_multi_control.msg->rst.mode));});
+node->lch()->lch()->lch()->add("angle",[](){return QVariant(mj->in.aufd.bup_multi_control.msg->rst.angle);});
+node->lch()->lch()->lch()->add("speed",[](){return QVariant(mj->in.aufd.bup_multi_control.msg->rst.speed);});
+node->lch()->lch()->lch()->add("voltage",[](){return QVariant(mj->in.aufd.bup_multi_control.msg->rst.voltage);});
+node->lch()->lch()->lch()->add("current",[](){return QVariant(mj->in.aufd.bup_multi_control.msg->rst.current);});
+mj->in.aufd.bup_multi_control.upd_cb = [](){ aufd_bup_multi_control_ptr->upd(mj->in.aufd.bup_multi_control.ts_s, mj->in.aufd.bup_multi_control.ts_ns);};
 aufd_cmd_ans_ptr = node->lch()->add("cmd_ans",[](){return QVariant(mj->in.aufd.cmd_ans.msg->hdr.cnt);});
 aufd_cmd_ans_ptr->state = []()->int32_t{return mj->in.aufd.cmd_ans.state;};
 aufd_cmd_ans_ptr->msgId = ID_CMD_ANS;
@@ -1018,7 +1455,25 @@ node->lch()->lch()->add("sync",[](){return QVariant((int32_t)(mj->in.bup_dcu_lfd
 node->lch()->lch()->add("inv_octw",[](){return QVariant((int32_t)(mj->in.bup_dcu_lfd.dcu_tel.msg->inv_octw));},[](){return (relay_signal_state_str(mj->in.bup_dcu_lfd.dcu_tel.msg->inv_octw));});
 node->lch()->lch()->add("inv_fault",[](){return QVariant((int32_t)(mj->in.bup_dcu_lfd.dcu_tel.msg->inv_fault));},[](){return (relay_signal_state_str(mj->in.bup_dcu_lfd.dcu_tel.msg->inv_fault));});
 node->lch()->lch()->add("en_gate",[](){return QVariant((int32_t)(mj->in.bup_dcu_lfd.dcu_tel.msg->en_gate));},[](){return (relay_signal_state_str(mj->in.bup_dcu_lfd.dcu_tel.msg->en_gate));});
+node->lch()->lch()->add("hall",[](){return QVariant();});
+node->lch()->lch()->lch()->add("a",[](){return QVariant(mj->in.bup_dcu_lfd.dcu_tel.msg->hall.a);});
+node->lch()->lch()->lch()->add("b",[](){return QVariant(mj->in.bup_dcu_lfd.dcu_tel.msg->hall.b);});
+node->lch()->lch()->lch()->add("c",[](){return QVariant(mj->in.bup_dcu_lfd.dcu_tel.msg->hall.c);});
 mj->in.bup_dcu_lfd.dcu_tel.upd_cb = [](){ bup_dcu_lfd_dcu_tel_ptr->upd(mj->in.bup_dcu_lfd.dcu_tel.ts_s, mj->in.bup_dcu_lfd.dcu_tel.ts_ns);};
+bup_dcu_lfd_drive_master_ctrl_ptr = node->lch()->add("drive_master_ctrl",[](){return QVariant(mj->in.bup_dcu_lfd.drive_master_ctrl.msg->hdr.cnt);});
+bup_dcu_lfd_drive_master_ctrl_ptr->state = []()->int32_t{return mj->in.bup_dcu_lfd.drive_master_ctrl.state;};
+bup_dcu_lfd_drive_master_ctrl_ptr->msgId = ID_DRIVE_MASTER_CTRL;
+bup_dcu_lfd_drive_master_ctrl_ptr->add("time",[](){return QVariant(static_cast<double>(mj->in.bup_dcu_lfd.drive_master_ctrl.msg->hdr.ts_s)+static_cast<double>(mj->in.bup_dcu_lfd.drive_master_ctrl.msg->hdr.ts_ns)/1e9);});
+
+node->lch()->lch()->add("current",[](){return QVariant(mj->in.bup_dcu_lfd.drive_master_ctrl.msg->current);});
+mj->in.bup_dcu_lfd.drive_master_ctrl.upd_cb = [](){ bup_dcu_lfd_drive_master_ctrl_ptr->upd(mj->in.bup_dcu_lfd.drive_master_ctrl.ts_s, mj->in.bup_dcu_lfd.drive_master_ctrl.ts_ns);};
+bup_dcu_lfd_drive_slave_fb_ptr = node->lch()->add("drive_slave_fb",[](){return QVariant(mj->in.bup_dcu_lfd.drive_slave_fb.msg->hdr.cnt);});
+bup_dcu_lfd_drive_slave_fb_ptr->state = []()->int32_t{return mj->in.bup_dcu_lfd.drive_slave_fb.state;};
+bup_dcu_lfd_drive_slave_fb_ptr->msgId = ID_DRIVE_SLAVE_FB;
+bup_dcu_lfd_drive_slave_fb_ptr->add("time",[](){return QVariant(static_cast<double>(mj->in.bup_dcu_lfd.drive_slave_fb.msg->hdr.ts_s)+static_cast<double>(mj->in.bup_dcu_lfd.drive_slave_fb.msg->hdr.ts_ns)/1e9);});
+
+node->lch()->lch()->add("rotor_speed",[](){return QVariant(mj->in.bup_dcu_lfd.drive_slave_fb.msg->rotor_speed);});
+mj->in.bup_dcu_lfd.drive_slave_fb.upd_cb = [](){ bup_dcu_lfd_drive_slave_fb_ptr->upd(mj->in.bup_dcu_lfd.drive_slave_fb.ts_s, mj->in.bup_dcu_lfd.drive_slave_fb.ts_ns);};
 bup_dcu_lfd_formular_ptr = node->lch()->add("formular",[](){return QVariant(mj->in.bup_dcu_lfd.formular.msg->hdr.cnt);});
 bup_dcu_lfd_formular_ptr->state = []()->int32_t{return mj->in.bup_dcu_lfd.formular.state;};
 bup_dcu_lfd_formular_ptr->msgId = ID_FORMULAR;
@@ -1202,7 +1657,25 @@ node->lch()->lch()->add("sync",[](){return QVariant((int32_t)(mj->in.bup_dcu_lrd
 node->lch()->lch()->add("inv_octw",[](){return QVariant((int32_t)(mj->in.bup_dcu_lrd.dcu_tel.msg->inv_octw));},[](){return (relay_signal_state_str(mj->in.bup_dcu_lrd.dcu_tel.msg->inv_octw));});
 node->lch()->lch()->add("inv_fault",[](){return QVariant((int32_t)(mj->in.bup_dcu_lrd.dcu_tel.msg->inv_fault));},[](){return (relay_signal_state_str(mj->in.bup_dcu_lrd.dcu_tel.msg->inv_fault));});
 node->lch()->lch()->add("en_gate",[](){return QVariant((int32_t)(mj->in.bup_dcu_lrd.dcu_tel.msg->en_gate));},[](){return (relay_signal_state_str(mj->in.bup_dcu_lrd.dcu_tel.msg->en_gate));});
+node->lch()->lch()->add("hall",[](){return QVariant();});
+node->lch()->lch()->lch()->add("a",[](){return QVariant(mj->in.bup_dcu_lrd.dcu_tel.msg->hall.a);});
+node->lch()->lch()->lch()->add("b",[](){return QVariant(mj->in.bup_dcu_lrd.dcu_tel.msg->hall.b);});
+node->lch()->lch()->lch()->add("c",[](){return QVariant(mj->in.bup_dcu_lrd.dcu_tel.msg->hall.c);});
 mj->in.bup_dcu_lrd.dcu_tel.upd_cb = [](){ bup_dcu_lrd_dcu_tel_ptr->upd(mj->in.bup_dcu_lrd.dcu_tel.ts_s, mj->in.bup_dcu_lrd.dcu_tel.ts_ns);};
+bup_dcu_lrd_drive_master_ctrl_ptr = node->lch()->add("drive_master_ctrl",[](){return QVariant(mj->in.bup_dcu_lrd.drive_master_ctrl.msg->hdr.cnt);});
+bup_dcu_lrd_drive_master_ctrl_ptr->state = []()->int32_t{return mj->in.bup_dcu_lrd.drive_master_ctrl.state;};
+bup_dcu_lrd_drive_master_ctrl_ptr->msgId = ID_DRIVE_MASTER_CTRL;
+bup_dcu_lrd_drive_master_ctrl_ptr->add("time",[](){return QVariant(static_cast<double>(mj->in.bup_dcu_lrd.drive_master_ctrl.msg->hdr.ts_s)+static_cast<double>(mj->in.bup_dcu_lrd.drive_master_ctrl.msg->hdr.ts_ns)/1e9);});
+
+node->lch()->lch()->add("current",[](){return QVariant(mj->in.bup_dcu_lrd.drive_master_ctrl.msg->current);});
+mj->in.bup_dcu_lrd.drive_master_ctrl.upd_cb = [](){ bup_dcu_lrd_drive_master_ctrl_ptr->upd(mj->in.bup_dcu_lrd.drive_master_ctrl.ts_s, mj->in.bup_dcu_lrd.drive_master_ctrl.ts_ns);};
+bup_dcu_lrd_drive_slave_fb_ptr = node->lch()->add("drive_slave_fb",[](){return QVariant(mj->in.bup_dcu_lrd.drive_slave_fb.msg->hdr.cnt);});
+bup_dcu_lrd_drive_slave_fb_ptr->state = []()->int32_t{return mj->in.bup_dcu_lrd.drive_slave_fb.state;};
+bup_dcu_lrd_drive_slave_fb_ptr->msgId = ID_DRIVE_SLAVE_FB;
+bup_dcu_lrd_drive_slave_fb_ptr->add("time",[](){return QVariant(static_cast<double>(mj->in.bup_dcu_lrd.drive_slave_fb.msg->hdr.ts_s)+static_cast<double>(mj->in.bup_dcu_lrd.drive_slave_fb.msg->hdr.ts_ns)/1e9);});
+
+node->lch()->lch()->add("rotor_speed",[](){return QVariant(mj->in.bup_dcu_lrd.drive_slave_fb.msg->rotor_speed);});
+mj->in.bup_dcu_lrd.drive_slave_fb.upd_cb = [](){ bup_dcu_lrd_drive_slave_fb_ptr->upd(mj->in.bup_dcu_lrd.drive_slave_fb.ts_s, mj->in.bup_dcu_lrd.drive_slave_fb.ts_ns);};
 bup_dcu_lrd_formular_ptr = node->lch()->add("formular",[](){return QVariant(mj->in.bup_dcu_lrd.formular.msg->hdr.cnt);});
 bup_dcu_lrd_formular_ptr->state = []()->int32_t{return mj->in.bup_dcu_lrd.formular.state;};
 bup_dcu_lrd_formular_ptr->msgId = ID_FORMULAR;
@@ -1386,7 +1859,25 @@ node->lch()->lch()->add("sync",[](){return QVariant((int32_t)(mj->in.bup_dcu_lst
 node->lch()->lch()->add("inv_octw",[](){return QVariant((int32_t)(mj->in.bup_dcu_lst.dcu_tel.msg->inv_octw));},[](){return (relay_signal_state_str(mj->in.bup_dcu_lst.dcu_tel.msg->inv_octw));});
 node->lch()->lch()->add("inv_fault",[](){return QVariant((int32_t)(mj->in.bup_dcu_lst.dcu_tel.msg->inv_fault));},[](){return (relay_signal_state_str(mj->in.bup_dcu_lst.dcu_tel.msg->inv_fault));});
 node->lch()->lch()->add("en_gate",[](){return QVariant((int32_t)(mj->in.bup_dcu_lst.dcu_tel.msg->en_gate));},[](){return (relay_signal_state_str(mj->in.bup_dcu_lst.dcu_tel.msg->en_gate));});
+node->lch()->lch()->add("hall",[](){return QVariant();});
+node->lch()->lch()->lch()->add("a",[](){return QVariant(mj->in.bup_dcu_lst.dcu_tel.msg->hall.a);});
+node->lch()->lch()->lch()->add("b",[](){return QVariant(mj->in.bup_dcu_lst.dcu_tel.msg->hall.b);});
+node->lch()->lch()->lch()->add("c",[](){return QVariant(mj->in.bup_dcu_lst.dcu_tel.msg->hall.c);});
 mj->in.bup_dcu_lst.dcu_tel.upd_cb = [](){ bup_dcu_lst_dcu_tel_ptr->upd(mj->in.bup_dcu_lst.dcu_tel.ts_s, mj->in.bup_dcu_lst.dcu_tel.ts_ns);};
+bup_dcu_lst_drive_master_ctrl_ptr = node->lch()->add("drive_master_ctrl",[](){return QVariant(mj->in.bup_dcu_lst.drive_master_ctrl.msg->hdr.cnt);});
+bup_dcu_lst_drive_master_ctrl_ptr->state = []()->int32_t{return mj->in.bup_dcu_lst.drive_master_ctrl.state;};
+bup_dcu_lst_drive_master_ctrl_ptr->msgId = ID_DRIVE_MASTER_CTRL;
+bup_dcu_lst_drive_master_ctrl_ptr->add("time",[](){return QVariant(static_cast<double>(mj->in.bup_dcu_lst.drive_master_ctrl.msg->hdr.ts_s)+static_cast<double>(mj->in.bup_dcu_lst.drive_master_ctrl.msg->hdr.ts_ns)/1e9);});
+
+node->lch()->lch()->add("current",[](){return QVariant(mj->in.bup_dcu_lst.drive_master_ctrl.msg->current);});
+mj->in.bup_dcu_lst.drive_master_ctrl.upd_cb = [](){ bup_dcu_lst_drive_master_ctrl_ptr->upd(mj->in.bup_dcu_lst.drive_master_ctrl.ts_s, mj->in.bup_dcu_lst.drive_master_ctrl.ts_ns);};
+bup_dcu_lst_drive_slave_fb_ptr = node->lch()->add("drive_slave_fb",[](){return QVariant(mj->in.bup_dcu_lst.drive_slave_fb.msg->hdr.cnt);});
+bup_dcu_lst_drive_slave_fb_ptr->state = []()->int32_t{return mj->in.bup_dcu_lst.drive_slave_fb.state;};
+bup_dcu_lst_drive_slave_fb_ptr->msgId = ID_DRIVE_SLAVE_FB;
+bup_dcu_lst_drive_slave_fb_ptr->add("time",[](){return QVariant(static_cast<double>(mj->in.bup_dcu_lst.drive_slave_fb.msg->hdr.ts_s)+static_cast<double>(mj->in.bup_dcu_lst.drive_slave_fb.msg->hdr.ts_ns)/1e9);});
+
+node->lch()->lch()->add("rotor_speed",[](){return QVariant(mj->in.bup_dcu_lst.drive_slave_fb.msg->rotor_speed);});
+mj->in.bup_dcu_lst.drive_slave_fb.upd_cb = [](){ bup_dcu_lst_drive_slave_fb_ptr->upd(mj->in.bup_dcu_lst.drive_slave_fb.ts_s, mj->in.bup_dcu_lst.drive_slave_fb.ts_ns);};
 bup_dcu_lst_formular_ptr = node->lch()->add("formular",[](){return QVariant(mj->in.bup_dcu_lst.formular.msg->hdr.cnt);});
 bup_dcu_lst_formular_ptr->state = []()->int32_t{return mj->in.bup_dcu_lst.formular.state;};
 bup_dcu_lst_formular_ptr->msgId = ID_FORMULAR;
@@ -1570,7 +2061,25 @@ node->lch()->lch()->add("sync",[](){return QVariant((int32_t)(mj->in.bup_dcu_rfd
 node->lch()->lch()->add("inv_octw",[](){return QVariant((int32_t)(mj->in.bup_dcu_rfd.dcu_tel.msg->inv_octw));},[](){return (relay_signal_state_str(mj->in.bup_dcu_rfd.dcu_tel.msg->inv_octw));});
 node->lch()->lch()->add("inv_fault",[](){return QVariant((int32_t)(mj->in.bup_dcu_rfd.dcu_tel.msg->inv_fault));},[](){return (relay_signal_state_str(mj->in.bup_dcu_rfd.dcu_tel.msg->inv_fault));});
 node->lch()->lch()->add("en_gate",[](){return QVariant((int32_t)(mj->in.bup_dcu_rfd.dcu_tel.msg->en_gate));},[](){return (relay_signal_state_str(mj->in.bup_dcu_rfd.dcu_tel.msg->en_gate));});
+node->lch()->lch()->add("hall",[](){return QVariant();});
+node->lch()->lch()->lch()->add("a",[](){return QVariant(mj->in.bup_dcu_rfd.dcu_tel.msg->hall.a);});
+node->lch()->lch()->lch()->add("b",[](){return QVariant(mj->in.bup_dcu_rfd.dcu_tel.msg->hall.b);});
+node->lch()->lch()->lch()->add("c",[](){return QVariant(mj->in.bup_dcu_rfd.dcu_tel.msg->hall.c);});
 mj->in.bup_dcu_rfd.dcu_tel.upd_cb = [](){ bup_dcu_rfd_dcu_tel_ptr->upd(mj->in.bup_dcu_rfd.dcu_tel.ts_s, mj->in.bup_dcu_rfd.dcu_tel.ts_ns);};
+bup_dcu_rfd_drive_master_ctrl_ptr = node->lch()->add("drive_master_ctrl",[](){return QVariant(mj->in.bup_dcu_rfd.drive_master_ctrl.msg->hdr.cnt);});
+bup_dcu_rfd_drive_master_ctrl_ptr->state = []()->int32_t{return mj->in.bup_dcu_rfd.drive_master_ctrl.state;};
+bup_dcu_rfd_drive_master_ctrl_ptr->msgId = ID_DRIVE_MASTER_CTRL;
+bup_dcu_rfd_drive_master_ctrl_ptr->add("time",[](){return QVariant(static_cast<double>(mj->in.bup_dcu_rfd.drive_master_ctrl.msg->hdr.ts_s)+static_cast<double>(mj->in.bup_dcu_rfd.drive_master_ctrl.msg->hdr.ts_ns)/1e9);});
+
+node->lch()->lch()->add("current",[](){return QVariant(mj->in.bup_dcu_rfd.drive_master_ctrl.msg->current);});
+mj->in.bup_dcu_rfd.drive_master_ctrl.upd_cb = [](){ bup_dcu_rfd_drive_master_ctrl_ptr->upd(mj->in.bup_dcu_rfd.drive_master_ctrl.ts_s, mj->in.bup_dcu_rfd.drive_master_ctrl.ts_ns);};
+bup_dcu_rfd_drive_slave_fb_ptr = node->lch()->add("drive_slave_fb",[](){return QVariant(mj->in.bup_dcu_rfd.drive_slave_fb.msg->hdr.cnt);});
+bup_dcu_rfd_drive_slave_fb_ptr->state = []()->int32_t{return mj->in.bup_dcu_rfd.drive_slave_fb.state;};
+bup_dcu_rfd_drive_slave_fb_ptr->msgId = ID_DRIVE_SLAVE_FB;
+bup_dcu_rfd_drive_slave_fb_ptr->add("time",[](){return QVariant(static_cast<double>(mj->in.bup_dcu_rfd.drive_slave_fb.msg->hdr.ts_s)+static_cast<double>(mj->in.bup_dcu_rfd.drive_slave_fb.msg->hdr.ts_ns)/1e9);});
+
+node->lch()->lch()->add("rotor_speed",[](){return QVariant(mj->in.bup_dcu_rfd.drive_slave_fb.msg->rotor_speed);});
+mj->in.bup_dcu_rfd.drive_slave_fb.upd_cb = [](){ bup_dcu_rfd_drive_slave_fb_ptr->upd(mj->in.bup_dcu_rfd.drive_slave_fb.ts_s, mj->in.bup_dcu_rfd.drive_slave_fb.ts_ns);};
 bup_dcu_rfd_formular_ptr = node->lch()->add("formular",[](){return QVariant(mj->in.bup_dcu_rfd.formular.msg->hdr.cnt);});
 bup_dcu_rfd_formular_ptr->state = []()->int32_t{return mj->in.bup_dcu_rfd.formular.state;};
 bup_dcu_rfd_formular_ptr->msgId = ID_FORMULAR;
@@ -1754,7 +2263,25 @@ node->lch()->lch()->add("sync",[](){return QVariant((int32_t)(mj->in.bup_dcu_rrd
 node->lch()->lch()->add("inv_octw",[](){return QVariant((int32_t)(mj->in.bup_dcu_rrd.dcu_tel.msg->inv_octw));},[](){return (relay_signal_state_str(mj->in.bup_dcu_rrd.dcu_tel.msg->inv_octw));});
 node->lch()->lch()->add("inv_fault",[](){return QVariant((int32_t)(mj->in.bup_dcu_rrd.dcu_tel.msg->inv_fault));},[](){return (relay_signal_state_str(mj->in.bup_dcu_rrd.dcu_tel.msg->inv_fault));});
 node->lch()->lch()->add("en_gate",[](){return QVariant((int32_t)(mj->in.bup_dcu_rrd.dcu_tel.msg->en_gate));},[](){return (relay_signal_state_str(mj->in.bup_dcu_rrd.dcu_tel.msg->en_gate));});
+node->lch()->lch()->add("hall",[](){return QVariant();});
+node->lch()->lch()->lch()->add("a",[](){return QVariant(mj->in.bup_dcu_rrd.dcu_tel.msg->hall.a);});
+node->lch()->lch()->lch()->add("b",[](){return QVariant(mj->in.bup_dcu_rrd.dcu_tel.msg->hall.b);});
+node->lch()->lch()->lch()->add("c",[](){return QVariant(mj->in.bup_dcu_rrd.dcu_tel.msg->hall.c);});
 mj->in.bup_dcu_rrd.dcu_tel.upd_cb = [](){ bup_dcu_rrd_dcu_tel_ptr->upd(mj->in.bup_dcu_rrd.dcu_tel.ts_s, mj->in.bup_dcu_rrd.dcu_tel.ts_ns);};
+bup_dcu_rrd_drive_master_ctrl_ptr = node->lch()->add("drive_master_ctrl",[](){return QVariant(mj->in.bup_dcu_rrd.drive_master_ctrl.msg->hdr.cnt);});
+bup_dcu_rrd_drive_master_ctrl_ptr->state = []()->int32_t{return mj->in.bup_dcu_rrd.drive_master_ctrl.state;};
+bup_dcu_rrd_drive_master_ctrl_ptr->msgId = ID_DRIVE_MASTER_CTRL;
+bup_dcu_rrd_drive_master_ctrl_ptr->add("time",[](){return QVariant(static_cast<double>(mj->in.bup_dcu_rrd.drive_master_ctrl.msg->hdr.ts_s)+static_cast<double>(mj->in.bup_dcu_rrd.drive_master_ctrl.msg->hdr.ts_ns)/1e9);});
+
+node->lch()->lch()->add("current",[](){return QVariant(mj->in.bup_dcu_rrd.drive_master_ctrl.msg->current);});
+mj->in.bup_dcu_rrd.drive_master_ctrl.upd_cb = [](){ bup_dcu_rrd_drive_master_ctrl_ptr->upd(mj->in.bup_dcu_rrd.drive_master_ctrl.ts_s, mj->in.bup_dcu_rrd.drive_master_ctrl.ts_ns);};
+bup_dcu_rrd_drive_slave_fb_ptr = node->lch()->add("drive_slave_fb",[](){return QVariant(mj->in.bup_dcu_rrd.drive_slave_fb.msg->hdr.cnt);});
+bup_dcu_rrd_drive_slave_fb_ptr->state = []()->int32_t{return mj->in.bup_dcu_rrd.drive_slave_fb.state;};
+bup_dcu_rrd_drive_slave_fb_ptr->msgId = ID_DRIVE_SLAVE_FB;
+bup_dcu_rrd_drive_slave_fb_ptr->add("time",[](){return QVariant(static_cast<double>(mj->in.bup_dcu_rrd.drive_slave_fb.msg->hdr.ts_s)+static_cast<double>(mj->in.bup_dcu_rrd.drive_slave_fb.msg->hdr.ts_ns)/1e9);});
+
+node->lch()->lch()->add("rotor_speed",[](){return QVariant(mj->in.bup_dcu_rrd.drive_slave_fb.msg->rotor_speed);});
+mj->in.bup_dcu_rrd.drive_slave_fb.upd_cb = [](){ bup_dcu_rrd_drive_slave_fb_ptr->upd(mj->in.bup_dcu_rrd.drive_slave_fb.ts_s, mj->in.bup_dcu_rrd.drive_slave_fb.ts_ns);};
 bup_dcu_rrd_formular_ptr = node->lch()->add("formular",[](){return QVariant(mj->in.bup_dcu_rrd.formular.msg->hdr.cnt);});
 bup_dcu_rrd_formular_ptr->state = []()->int32_t{return mj->in.bup_dcu_rrd.formular.state;};
 bup_dcu_rrd_formular_ptr->msgId = ID_FORMULAR;
@@ -1938,7 +2465,25 @@ node->lch()->lch()->add("sync",[](){return QVariant((int32_t)(mj->in.bup_dcu_rst
 node->lch()->lch()->add("inv_octw",[](){return QVariant((int32_t)(mj->in.bup_dcu_rst.dcu_tel.msg->inv_octw));},[](){return (relay_signal_state_str(mj->in.bup_dcu_rst.dcu_tel.msg->inv_octw));});
 node->lch()->lch()->add("inv_fault",[](){return QVariant((int32_t)(mj->in.bup_dcu_rst.dcu_tel.msg->inv_fault));},[](){return (relay_signal_state_str(mj->in.bup_dcu_rst.dcu_tel.msg->inv_fault));});
 node->lch()->lch()->add("en_gate",[](){return QVariant((int32_t)(mj->in.bup_dcu_rst.dcu_tel.msg->en_gate));},[](){return (relay_signal_state_str(mj->in.bup_dcu_rst.dcu_tel.msg->en_gate));});
+node->lch()->lch()->add("hall",[](){return QVariant();});
+node->lch()->lch()->lch()->add("a",[](){return QVariant(mj->in.bup_dcu_rst.dcu_tel.msg->hall.a);});
+node->lch()->lch()->lch()->add("b",[](){return QVariant(mj->in.bup_dcu_rst.dcu_tel.msg->hall.b);});
+node->lch()->lch()->lch()->add("c",[](){return QVariant(mj->in.bup_dcu_rst.dcu_tel.msg->hall.c);});
 mj->in.bup_dcu_rst.dcu_tel.upd_cb = [](){ bup_dcu_rst_dcu_tel_ptr->upd(mj->in.bup_dcu_rst.dcu_tel.ts_s, mj->in.bup_dcu_rst.dcu_tel.ts_ns);};
+bup_dcu_rst_drive_master_ctrl_ptr = node->lch()->add("drive_master_ctrl",[](){return QVariant(mj->in.bup_dcu_rst.drive_master_ctrl.msg->hdr.cnt);});
+bup_dcu_rst_drive_master_ctrl_ptr->state = []()->int32_t{return mj->in.bup_dcu_rst.drive_master_ctrl.state;};
+bup_dcu_rst_drive_master_ctrl_ptr->msgId = ID_DRIVE_MASTER_CTRL;
+bup_dcu_rst_drive_master_ctrl_ptr->add("time",[](){return QVariant(static_cast<double>(mj->in.bup_dcu_rst.drive_master_ctrl.msg->hdr.ts_s)+static_cast<double>(mj->in.bup_dcu_rst.drive_master_ctrl.msg->hdr.ts_ns)/1e9);});
+
+node->lch()->lch()->add("current",[](){return QVariant(mj->in.bup_dcu_rst.drive_master_ctrl.msg->current);});
+mj->in.bup_dcu_rst.drive_master_ctrl.upd_cb = [](){ bup_dcu_rst_drive_master_ctrl_ptr->upd(mj->in.bup_dcu_rst.drive_master_ctrl.ts_s, mj->in.bup_dcu_rst.drive_master_ctrl.ts_ns);};
+bup_dcu_rst_drive_slave_fb_ptr = node->lch()->add("drive_slave_fb",[](){return QVariant(mj->in.bup_dcu_rst.drive_slave_fb.msg->hdr.cnt);});
+bup_dcu_rst_drive_slave_fb_ptr->state = []()->int32_t{return mj->in.bup_dcu_rst.drive_slave_fb.state;};
+bup_dcu_rst_drive_slave_fb_ptr->msgId = ID_DRIVE_SLAVE_FB;
+bup_dcu_rst_drive_slave_fb_ptr->add("time",[](){return QVariant(static_cast<double>(mj->in.bup_dcu_rst.drive_slave_fb.msg->hdr.ts_s)+static_cast<double>(mj->in.bup_dcu_rst.drive_slave_fb.msg->hdr.ts_ns)/1e9);});
+
+node->lch()->lch()->add("rotor_speed",[](){return QVariant(mj->in.bup_dcu_rst.drive_slave_fb.msg->rotor_speed);});
+mj->in.bup_dcu_rst.drive_slave_fb.upd_cb = [](){ bup_dcu_rst_drive_slave_fb_ptr->upd(mj->in.bup_dcu_rst.drive_slave_fb.ts_s, mj->in.bup_dcu_rst.drive_slave_fb.ts_ns);};
 bup_dcu_rst_formular_ptr = node->lch()->add("formular",[](){return QVariant(mj->in.bup_dcu_rst.formular.msg->hdr.cnt);});
 bup_dcu_rst_formular_ptr->state = []()->int32_t{return mj->in.bup_dcu_rst.formular.state;};
 bup_dcu_rst_formular_ptr->msgId = ID_FORMULAR;
@@ -2122,7 +2667,25 @@ node->lch()->lch()->add("sync",[](){return QVariant((int32_t)(mj->in.dcu.dcu_tel
 node->lch()->lch()->add("inv_octw",[](){return QVariant((int32_t)(mj->in.dcu.dcu_tel.msg->inv_octw));},[](){return (relay_signal_state_str(mj->in.dcu.dcu_tel.msg->inv_octw));});
 node->lch()->lch()->add("inv_fault",[](){return QVariant((int32_t)(mj->in.dcu.dcu_tel.msg->inv_fault));},[](){return (relay_signal_state_str(mj->in.dcu.dcu_tel.msg->inv_fault));});
 node->lch()->lch()->add("en_gate",[](){return QVariant((int32_t)(mj->in.dcu.dcu_tel.msg->en_gate));},[](){return (relay_signal_state_str(mj->in.dcu.dcu_tel.msg->en_gate));});
+node->lch()->lch()->add("hall",[](){return QVariant();});
+node->lch()->lch()->lch()->add("a",[](){return QVariant(mj->in.dcu.dcu_tel.msg->hall.a);});
+node->lch()->lch()->lch()->add("b",[](){return QVariant(mj->in.dcu.dcu_tel.msg->hall.b);});
+node->lch()->lch()->lch()->add("c",[](){return QVariant(mj->in.dcu.dcu_tel.msg->hall.c);});
 mj->in.dcu.dcu_tel.upd_cb = [](){ dcu_dcu_tel_ptr->upd(mj->in.dcu.dcu_tel.ts_s, mj->in.dcu.dcu_tel.ts_ns);};
+dcu_drive_master_ctrl_ptr = node->lch()->add("drive_master_ctrl",[](){return QVariant(mj->in.dcu.drive_master_ctrl.msg->hdr.cnt);});
+dcu_drive_master_ctrl_ptr->state = []()->int32_t{return mj->in.dcu.drive_master_ctrl.state;};
+dcu_drive_master_ctrl_ptr->msgId = ID_DRIVE_MASTER_CTRL;
+dcu_drive_master_ctrl_ptr->add("time",[](){return QVariant(static_cast<double>(mj->in.dcu.drive_master_ctrl.msg->hdr.ts_s)+static_cast<double>(mj->in.dcu.drive_master_ctrl.msg->hdr.ts_ns)/1e9);});
+
+node->lch()->lch()->add("current",[](){return QVariant(mj->in.dcu.drive_master_ctrl.msg->current);});
+mj->in.dcu.drive_master_ctrl.upd_cb = [](){ dcu_drive_master_ctrl_ptr->upd(mj->in.dcu.drive_master_ctrl.ts_s, mj->in.dcu.drive_master_ctrl.ts_ns);};
+dcu_drive_slave_fb_ptr = node->lch()->add("drive_slave_fb",[](){return QVariant(mj->in.dcu.drive_slave_fb.msg->hdr.cnt);});
+dcu_drive_slave_fb_ptr->state = []()->int32_t{return mj->in.dcu.drive_slave_fb.state;};
+dcu_drive_slave_fb_ptr->msgId = ID_DRIVE_SLAVE_FB;
+dcu_drive_slave_fb_ptr->add("time",[](){return QVariant(static_cast<double>(mj->in.dcu.drive_slave_fb.msg->hdr.ts_s)+static_cast<double>(mj->in.dcu.drive_slave_fb.msg->hdr.ts_ns)/1e9);});
+
+node->lch()->lch()->add("rotor_speed",[](){return QVariant(mj->in.dcu.drive_slave_fb.msg->rotor_speed);});
+mj->in.dcu.drive_slave_fb.upd_cb = [](){ dcu_drive_slave_fb_ptr->upd(mj->in.dcu.drive_slave_fb.ts_s, mj->in.dcu.drive_slave_fb.ts_ns);};
 dcu_formular_ptr = node->lch()->add("formular",[](){return QVariant(mj->in.dcu.formular.msg->hdr.cnt);});
 dcu_formular_ptr->state = []()->int32_t{return mj->in.dcu.formular.state;};
 dcu_formular_ptr->msgId = ID_FORMULAR;
@@ -2208,6 +2771,232 @@ static mj_mon_t * mj = mj_ptr;
 TreeNode * node = new TreeNode("OUTPUT",[](){return QVariant();});
 node->devIDs = devIDs;
 node->devList = devList;
+bup_multi_control_ptr = node->add("bup_multi_control",[](){return QVariant(mj->out.bup_multi_control.msg->hdr.cnt);});
+bup_multi_control_ptr->tx_enable = &mj->out.bup_multi_control.tx_enable;
+
+node->lch()->add("lfd",[](){return QVariant();});
+node->lch()->lch()->add("mode",[](){return QVariant((int32_t)(mj->out.bup_multi_control.msg->lfd.mode));},[](){return (drv_ctrl_mode_str(mj->out.bup_multi_control.msg->lfd.mode));})->setData =  [](QVariant data){ mj->out.bup_multi_control.msg->lfd.mode=(drv_ctrl_mode)(data.value<int32_t>());return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->lch()->values.append("UNKNOWN");
+node->lch()->lch()->lch()->values.append("OFF");
+node->lch()->lch()->lch()->values.append("FREEMOVE");
+node->lch()->lch()->lch()->values.append("HOLD");
+node->lch()->lch()->lch()->values.append("ANGLE");
+node->lch()->lch()->lch()->values.append("SPEED");
+node->lch()->lch()->lch()->values.append("RSPEED");
+node->lch()->lch()->lch()->values.append("VOLTAGE");
+node->lch()->lch()->lch()->values.append("SYNCHRO");
+node->lch()->lch()->lch()->values.append("CURRENT");
+node->lch()->lch()->lch()->values.append("VOLTAGE_A");
+node->lch()->lch()->lch()->values.append("VOLTAGE_B");
+node->lch()->lch()->lch()->values.append("VOLTAGE_C");
+node->lch()->lch()->lch()->intval.append(0);
+node->lch()->lch()->lch()->intval.append(1);
+node->lch()->lch()->lch()->intval.append(2);
+node->lch()->lch()->lch()->intval.append(3);
+node->lch()->lch()->lch()->intval.append(4);
+node->lch()->lch()->lch()->intval.append(5);
+node->lch()->lch()->lch()->intval.append(6);
+node->lch()->lch()->lch()->intval.append(7);
+node->lch()->lch()->lch()->intval.append(8);
+node->lch()->lch()->lch()->intval.append(9);
+node->lch()->lch()->lch()->intval.append(10);
+node->lch()->lch()->lch()->intval.append(11);
+node->lch()->lch()->lch()->intval.append(12);
+node->lch()->lch()->add("angle",[](){return QVariant(mj->out.bup_multi_control.msg->lfd.angle);})->setData =  [](QVariant data){ mj->out.bup_multi_control.msg->lfd.angle=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("speed",[](){return QVariant(mj->out.bup_multi_control.msg->lfd.speed);})->setData =  [](QVariant data){ mj->out.bup_multi_control.msg->lfd.speed=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("voltage",[](){return QVariant(mj->out.bup_multi_control.msg->lfd.voltage);})->setData =  [](QVariant data){ mj->out.bup_multi_control.msg->lfd.voltage=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("current",[](){return QVariant(mj->out.bup_multi_control.msg->lfd.current);})->setData =  [](QVariant data){ mj->out.bup_multi_control.msg->lfd.current=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->add("lrd",[](){return QVariant();});
+node->lch()->lch()->add("mode",[](){return QVariant((int32_t)(mj->out.bup_multi_control.msg->lrd.mode));},[](){return (drv_ctrl_mode_str(mj->out.bup_multi_control.msg->lrd.mode));})->setData =  [](QVariant data){ mj->out.bup_multi_control.msg->lrd.mode=(drv_ctrl_mode)(data.value<int32_t>());return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->lch()->values.append("UNKNOWN");
+node->lch()->lch()->lch()->values.append("OFF");
+node->lch()->lch()->lch()->values.append("FREEMOVE");
+node->lch()->lch()->lch()->values.append("HOLD");
+node->lch()->lch()->lch()->values.append("ANGLE");
+node->lch()->lch()->lch()->values.append("SPEED");
+node->lch()->lch()->lch()->values.append("RSPEED");
+node->lch()->lch()->lch()->values.append("VOLTAGE");
+node->lch()->lch()->lch()->values.append("SYNCHRO");
+node->lch()->lch()->lch()->values.append("CURRENT");
+node->lch()->lch()->lch()->values.append("VOLTAGE_A");
+node->lch()->lch()->lch()->values.append("VOLTAGE_B");
+node->lch()->lch()->lch()->values.append("VOLTAGE_C");
+node->lch()->lch()->lch()->intval.append(0);
+node->lch()->lch()->lch()->intval.append(1);
+node->lch()->lch()->lch()->intval.append(2);
+node->lch()->lch()->lch()->intval.append(3);
+node->lch()->lch()->lch()->intval.append(4);
+node->lch()->lch()->lch()->intval.append(5);
+node->lch()->lch()->lch()->intval.append(6);
+node->lch()->lch()->lch()->intval.append(7);
+node->lch()->lch()->lch()->intval.append(8);
+node->lch()->lch()->lch()->intval.append(9);
+node->lch()->lch()->lch()->intval.append(10);
+node->lch()->lch()->lch()->intval.append(11);
+node->lch()->lch()->lch()->intval.append(12);
+node->lch()->lch()->add("angle",[](){return QVariant(mj->out.bup_multi_control.msg->lrd.angle);})->setData =  [](QVariant data){ mj->out.bup_multi_control.msg->lrd.angle=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("speed",[](){return QVariant(mj->out.bup_multi_control.msg->lrd.speed);})->setData =  [](QVariant data){ mj->out.bup_multi_control.msg->lrd.speed=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("voltage",[](){return QVariant(mj->out.bup_multi_control.msg->lrd.voltage);})->setData =  [](QVariant data){ mj->out.bup_multi_control.msg->lrd.voltage=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("current",[](){return QVariant(mj->out.bup_multi_control.msg->lrd.current);})->setData =  [](QVariant data){ mj->out.bup_multi_control.msg->lrd.current=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->add("lst",[](){return QVariant();});
+node->lch()->lch()->add("mode",[](){return QVariant((int32_t)(mj->out.bup_multi_control.msg->lst.mode));},[](){return (drv_ctrl_mode_str(mj->out.bup_multi_control.msg->lst.mode));})->setData =  [](QVariant data){ mj->out.bup_multi_control.msg->lst.mode=(drv_ctrl_mode)(data.value<int32_t>());return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->lch()->values.append("UNKNOWN");
+node->lch()->lch()->lch()->values.append("OFF");
+node->lch()->lch()->lch()->values.append("FREEMOVE");
+node->lch()->lch()->lch()->values.append("HOLD");
+node->lch()->lch()->lch()->values.append("ANGLE");
+node->lch()->lch()->lch()->values.append("SPEED");
+node->lch()->lch()->lch()->values.append("RSPEED");
+node->lch()->lch()->lch()->values.append("VOLTAGE");
+node->lch()->lch()->lch()->values.append("SYNCHRO");
+node->lch()->lch()->lch()->values.append("CURRENT");
+node->lch()->lch()->lch()->values.append("VOLTAGE_A");
+node->lch()->lch()->lch()->values.append("VOLTAGE_B");
+node->lch()->lch()->lch()->values.append("VOLTAGE_C");
+node->lch()->lch()->lch()->intval.append(0);
+node->lch()->lch()->lch()->intval.append(1);
+node->lch()->lch()->lch()->intval.append(2);
+node->lch()->lch()->lch()->intval.append(3);
+node->lch()->lch()->lch()->intval.append(4);
+node->lch()->lch()->lch()->intval.append(5);
+node->lch()->lch()->lch()->intval.append(6);
+node->lch()->lch()->lch()->intval.append(7);
+node->lch()->lch()->lch()->intval.append(8);
+node->lch()->lch()->lch()->intval.append(9);
+node->lch()->lch()->lch()->intval.append(10);
+node->lch()->lch()->lch()->intval.append(11);
+node->lch()->lch()->lch()->intval.append(12);
+node->lch()->lch()->add("angle",[](){return QVariant(mj->out.bup_multi_control.msg->lst.angle);})->setData =  [](QVariant data){ mj->out.bup_multi_control.msg->lst.angle=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("speed",[](){return QVariant(mj->out.bup_multi_control.msg->lst.speed);})->setData =  [](QVariant data){ mj->out.bup_multi_control.msg->lst.speed=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("voltage",[](){return QVariant(mj->out.bup_multi_control.msg->lst.voltage);})->setData =  [](QVariant data){ mj->out.bup_multi_control.msg->lst.voltage=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("current",[](){return QVariant(mj->out.bup_multi_control.msg->lst.current);})->setData =  [](QVariant data){ mj->out.bup_multi_control.msg->lst.current=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->add("rfd",[](){return QVariant();});
+node->lch()->lch()->add("mode",[](){return QVariant((int32_t)(mj->out.bup_multi_control.msg->rfd.mode));},[](){return (drv_ctrl_mode_str(mj->out.bup_multi_control.msg->rfd.mode));})->setData =  [](QVariant data){ mj->out.bup_multi_control.msg->rfd.mode=(drv_ctrl_mode)(data.value<int32_t>());return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->lch()->values.append("UNKNOWN");
+node->lch()->lch()->lch()->values.append("OFF");
+node->lch()->lch()->lch()->values.append("FREEMOVE");
+node->lch()->lch()->lch()->values.append("HOLD");
+node->lch()->lch()->lch()->values.append("ANGLE");
+node->lch()->lch()->lch()->values.append("SPEED");
+node->lch()->lch()->lch()->values.append("RSPEED");
+node->lch()->lch()->lch()->values.append("VOLTAGE");
+node->lch()->lch()->lch()->values.append("SYNCHRO");
+node->lch()->lch()->lch()->values.append("CURRENT");
+node->lch()->lch()->lch()->values.append("VOLTAGE_A");
+node->lch()->lch()->lch()->values.append("VOLTAGE_B");
+node->lch()->lch()->lch()->values.append("VOLTAGE_C");
+node->lch()->lch()->lch()->intval.append(0);
+node->lch()->lch()->lch()->intval.append(1);
+node->lch()->lch()->lch()->intval.append(2);
+node->lch()->lch()->lch()->intval.append(3);
+node->lch()->lch()->lch()->intval.append(4);
+node->lch()->lch()->lch()->intval.append(5);
+node->lch()->lch()->lch()->intval.append(6);
+node->lch()->lch()->lch()->intval.append(7);
+node->lch()->lch()->lch()->intval.append(8);
+node->lch()->lch()->lch()->intval.append(9);
+node->lch()->lch()->lch()->intval.append(10);
+node->lch()->lch()->lch()->intval.append(11);
+node->lch()->lch()->lch()->intval.append(12);
+node->lch()->lch()->add("angle",[](){return QVariant(mj->out.bup_multi_control.msg->rfd.angle);})->setData =  [](QVariant data){ mj->out.bup_multi_control.msg->rfd.angle=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("speed",[](){return QVariant(mj->out.bup_multi_control.msg->rfd.speed);})->setData =  [](QVariant data){ mj->out.bup_multi_control.msg->rfd.speed=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("voltage",[](){return QVariant(mj->out.bup_multi_control.msg->rfd.voltage);})->setData =  [](QVariant data){ mj->out.bup_multi_control.msg->rfd.voltage=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("current",[](){return QVariant(mj->out.bup_multi_control.msg->rfd.current);})->setData =  [](QVariant data){ mj->out.bup_multi_control.msg->rfd.current=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->add("rrd",[](){return QVariant();});
+node->lch()->lch()->add("mode",[](){return QVariant((int32_t)(mj->out.bup_multi_control.msg->rrd.mode));},[](){return (drv_ctrl_mode_str(mj->out.bup_multi_control.msg->rrd.mode));})->setData =  [](QVariant data){ mj->out.bup_multi_control.msg->rrd.mode=(drv_ctrl_mode)(data.value<int32_t>());return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->lch()->values.append("UNKNOWN");
+node->lch()->lch()->lch()->values.append("OFF");
+node->lch()->lch()->lch()->values.append("FREEMOVE");
+node->lch()->lch()->lch()->values.append("HOLD");
+node->lch()->lch()->lch()->values.append("ANGLE");
+node->lch()->lch()->lch()->values.append("SPEED");
+node->lch()->lch()->lch()->values.append("RSPEED");
+node->lch()->lch()->lch()->values.append("VOLTAGE");
+node->lch()->lch()->lch()->values.append("SYNCHRO");
+node->lch()->lch()->lch()->values.append("CURRENT");
+node->lch()->lch()->lch()->values.append("VOLTAGE_A");
+node->lch()->lch()->lch()->values.append("VOLTAGE_B");
+node->lch()->lch()->lch()->values.append("VOLTAGE_C");
+node->lch()->lch()->lch()->intval.append(0);
+node->lch()->lch()->lch()->intval.append(1);
+node->lch()->lch()->lch()->intval.append(2);
+node->lch()->lch()->lch()->intval.append(3);
+node->lch()->lch()->lch()->intval.append(4);
+node->lch()->lch()->lch()->intval.append(5);
+node->lch()->lch()->lch()->intval.append(6);
+node->lch()->lch()->lch()->intval.append(7);
+node->lch()->lch()->lch()->intval.append(8);
+node->lch()->lch()->lch()->intval.append(9);
+node->lch()->lch()->lch()->intval.append(10);
+node->lch()->lch()->lch()->intval.append(11);
+node->lch()->lch()->lch()->intval.append(12);
+node->lch()->lch()->add("angle",[](){return QVariant(mj->out.bup_multi_control.msg->rrd.angle);})->setData =  [](QVariant data){ mj->out.bup_multi_control.msg->rrd.angle=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("speed",[](){return QVariant(mj->out.bup_multi_control.msg->rrd.speed);})->setData =  [](QVariant data){ mj->out.bup_multi_control.msg->rrd.speed=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("voltage",[](){return QVariant(mj->out.bup_multi_control.msg->rrd.voltage);})->setData =  [](QVariant data){ mj->out.bup_multi_control.msg->rrd.voltage=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("current",[](){return QVariant(mj->out.bup_multi_control.msg->rrd.current);})->setData =  [](QVariant data){ mj->out.bup_multi_control.msg->rrd.current=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->add("rst",[](){return QVariant();});
+node->lch()->lch()->add("mode",[](){return QVariant((int32_t)(mj->out.bup_multi_control.msg->rst.mode));},[](){return (drv_ctrl_mode_str(mj->out.bup_multi_control.msg->rst.mode));})->setData =  [](QVariant data){ mj->out.bup_multi_control.msg->rst.mode=(drv_ctrl_mode)(data.value<int32_t>());return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->lch()->values.append("UNKNOWN");
+node->lch()->lch()->lch()->values.append("OFF");
+node->lch()->lch()->lch()->values.append("FREEMOVE");
+node->lch()->lch()->lch()->values.append("HOLD");
+node->lch()->lch()->lch()->values.append("ANGLE");
+node->lch()->lch()->lch()->values.append("SPEED");
+node->lch()->lch()->lch()->values.append("RSPEED");
+node->lch()->lch()->lch()->values.append("VOLTAGE");
+node->lch()->lch()->lch()->values.append("SYNCHRO");
+node->lch()->lch()->lch()->values.append("CURRENT");
+node->lch()->lch()->lch()->values.append("VOLTAGE_A");
+node->lch()->lch()->lch()->values.append("VOLTAGE_B");
+node->lch()->lch()->lch()->values.append("VOLTAGE_C");
+node->lch()->lch()->lch()->intval.append(0);
+node->lch()->lch()->lch()->intval.append(1);
+node->lch()->lch()->lch()->intval.append(2);
+node->lch()->lch()->lch()->intval.append(3);
+node->lch()->lch()->lch()->intval.append(4);
+node->lch()->lch()->lch()->intval.append(5);
+node->lch()->lch()->lch()->intval.append(6);
+node->lch()->lch()->lch()->intval.append(7);
+node->lch()->lch()->lch()->intval.append(8);
+node->lch()->lch()->lch()->intval.append(9);
+node->lch()->lch()->lch()->intval.append(10);
+node->lch()->lch()->lch()->intval.append(11);
+node->lch()->lch()->lch()->intval.append(12);
+node->lch()->lch()->add("angle",[](){return QVariant(mj->out.bup_multi_control.msg->rst.angle);})->setData =  [](QVariant data){ mj->out.bup_multi_control.msg->rst.angle=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("speed",[](){return QVariant(mj->out.bup_multi_control.msg->rst.speed);})->setData =  [](QVariant data){ mj->out.bup_multi_control.msg->rst.speed=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("voltage",[](){return QVariant(mj->out.bup_multi_control.msg->rst.voltage);})->setData =  [](QVariant data){ mj->out.bup_multi_control.msg->rst.voltage=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+node->lch()->lch()->add("current",[](){return QVariant(mj->out.bup_multi_control.msg->rst.current);})->setData =  [](QVariant data){ mj->out.bup_multi_control.msg->rst.current=data.value<float>();return;};
+node->lch()->lch()->lch()->editable = true;
+
 bup_srv_ctrl_ptr = node->add("bup_srv_ctrl",[](){return QVariant(mj->out.bup_srv_ctrl.msg->hdr.cnt);});
 bup_srv_ctrl_ptr->tx_enable = &mj->out.bup_srv_ctrl.tx_enable;
 
@@ -2309,6 +3098,7 @@ node->lch()->lch()->values.append("drv_current_reverse");
 node->lch()->lch()->values.append("drv_voltage_reverse");
 node->lch()->lch()->values.append("drv_zero");
 node->lch()->lch()->values.append("ohp_lvl");
+node->lch()->lch()->values.append("ohp_hyst");
 node->lch()->lch()->values.append("el_zero");
 node->lch()->lch()->values.append("pole_pairs");
 node->lch()->lch()->values.append("ph_resistance");
@@ -2327,6 +3117,8 @@ node->lch()->lch()->values.append("curr_err_lim");
 node->lch()->lch()->values.append("curr_out_lim");
 node->lch()->lch()->values.append("curr_out_rate_lim");
 node->lch()->lch()->values.append("curr_err_rate_lim");
+node->lch()->lch()->values.append("load_speed_flt_fc");
+node->lch()->lch()->values.append("rotor_speed_flt_fc");
 node->lch()->lch()->values.append("load_speed_kp");
 node->lch()->lch()->values.append("load_speed_ki");
 node->lch()->lch()->values.append("load_speed_kb");
@@ -2334,8 +3126,22 @@ node->lch()->lch()->values.append("load_speed_kt");
 node->lch()->lch()->values.append("load_speed_kf");
 node->lch()->lch()->values.append("load_speed_err_lim");
 node->lch()->lch()->values.append("load_speed_out_lim");
+node->lch()->lch()->values.append("load_speed_int_lim");
 node->lch()->lch()->values.append("load_speed_out_rate_lim");
 node->lch()->lch()->values.append("load_speed_err_rate_lim");
+node->lch()->lch()->values.append("load_ang_rev");
+node->lch()->lch()->values.append("load_ang_kp");
+node->lch()->lch()->values.append("load_ang_ki");
+node->lch()->lch()->values.append("load_ang_kb");
+node->lch()->lch()->values.append("load_ang_kt");
+node->lch()->lch()->values.append("load_ang_kf");
+node->lch()->lch()->values.append("load_ang_kd");
+node->lch()->lch()->values.append("load_ang_err_lim");
+node->lch()->lch()->values.append("load_ang_out_lim");
+node->lch()->lch()->values.append("load_ang_out_rate_lim");
+node->lch()->lch()->values.append("load_ang_err_rate_lim");
+node->lch()->lch()->values.append("load_ang_dz");
+node->lch()->lch()->values.append("load_ang_dz_en");
 node->lch()->lch()->values.append("rotor_speed_kp");
 node->lch()->lch()->values.append("rotor_speed_ki");
 node->lch()->lch()->values.append("rotor_speed_kb");
@@ -2343,8 +3149,30 @@ node->lch()->lch()->values.append("rotor_speed_kt");
 node->lch()->lch()->values.append("rotor_speed_kf");
 node->lch()->lch()->values.append("rotor_speed_err_lim");
 node->lch()->lch()->values.append("rotor_speed_out_lim");
+node->lch()->lch()->values.append("rotor_speed_int_lim");
 node->lch()->lch()->values.append("rotor_speed_out_rate_lim");
 node->lch()->lch()->values.append("rotor_speed_err_rate_lim");
+node->lch()->lch()->values.append("rotor_speed_master_common_kp");
+node->lch()->lch()->values.append("rotor_speed_master_common_ki");
+node->lch()->lch()->values.append("rotor_speed_master_common_kb");
+node->lch()->lch()->values.append("rotor_speed_master_common_kt");
+node->lch()->lch()->values.append("rotor_speed_master_common_kf");
+node->lch()->lch()->values.append("rotor_speed_master_common_err_lim");
+node->lch()->lch()->values.append("rotor_speed_master_common_out_lim");
+node->lch()->lch()->values.append("rotor_speed_master_common_int_lim");
+node->lch()->lch()->values.append("rotor_speed_master_common_out_rate_lim");
+node->lch()->lch()->values.append("rotor_speed_master_common_err_rate_lim");
+node->lch()->lch()->values.append("rotor_speed_master_diff_kp");
+node->lch()->lch()->values.append("rotor_speed_master_diff_ki");
+node->lch()->lch()->values.append("rotor_speed_master_diff_kb");
+node->lch()->lch()->values.append("rotor_speed_master_diff_kt");
+node->lch()->lch()->values.append("rotor_speed_master_diff_kf");
+node->lch()->lch()->values.append("rotor_speed_master_diff_err_lim");
+node->lch()->lch()->values.append("rotor_speed_master_diff_out_lim");
+node->lch()->lch()->values.append("rotor_speed_master_diff_int_lim");
+node->lch()->lch()->values.append("rotor_speed_master_diff_out_rate_lim");
+node->lch()->lch()->values.append("rotor_speed_master_diff_err_rate_lim");
+node->lch()->lch()->values.append("rotor_speed_role");
 node->lch()->lch()->values.append("rotor_ang_kp");
 node->lch()->lch()->values.append("rotor_ang_ki");
 node->lch()->lch()->values.append("rotor_ang_kb");
@@ -2354,6 +3182,8 @@ node->lch()->lch()->values.append("rotor_ang_err_lim");
 node->lch()->lch()->values.append("rotor_ang_out_lim");
 node->lch()->lch()->values.append("rotor_ang_out_rate_lim");
 node->lch()->lch()->values.append("rotor_ang_err_rate_lim");
+node->lch()->lch()->values.append("rotor_ang_dz");
+node->lch()->lch()->values.append("rotor_ang_dz_en");
 node->lch()->lch()->values.append("im_mode");
 node->lch()->lch()->values.append("ptp_kp");
 node->lch()->lch()->values.append("ptp_ki");
@@ -2365,6 +3195,7 @@ node->lch()->lch()->values.append("com_if_srv_mcast_req");
 node->lch()->lch()->values.append("com_if_srv_mcast_ans");
 node->lch()->lch()->values.append("com_if_bro_bup_ctrl_mcast");
 node->lch()->lch()->values.append("com_if_bro_bup_data_mcast");
+node->lch()->lch()->values.append("com_if_bup_internal_mcast");
 node->lch()->lch()->values.append("com_if_bro_bup_srv_mcast");
 node->lch()->lch()->values.append("com_if_im_bro_drive_mcast");
 node->lch()->lch()->values.append("com_if_im_bro_drive_ctrl_mcast");
@@ -2384,6 +3215,7 @@ node->lch()->lch()->intval.append(0xFC9F76B6);
 node->lch()->lch()->intval.append(0x310908E7);
 node->lch()->lch()->intval.append(0x74C112A);
 node->lch()->lch()->intval.append(0x12DB50AA);
+node->lch()->lch()->intval.append(0xB67F1E8);
 node->lch()->lch()->intval.append(0xA57FD22E);
 node->lch()->lch()->intval.append(0x393E0A69);
 node->lch()->lch()->intval.append(0xD478FE43);
@@ -2402,6 +3234,8 @@ node->lch()->lch()->intval.append(0xCAF1DD24);
 node->lch()->lch()->intval.append(0x8D2D0B70);
 node->lch()->lch()->intval.append(0x41824DD2);
 node->lch()->lch()->intval.append(0x6EFAD7A0);
+node->lch()->lch()->intval.append(0x47B4E0EE);
+node->lch()->lch()->intval.append(0xE4CCE479);
 node->lch()->lch()->intval.append(0x44EE1601);
 node->lch()->lch()->intval.append(0x6078F429);
 node->lch()->lch()->intval.append(0xF6D4B455);
@@ -2409,8 +3243,22 @@ node->lch()->lch()->intval.append(0xDB8CBF1A);
 node->lch()->lch()->intval.append(0x69B61D4E);
 node->lch()->lch()->intval.append(0xDA07EA66);
 node->lch()->lch()->intval.append(0x9DDB3C32);
+node->lch()->lch()->intval.append(0xB815CE97);
 node->lch()->lch()->intval.append(0x4608CFD6);
 node->lch()->lch()->intval.append(0x697055A4);
+node->lch()->lch()->intval.append(0x96EC79E6);
+node->lch()->lch()->intval.append(0x380A69BE);
+node->lch()->lch()->intval.append(0x1C9C8B96);
+node->lch()->lch()->intval.append(0x8A30CBEA);
+node->lch()->lch()->intval.append(0xA768C0A5);
+node->lch()->lch()->intval.append(0x155262F1);
+node->lch()->lch()->intval.append(0xDAE373A7);
+node->lch()->lch()->intval.append(0x15AB5439);
+node->lch()->lch()->intval.append(0x5277826D);
+node->lch()->lch()->intval.append(0xC6B60F77);
+node->lch()->lch()->intval.append(0xE9CE9505);
+node->lch()->lch()->intval.append(0x665CAA19);
+node->lch()->lch()->intval.append(0x69B9B702);
 node->lch()->lch()->intval.append(0x53930154);
 node->lch()->lch()->intval.append(0x7705E37C);
 node->lch()->lch()->intval.append(0xE1A9A300);
@@ -2418,8 +3266,30 @@ node->lch()->lch()->intval.append(0xCCF1A84F);
 node->lch()->lch()->intval.append(0x7ECB0A1B);
 node->lch()->lch()->intval.append(0xA2564CDF);
 node->lch()->lch()->intval.append(0xE58A9A8B);
+node->lch()->lch()->intval.append(0xC044682E);
 node->lch()->lch()->intval.append(0x86EE36E2);
 node->lch()->lch()->intval.append(0xA996AC90);
+node->lch()->lch()->intval.append(0xE4BC057D);
+node->lch()->lch()->intval.append(0xC02AE755);
+node->lch()->lch()->intval.append(0x5686A729);
+node->lch()->lch()->intval.append(0x7BDEAC66);
+node->lch()->lch()->intval.append(0xC9E40E32);
+node->lch()->lch()->intval.append(0x2073EC66);
+node->lch()->lch()->intval.append(0x67AF3A32);
+node->lch()->lch()->intval.append(0x4261C897);
+node->lch()->lch()->intval.append(0x53169F2D);
+node->lch()->lch()->intval.append(0x7C6E055F);
+node->lch()->lch()->intval.append(0x56EE8F6);
+node->lch()->lch()->intval.append(0x21F80ADE);
+node->lch()->lch()->intval.append(0xB7544AA2);
+node->lch()->lch()->intval.append(0x9A0C41ED);
+node->lch()->lch()->intval.append(0x2836E3B9);
+node->lch()->lch()->intval.append(0xC995954D);
+node->lch()->lch()->intval.append(0x8E494319);
+node->lch()->lch()->intval.append(0xAB87B1BC);
+node->lch()->lch()->intval.append(0xE37276C4);
+node->lch()->lch()->intval.append(0xCC0AECB6);
+node->lch()->lch()->intval.append(0xE8701AA);
 node->lch()->lch()->intval.append(0xBF7D3892);
 node->lch()->lch()->intval.append(0x9BEBDABA);
 node->lch()->lch()->intval.append(0xD479AC6);
@@ -2429,6 +3299,8 @@ node->lch()->lch()->intval.append(0x74081F2D);
 node->lch()->lch()->intval.append(0x33D4C979);
 node->lch()->lch()->intval.append(0x28CABE88);
 node->lch()->lch()->intval.append(0x7B224FA);
+node->lch()->lch()->intval.append(0x7121BD4C);
+node->lch()->lch()->intval.append(0x7EC4A057);
 node->lch()->lch()->intval.append(0xE54327C5);
 node->lch()->lch()->intval.append(0x70B25BB3);
 node->lch()->lch()->intval.append(0x5424B99B);
@@ -2440,6 +3312,7 @@ node->lch()->lch()->intval.append(0x4DDDD1EE);
 node->lch()->lch()->intval.append(0x52F653D2);
 node->lch()->lch()->intval.append(0xDDFE2DA4);
 node->lch()->lch()->intval.append(0x6F0DA7DD);
+node->lch()->lch()->intval.append(0x5BF96276);
 node->lch()->lch()->intval.append(0x6F720C87);
 node->lch()->lch()->intval.append(0x64B26340);
 node->lch()->lch()->intval.append(0x3C3707BD);
@@ -2517,6 +3390,8 @@ node->lch()->lch()->values.append("drv_zero");
 node->lch()->lch()->intval.append(0x74C112A);
 node->lch()->lch()->values.append("ohp_lvl");
 node->lch()->lch()->intval.append(0x12DB50AA);
+node->lch()->lch()->values.append("ohp_hyst");
+node->lch()->lch()->intval.append(0xB67F1E8);
 node->lch()->lch()->values.append("el_zero");
 node->lch()->lch()->intval.append(0xA57FD22E);
 node->lch()->lch()->values.append("pole_pairs");
@@ -2553,6 +3428,10 @@ node->lch()->lch()->values.append("curr_out_rate_lim");
 node->lch()->lch()->intval.append(0x41824DD2);
 node->lch()->lch()->values.append("curr_err_rate_lim");
 node->lch()->lch()->intval.append(0x6EFAD7A0);
+node->lch()->lch()->values.append("load_speed_flt_fc");
+node->lch()->lch()->intval.append(0x47B4E0EE);
+node->lch()->lch()->values.append("rotor_speed_flt_fc");
+node->lch()->lch()->intval.append(0xE4CCE479);
 node->lch()->lch()->values.append("load_speed_kp");
 node->lch()->lch()->intval.append(0x44EE1601);
 node->lch()->lch()->values.append("load_speed_ki");
@@ -2567,10 +3446,38 @@ node->lch()->lch()->values.append("load_speed_err_lim");
 node->lch()->lch()->intval.append(0xDA07EA66);
 node->lch()->lch()->values.append("load_speed_out_lim");
 node->lch()->lch()->intval.append(0x9DDB3C32);
+node->lch()->lch()->values.append("load_speed_int_lim");
+node->lch()->lch()->intval.append(0xB815CE97);
 node->lch()->lch()->values.append("load_speed_out_rate_lim");
 node->lch()->lch()->intval.append(0x4608CFD6);
 node->lch()->lch()->values.append("load_speed_err_rate_lim");
 node->lch()->lch()->intval.append(0x697055A4);
+node->lch()->lch()->values.append("load_ang_rev");
+node->lch()->lch()->intval.append(0x96EC79E6);
+node->lch()->lch()->values.append("load_ang_kp");
+node->lch()->lch()->intval.append(0x380A69BE);
+node->lch()->lch()->values.append("load_ang_ki");
+node->lch()->lch()->intval.append(0x1C9C8B96);
+node->lch()->lch()->values.append("load_ang_kb");
+node->lch()->lch()->intval.append(0x8A30CBEA);
+node->lch()->lch()->values.append("load_ang_kt");
+node->lch()->lch()->intval.append(0xA768C0A5);
+node->lch()->lch()->values.append("load_ang_kf");
+node->lch()->lch()->intval.append(0x155262F1);
+node->lch()->lch()->values.append("load_ang_kd");
+node->lch()->lch()->intval.append(0xDAE373A7);
+node->lch()->lch()->values.append("load_ang_err_lim");
+node->lch()->lch()->intval.append(0x15AB5439);
+node->lch()->lch()->values.append("load_ang_out_lim");
+node->lch()->lch()->intval.append(0x5277826D);
+node->lch()->lch()->values.append("load_ang_out_rate_lim");
+node->lch()->lch()->intval.append(0xC6B60F77);
+node->lch()->lch()->values.append("load_ang_err_rate_lim");
+node->lch()->lch()->intval.append(0xE9CE9505);
+node->lch()->lch()->values.append("load_ang_dz");
+node->lch()->lch()->intval.append(0x665CAA19);
+node->lch()->lch()->values.append("load_ang_dz_en");
+node->lch()->lch()->intval.append(0x69B9B702);
 node->lch()->lch()->values.append("rotor_speed_kp");
 node->lch()->lch()->intval.append(0x53930154);
 node->lch()->lch()->values.append("rotor_speed_ki");
@@ -2585,10 +3492,54 @@ node->lch()->lch()->values.append("rotor_speed_err_lim");
 node->lch()->lch()->intval.append(0xA2564CDF);
 node->lch()->lch()->values.append("rotor_speed_out_lim");
 node->lch()->lch()->intval.append(0xE58A9A8B);
+node->lch()->lch()->values.append("rotor_speed_int_lim");
+node->lch()->lch()->intval.append(0xC044682E);
 node->lch()->lch()->values.append("rotor_speed_out_rate_lim");
 node->lch()->lch()->intval.append(0x86EE36E2);
 node->lch()->lch()->values.append("rotor_speed_err_rate_lim");
 node->lch()->lch()->intval.append(0xA996AC90);
+node->lch()->lch()->values.append("rotor_speed_master_common_kp");
+node->lch()->lch()->intval.append(0xE4BC057D);
+node->lch()->lch()->values.append("rotor_speed_master_common_ki");
+node->lch()->lch()->intval.append(0xC02AE755);
+node->lch()->lch()->values.append("rotor_speed_master_common_kb");
+node->lch()->lch()->intval.append(0x5686A729);
+node->lch()->lch()->values.append("rotor_speed_master_common_kt");
+node->lch()->lch()->intval.append(0x7BDEAC66);
+node->lch()->lch()->values.append("rotor_speed_master_common_kf");
+node->lch()->lch()->intval.append(0xC9E40E32);
+node->lch()->lch()->values.append("rotor_speed_master_common_err_lim");
+node->lch()->lch()->intval.append(0x2073EC66);
+node->lch()->lch()->values.append("rotor_speed_master_common_out_lim");
+node->lch()->lch()->intval.append(0x67AF3A32);
+node->lch()->lch()->values.append("rotor_speed_master_common_int_lim");
+node->lch()->lch()->intval.append(0x4261C897);
+node->lch()->lch()->values.append("rotor_speed_master_common_out_rate_lim");
+node->lch()->lch()->intval.append(0x53169F2D);
+node->lch()->lch()->values.append("rotor_speed_master_common_err_rate_lim");
+node->lch()->lch()->intval.append(0x7C6E055F);
+node->lch()->lch()->values.append("rotor_speed_master_diff_kp");
+node->lch()->lch()->intval.append(0x56EE8F6);
+node->lch()->lch()->values.append("rotor_speed_master_diff_ki");
+node->lch()->lch()->intval.append(0x21F80ADE);
+node->lch()->lch()->values.append("rotor_speed_master_diff_kb");
+node->lch()->lch()->intval.append(0xB7544AA2);
+node->lch()->lch()->values.append("rotor_speed_master_diff_kt");
+node->lch()->lch()->intval.append(0x9A0C41ED);
+node->lch()->lch()->values.append("rotor_speed_master_diff_kf");
+node->lch()->lch()->intval.append(0x2836E3B9);
+node->lch()->lch()->values.append("rotor_speed_master_diff_err_lim");
+node->lch()->lch()->intval.append(0xC995954D);
+node->lch()->lch()->values.append("rotor_speed_master_diff_out_lim");
+node->lch()->lch()->intval.append(0x8E494319);
+node->lch()->lch()->values.append("rotor_speed_master_diff_int_lim");
+node->lch()->lch()->intval.append(0xAB87B1BC);
+node->lch()->lch()->values.append("rotor_speed_master_diff_out_rate_lim");
+node->lch()->lch()->intval.append(0xE37276C4);
+node->lch()->lch()->values.append("rotor_speed_master_diff_err_rate_lim");
+node->lch()->lch()->intval.append(0xCC0AECB6);
+node->lch()->lch()->values.append("rotor_speed_role");
+node->lch()->lch()->intval.append(0xE8701AA);
 node->lch()->lch()->values.append("rotor_ang_kp");
 node->lch()->lch()->intval.append(0xBF7D3892);
 node->lch()->lch()->values.append("rotor_ang_ki");
@@ -2607,6 +3558,10 @@ node->lch()->lch()->values.append("rotor_ang_out_rate_lim");
 node->lch()->lch()->intval.append(0x28CABE88);
 node->lch()->lch()->values.append("rotor_ang_err_rate_lim");
 node->lch()->lch()->intval.append(0x7B224FA);
+node->lch()->lch()->values.append("rotor_ang_dz");
+node->lch()->lch()->intval.append(0x7121BD4C);
+node->lch()->lch()->values.append("rotor_ang_dz_en");
+node->lch()->lch()->intval.append(0x7EC4A057);
 node->lch()->lch()->values.append("im_mode");
 node->lch()->lch()->intval.append(0xE54327C5);
 node->lch()->lch()->values.append("ptp_kp");
@@ -2629,6 +3584,8 @@ node->lch()->lch()->values.append("com_if_bro_bup_ctrl_mcast");
 node->lch()->lch()->intval.append(0xDDFE2DA4);
 node->lch()->lch()->values.append("com_if_bro_bup_data_mcast");
 node->lch()->lch()->intval.append(0x6F0DA7DD);
+node->lch()->lch()->values.append("com_if_bup_internal_mcast");
+node->lch()->lch()->intval.append(0x5BF96276);
 node->lch()->lch()->values.append("com_if_bro_bup_srv_mcast");
 node->lch()->lch()->intval.append(0x6F720C87);
 node->lch()->lch()->values.append("com_if_im_bro_drive_mcast");
@@ -2671,6 +3628,8 @@ node->lch()->lch()->values.append("drv_zero");
 node->lch()->lch()->intval.append(0x74C112A);
 node->lch()->lch()->values.append("ohp_lvl");
 node->lch()->lch()->intval.append(0x12DB50AA);
+node->lch()->lch()->values.append("ohp_hyst");
+node->lch()->lch()->intval.append(0xB67F1E8);
 node->lch()->lch()->values.append("el_zero");
 node->lch()->lch()->intval.append(0xA57FD22E);
 node->lch()->lch()->values.append("pole_pairs");
@@ -2707,6 +3666,10 @@ node->lch()->lch()->values.append("curr_out_rate_lim");
 node->lch()->lch()->intval.append(0x41824DD2);
 node->lch()->lch()->values.append("curr_err_rate_lim");
 node->lch()->lch()->intval.append(0x6EFAD7A0);
+node->lch()->lch()->values.append("load_speed_flt_fc");
+node->lch()->lch()->intval.append(0x47B4E0EE);
+node->lch()->lch()->values.append("rotor_speed_flt_fc");
+node->lch()->lch()->intval.append(0xE4CCE479);
 node->lch()->lch()->values.append("load_speed_kp");
 node->lch()->lch()->intval.append(0x44EE1601);
 node->lch()->lch()->values.append("load_speed_ki");
@@ -2721,10 +3684,38 @@ node->lch()->lch()->values.append("load_speed_err_lim");
 node->lch()->lch()->intval.append(0xDA07EA66);
 node->lch()->lch()->values.append("load_speed_out_lim");
 node->lch()->lch()->intval.append(0x9DDB3C32);
+node->lch()->lch()->values.append("load_speed_int_lim");
+node->lch()->lch()->intval.append(0xB815CE97);
 node->lch()->lch()->values.append("load_speed_out_rate_lim");
 node->lch()->lch()->intval.append(0x4608CFD6);
 node->lch()->lch()->values.append("load_speed_err_rate_lim");
 node->lch()->lch()->intval.append(0x697055A4);
+node->lch()->lch()->values.append("load_ang_rev");
+node->lch()->lch()->intval.append(0x96EC79E6);
+node->lch()->lch()->values.append("load_ang_kp");
+node->lch()->lch()->intval.append(0x380A69BE);
+node->lch()->lch()->values.append("load_ang_ki");
+node->lch()->lch()->intval.append(0x1C9C8B96);
+node->lch()->lch()->values.append("load_ang_kb");
+node->lch()->lch()->intval.append(0x8A30CBEA);
+node->lch()->lch()->values.append("load_ang_kt");
+node->lch()->lch()->intval.append(0xA768C0A5);
+node->lch()->lch()->values.append("load_ang_kf");
+node->lch()->lch()->intval.append(0x155262F1);
+node->lch()->lch()->values.append("load_ang_kd");
+node->lch()->lch()->intval.append(0xDAE373A7);
+node->lch()->lch()->values.append("load_ang_err_lim");
+node->lch()->lch()->intval.append(0x15AB5439);
+node->lch()->lch()->values.append("load_ang_out_lim");
+node->lch()->lch()->intval.append(0x5277826D);
+node->lch()->lch()->values.append("load_ang_out_rate_lim");
+node->lch()->lch()->intval.append(0xC6B60F77);
+node->lch()->lch()->values.append("load_ang_err_rate_lim");
+node->lch()->lch()->intval.append(0xE9CE9505);
+node->lch()->lch()->values.append("load_ang_dz");
+node->lch()->lch()->intval.append(0x665CAA19);
+node->lch()->lch()->values.append("load_ang_dz_en");
+node->lch()->lch()->intval.append(0x69B9B702);
 node->lch()->lch()->values.append("rotor_speed_kp");
 node->lch()->lch()->intval.append(0x53930154);
 node->lch()->lch()->values.append("rotor_speed_ki");
@@ -2739,10 +3730,54 @@ node->lch()->lch()->values.append("rotor_speed_err_lim");
 node->lch()->lch()->intval.append(0xA2564CDF);
 node->lch()->lch()->values.append("rotor_speed_out_lim");
 node->lch()->lch()->intval.append(0xE58A9A8B);
+node->lch()->lch()->values.append("rotor_speed_int_lim");
+node->lch()->lch()->intval.append(0xC044682E);
 node->lch()->lch()->values.append("rotor_speed_out_rate_lim");
 node->lch()->lch()->intval.append(0x86EE36E2);
 node->lch()->lch()->values.append("rotor_speed_err_rate_lim");
 node->lch()->lch()->intval.append(0xA996AC90);
+node->lch()->lch()->values.append("rotor_speed_master_common_kp");
+node->lch()->lch()->intval.append(0xE4BC057D);
+node->lch()->lch()->values.append("rotor_speed_master_common_ki");
+node->lch()->lch()->intval.append(0xC02AE755);
+node->lch()->lch()->values.append("rotor_speed_master_common_kb");
+node->lch()->lch()->intval.append(0x5686A729);
+node->lch()->lch()->values.append("rotor_speed_master_common_kt");
+node->lch()->lch()->intval.append(0x7BDEAC66);
+node->lch()->lch()->values.append("rotor_speed_master_common_kf");
+node->lch()->lch()->intval.append(0xC9E40E32);
+node->lch()->lch()->values.append("rotor_speed_master_common_err_lim");
+node->lch()->lch()->intval.append(0x2073EC66);
+node->lch()->lch()->values.append("rotor_speed_master_common_out_lim");
+node->lch()->lch()->intval.append(0x67AF3A32);
+node->lch()->lch()->values.append("rotor_speed_master_common_int_lim");
+node->lch()->lch()->intval.append(0x4261C897);
+node->lch()->lch()->values.append("rotor_speed_master_common_out_rate_lim");
+node->lch()->lch()->intval.append(0x53169F2D);
+node->lch()->lch()->values.append("rotor_speed_master_common_err_rate_lim");
+node->lch()->lch()->intval.append(0x7C6E055F);
+node->lch()->lch()->values.append("rotor_speed_master_diff_kp");
+node->lch()->lch()->intval.append(0x56EE8F6);
+node->lch()->lch()->values.append("rotor_speed_master_diff_ki");
+node->lch()->lch()->intval.append(0x21F80ADE);
+node->lch()->lch()->values.append("rotor_speed_master_diff_kb");
+node->lch()->lch()->intval.append(0xB7544AA2);
+node->lch()->lch()->values.append("rotor_speed_master_diff_kt");
+node->lch()->lch()->intval.append(0x9A0C41ED);
+node->lch()->lch()->values.append("rotor_speed_master_diff_kf");
+node->lch()->lch()->intval.append(0x2836E3B9);
+node->lch()->lch()->values.append("rotor_speed_master_diff_err_lim");
+node->lch()->lch()->intval.append(0xC995954D);
+node->lch()->lch()->values.append("rotor_speed_master_diff_out_lim");
+node->lch()->lch()->intval.append(0x8E494319);
+node->lch()->lch()->values.append("rotor_speed_master_diff_int_lim");
+node->lch()->lch()->intval.append(0xAB87B1BC);
+node->lch()->lch()->values.append("rotor_speed_master_diff_out_rate_lim");
+node->lch()->lch()->intval.append(0xE37276C4);
+node->lch()->lch()->values.append("rotor_speed_master_diff_err_rate_lim");
+node->lch()->lch()->intval.append(0xCC0AECB6);
+node->lch()->lch()->values.append("rotor_speed_role");
+node->lch()->lch()->intval.append(0xE8701AA);
 node->lch()->lch()->values.append("rotor_ang_kp");
 node->lch()->lch()->intval.append(0xBF7D3892);
 node->lch()->lch()->values.append("rotor_ang_ki");
@@ -2761,6 +3796,10 @@ node->lch()->lch()->values.append("rotor_ang_out_rate_lim");
 node->lch()->lch()->intval.append(0x28CABE88);
 node->lch()->lch()->values.append("rotor_ang_err_rate_lim");
 node->lch()->lch()->intval.append(0x7B224FA);
+node->lch()->lch()->values.append("rotor_ang_dz");
+node->lch()->lch()->intval.append(0x7121BD4C);
+node->lch()->lch()->values.append("rotor_ang_dz_en");
+node->lch()->lch()->intval.append(0x7EC4A057);
 node->lch()->lch()->values.append("im_mode");
 node->lch()->lch()->intval.append(0xE54327C5);
 node->lch()->lch()->values.append("ptp_kp");
@@ -2783,6 +3822,8 @@ node->lch()->lch()->values.append("com_if_bro_bup_ctrl_mcast");
 node->lch()->lch()->intval.append(0xDDFE2DA4);
 node->lch()->lch()->values.append("com_if_bro_bup_data_mcast");
 node->lch()->lch()->intval.append(0x6F0DA7DD);
+node->lch()->lch()->values.append("com_if_bup_internal_mcast");
+node->lch()->lch()->intval.append(0x5BF96276);
 node->lch()->lch()->values.append("com_if_bro_bup_srv_mcast");
 node->lch()->lch()->intval.append(0x6F720C87);
 node->lch()->lch()->values.append("com_if_im_bro_drive_mcast");
@@ -2825,6 +3866,8 @@ node->lch()->lch()->values.append("drv_zero");
 node->lch()->lch()->intval.append(0x74C112A);
 node->lch()->lch()->values.append("ohp_lvl");
 node->lch()->lch()->intval.append(0x12DB50AA);
+node->lch()->lch()->values.append("ohp_hyst");
+node->lch()->lch()->intval.append(0xB67F1E8);
 node->lch()->lch()->values.append("el_zero");
 node->lch()->lch()->intval.append(0xA57FD22E);
 node->lch()->lch()->values.append("pole_pairs");
@@ -2861,6 +3904,10 @@ node->lch()->lch()->values.append("curr_out_rate_lim");
 node->lch()->lch()->intval.append(0x41824DD2);
 node->lch()->lch()->values.append("curr_err_rate_lim");
 node->lch()->lch()->intval.append(0x6EFAD7A0);
+node->lch()->lch()->values.append("load_speed_flt_fc");
+node->lch()->lch()->intval.append(0x47B4E0EE);
+node->lch()->lch()->values.append("rotor_speed_flt_fc");
+node->lch()->lch()->intval.append(0xE4CCE479);
 node->lch()->lch()->values.append("load_speed_kp");
 node->lch()->lch()->intval.append(0x44EE1601);
 node->lch()->lch()->values.append("load_speed_ki");
@@ -2875,10 +3922,38 @@ node->lch()->lch()->values.append("load_speed_err_lim");
 node->lch()->lch()->intval.append(0xDA07EA66);
 node->lch()->lch()->values.append("load_speed_out_lim");
 node->lch()->lch()->intval.append(0x9DDB3C32);
+node->lch()->lch()->values.append("load_speed_int_lim");
+node->lch()->lch()->intval.append(0xB815CE97);
 node->lch()->lch()->values.append("load_speed_out_rate_lim");
 node->lch()->lch()->intval.append(0x4608CFD6);
 node->lch()->lch()->values.append("load_speed_err_rate_lim");
 node->lch()->lch()->intval.append(0x697055A4);
+node->lch()->lch()->values.append("load_ang_rev");
+node->lch()->lch()->intval.append(0x96EC79E6);
+node->lch()->lch()->values.append("load_ang_kp");
+node->lch()->lch()->intval.append(0x380A69BE);
+node->lch()->lch()->values.append("load_ang_ki");
+node->lch()->lch()->intval.append(0x1C9C8B96);
+node->lch()->lch()->values.append("load_ang_kb");
+node->lch()->lch()->intval.append(0x8A30CBEA);
+node->lch()->lch()->values.append("load_ang_kt");
+node->lch()->lch()->intval.append(0xA768C0A5);
+node->lch()->lch()->values.append("load_ang_kf");
+node->lch()->lch()->intval.append(0x155262F1);
+node->lch()->lch()->values.append("load_ang_kd");
+node->lch()->lch()->intval.append(0xDAE373A7);
+node->lch()->lch()->values.append("load_ang_err_lim");
+node->lch()->lch()->intval.append(0x15AB5439);
+node->lch()->lch()->values.append("load_ang_out_lim");
+node->lch()->lch()->intval.append(0x5277826D);
+node->lch()->lch()->values.append("load_ang_out_rate_lim");
+node->lch()->lch()->intval.append(0xC6B60F77);
+node->lch()->lch()->values.append("load_ang_err_rate_lim");
+node->lch()->lch()->intval.append(0xE9CE9505);
+node->lch()->lch()->values.append("load_ang_dz");
+node->lch()->lch()->intval.append(0x665CAA19);
+node->lch()->lch()->values.append("load_ang_dz_en");
+node->lch()->lch()->intval.append(0x69B9B702);
 node->lch()->lch()->values.append("rotor_speed_kp");
 node->lch()->lch()->intval.append(0x53930154);
 node->lch()->lch()->values.append("rotor_speed_ki");
@@ -2893,10 +3968,54 @@ node->lch()->lch()->values.append("rotor_speed_err_lim");
 node->lch()->lch()->intval.append(0xA2564CDF);
 node->lch()->lch()->values.append("rotor_speed_out_lim");
 node->lch()->lch()->intval.append(0xE58A9A8B);
+node->lch()->lch()->values.append("rotor_speed_int_lim");
+node->lch()->lch()->intval.append(0xC044682E);
 node->lch()->lch()->values.append("rotor_speed_out_rate_lim");
 node->lch()->lch()->intval.append(0x86EE36E2);
 node->lch()->lch()->values.append("rotor_speed_err_rate_lim");
 node->lch()->lch()->intval.append(0xA996AC90);
+node->lch()->lch()->values.append("rotor_speed_master_common_kp");
+node->lch()->lch()->intval.append(0xE4BC057D);
+node->lch()->lch()->values.append("rotor_speed_master_common_ki");
+node->lch()->lch()->intval.append(0xC02AE755);
+node->lch()->lch()->values.append("rotor_speed_master_common_kb");
+node->lch()->lch()->intval.append(0x5686A729);
+node->lch()->lch()->values.append("rotor_speed_master_common_kt");
+node->lch()->lch()->intval.append(0x7BDEAC66);
+node->lch()->lch()->values.append("rotor_speed_master_common_kf");
+node->lch()->lch()->intval.append(0xC9E40E32);
+node->lch()->lch()->values.append("rotor_speed_master_common_err_lim");
+node->lch()->lch()->intval.append(0x2073EC66);
+node->lch()->lch()->values.append("rotor_speed_master_common_out_lim");
+node->lch()->lch()->intval.append(0x67AF3A32);
+node->lch()->lch()->values.append("rotor_speed_master_common_int_lim");
+node->lch()->lch()->intval.append(0x4261C897);
+node->lch()->lch()->values.append("rotor_speed_master_common_out_rate_lim");
+node->lch()->lch()->intval.append(0x53169F2D);
+node->lch()->lch()->values.append("rotor_speed_master_common_err_rate_lim");
+node->lch()->lch()->intval.append(0x7C6E055F);
+node->lch()->lch()->values.append("rotor_speed_master_diff_kp");
+node->lch()->lch()->intval.append(0x56EE8F6);
+node->lch()->lch()->values.append("rotor_speed_master_diff_ki");
+node->lch()->lch()->intval.append(0x21F80ADE);
+node->lch()->lch()->values.append("rotor_speed_master_diff_kb");
+node->lch()->lch()->intval.append(0xB7544AA2);
+node->lch()->lch()->values.append("rotor_speed_master_diff_kt");
+node->lch()->lch()->intval.append(0x9A0C41ED);
+node->lch()->lch()->values.append("rotor_speed_master_diff_kf");
+node->lch()->lch()->intval.append(0x2836E3B9);
+node->lch()->lch()->values.append("rotor_speed_master_diff_err_lim");
+node->lch()->lch()->intval.append(0xC995954D);
+node->lch()->lch()->values.append("rotor_speed_master_diff_out_lim");
+node->lch()->lch()->intval.append(0x8E494319);
+node->lch()->lch()->values.append("rotor_speed_master_diff_int_lim");
+node->lch()->lch()->intval.append(0xAB87B1BC);
+node->lch()->lch()->values.append("rotor_speed_master_diff_out_rate_lim");
+node->lch()->lch()->intval.append(0xE37276C4);
+node->lch()->lch()->values.append("rotor_speed_master_diff_err_rate_lim");
+node->lch()->lch()->intval.append(0xCC0AECB6);
+node->lch()->lch()->values.append("rotor_speed_role");
+node->lch()->lch()->intval.append(0xE8701AA);
 node->lch()->lch()->values.append("rotor_ang_kp");
 node->lch()->lch()->intval.append(0xBF7D3892);
 node->lch()->lch()->values.append("rotor_ang_ki");
@@ -2915,6 +4034,10 @@ node->lch()->lch()->values.append("rotor_ang_out_rate_lim");
 node->lch()->lch()->intval.append(0x28CABE88);
 node->lch()->lch()->values.append("rotor_ang_err_rate_lim");
 node->lch()->lch()->intval.append(0x7B224FA);
+node->lch()->lch()->values.append("rotor_ang_dz");
+node->lch()->lch()->intval.append(0x7121BD4C);
+node->lch()->lch()->values.append("rotor_ang_dz_en");
+node->lch()->lch()->intval.append(0x7EC4A057);
 node->lch()->lch()->values.append("im_mode");
 node->lch()->lch()->intval.append(0xE54327C5);
 node->lch()->lch()->values.append("ptp_kp");
@@ -2937,6 +4060,8 @@ node->lch()->lch()->values.append("com_if_bro_bup_ctrl_mcast");
 node->lch()->lch()->intval.append(0xDDFE2DA4);
 node->lch()->lch()->values.append("com_if_bro_bup_data_mcast");
 node->lch()->lch()->intval.append(0x6F0DA7DD);
+node->lch()->lch()->values.append("com_if_bup_internal_mcast");
+node->lch()->lch()->intval.append(0x5BF96276);
 node->lch()->lch()->values.append("com_if_bro_bup_srv_mcast");
 node->lch()->lch()->intval.append(0x6F720C87);
 node->lch()->lch()->values.append("com_if_im_bro_drive_mcast");
@@ -2979,6 +4104,8 @@ node->lch()->lch()->values.append("drv_zero");
 node->lch()->lch()->intval.append(0x74C112A);
 node->lch()->lch()->values.append("ohp_lvl");
 node->lch()->lch()->intval.append(0x12DB50AA);
+node->lch()->lch()->values.append("ohp_hyst");
+node->lch()->lch()->intval.append(0xB67F1E8);
 node->lch()->lch()->values.append("el_zero");
 node->lch()->lch()->intval.append(0xA57FD22E);
 node->lch()->lch()->values.append("pole_pairs");
@@ -3015,6 +4142,10 @@ node->lch()->lch()->values.append("curr_out_rate_lim");
 node->lch()->lch()->intval.append(0x41824DD2);
 node->lch()->lch()->values.append("curr_err_rate_lim");
 node->lch()->lch()->intval.append(0x6EFAD7A0);
+node->lch()->lch()->values.append("load_speed_flt_fc");
+node->lch()->lch()->intval.append(0x47B4E0EE);
+node->lch()->lch()->values.append("rotor_speed_flt_fc");
+node->lch()->lch()->intval.append(0xE4CCE479);
 node->lch()->lch()->values.append("load_speed_kp");
 node->lch()->lch()->intval.append(0x44EE1601);
 node->lch()->lch()->values.append("load_speed_ki");
@@ -3029,10 +4160,38 @@ node->lch()->lch()->values.append("load_speed_err_lim");
 node->lch()->lch()->intval.append(0xDA07EA66);
 node->lch()->lch()->values.append("load_speed_out_lim");
 node->lch()->lch()->intval.append(0x9DDB3C32);
+node->lch()->lch()->values.append("load_speed_int_lim");
+node->lch()->lch()->intval.append(0xB815CE97);
 node->lch()->lch()->values.append("load_speed_out_rate_lim");
 node->lch()->lch()->intval.append(0x4608CFD6);
 node->lch()->lch()->values.append("load_speed_err_rate_lim");
 node->lch()->lch()->intval.append(0x697055A4);
+node->lch()->lch()->values.append("load_ang_rev");
+node->lch()->lch()->intval.append(0x96EC79E6);
+node->lch()->lch()->values.append("load_ang_kp");
+node->lch()->lch()->intval.append(0x380A69BE);
+node->lch()->lch()->values.append("load_ang_ki");
+node->lch()->lch()->intval.append(0x1C9C8B96);
+node->lch()->lch()->values.append("load_ang_kb");
+node->lch()->lch()->intval.append(0x8A30CBEA);
+node->lch()->lch()->values.append("load_ang_kt");
+node->lch()->lch()->intval.append(0xA768C0A5);
+node->lch()->lch()->values.append("load_ang_kf");
+node->lch()->lch()->intval.append(0x155262F1);
+node->lch()->lch()->values.append("load_ang_kd");
+node->lch()->lch()->intval.append(0xDAE373A7);
+node->lch()->lch()->values.append("load_ang_err_lim");
+node->lch()->lch()->intval.append(0x15AB5439);
+node->lch()->lch()->values.append("load_ang_out_lim");
+node->lch()->lch()->intval.append(0x5277826D);
+node->lch()->lch()->values.append("load_ang_out_rate_lim");
+node->lch()->lch()->intval.append(0xC6B60F77);
+node->lch()->lch()->values.append("load_ang_err_rate_lim");
+node->lch()->lch()->intval.append(0xE9CE9505);
+node->lch()->lch()->values.append("load_ang_dz");
+node->lch()->lch()->intval.append(0x665CAA19);
+node->lch()->lch()->values.append("load_ang_dz_en");
+node->lch()->lch()->intval.append(0x69B9B702);
 node->lch()->lch()->values.append("rotor_speed_kp");
 node->lch()->lch()->intval.append(0x53930154);
 node->lch()->lch()->values.append("rotor_speed_ki");
@@ -3047,10 +4206,54 @@ node->lch()->lch()->values.append("rotor_speed_err_lim");
 node->lch()->lch()->intval.append(0xA2564CDF);
 node->lch()->lch()->values.append("rotor_speed_out_lim");
 node->lch()->lch()->intval.append(0xE58A9A8B);
+node->lch()->lch()->values.append("rotor_speed_int_lim");
+node->lch()->lch()->intval.append(0xC044682E);
 node->lch()->lch()->values.append("rotor_speed_out_rate_lim");
 node->lch()->lch()->intval.append(0x86EE36E2);
 node->lch()->lch()->values.append("rotor_speed_err_rate_lim");
 node->lch()->lch()->intval.append(0xA996AC90);
+node->lch()->lch()->values.append("rotor_speed_master_common_kp");
+node->lch()->lch()->intval.append(0xE4BC057D);
+node->lch()->lch()->values.append("rotor_speed_master_common_ki");
+node->lch()->lch()->intval.append(0xC02AE755);
+node->lch()->lch()->values.append("rotor_speed_master_common_kb");
+node->lch()->lch()->intval.append(0x5686A729);
+node->lch()->lch()->values.append("rotor_speed_master_common_kt");
+node->lch()->lch()->intval.append(0x7BDEAC66);
+node->lch()->lch()->values.append("rotor_speed_master_common_kf");
+node->lch()->lch()->intval.append(0xC9E40E32);
+node->lch()->lch()->values.append("rotor_speed_master_common_err_lim");
+node->lch()->lch()->intval.append(0x2073EC66);
+node->lch()->lch()->values.append("rotor_speed_master_common_out_lim");
+node->lch()->lch()->intval.append(0x67AF3A32);
+node->lch()->lch()->values.append("rotor_speed_master_common_int_lim");
+node->lch()->lch()->intval.append(0x4261C897);
+node->lch()->lch()->values.append("rotor_speed_master_common_out_rate_lim");
+node->lch()->lch()->intval.append(0x53169F2D);
+node->lch()->lch()->values.append("rotor_speed_master_common_err_rate_lim");
+node->lch()->lch()->intval.append(0x7C6E055F);
+node->lch()->lch()->values.append("rotor_speed_master_diff_kp");
+node->lch()->lch()->intval.append(0x56EE8F6);
+node->lch()->lch()->values.append("rotor_speed_master_diff_ki");
+node->lch()->lch()->intval.append(0x21F80ADE);
+node->lch()->lch()->values.append("rotor_speed_master_diff_kb");
+node->lch()->lch()->intval.append(0xB7544AA2);
+node->lch()->lch()->values.append("rotor_speed_master_diff_kt");
+node->lch()->lch()->intval.append(0x9A0C41ED);
+node->lch()->lch()->values.append("rotor_speed_master_diff_kf");
+node->lch()->lch()->intval.append(0x2836E3B9);
+node->lch()->lch()->values.append("rotor_speed_master_diff_err_lim");
+node->lch()->lch()->intval.append(0xC995954D);
+node->lch()->lch()->values.append("rotor_speed_master_diff_out_lim");
+node->lch()->lch()->intval.append(0x8E494319);
+node->lch()->lch()->values.append("rotor_speed_master_diff_int_lim");
+node->lch()->lch()->intval.append(0xAB87B1BC);
+node->lch()->lch()->values.append("rotor_speed_master_diff_out_rate_lim");
+node->lch()->lch()->intval.append(0xE37276C4);
+node->lch()->lch()->values.append("rotor_speed_master_diff_err_rate_lim");
+node->lch()->lch()->intval.append(0xCC0AECB6);
+node->lch()->lch()->values.append("rotor_speed_role");
+node->lch()->lch()->intval.append(0xE8701AA);
 node->lch()->lch()->values.append("rotor_ang_kp");
 node->lch()->lch()->intval.append(0xBF7D3892);
 node->lch()->lch()->values.append("rotor_ang_ki");
@@ -3069,6 +4272,10 @@ node->lch()->lch()->values.append("rotor_ang_out_rate_lim");
 node->lch()->lch()->intval.append(0x28CABE88);
 node->lch()->lch()->values.append("rotor_ang_err_rate_lim");
 node->lch()->lch()->intval.append(0x7B224FA);
+node->lch()->lch()->values.append("rotor_ang_dz");
+node->lch()->lch()->intval.append(0x7121BD4C);
+node->lch()->lch()->values.append("rotor_ang_dz_en");
+node->lch()->lch()->intval.append(0x7EC4A057);
 node->lch()->lch()->values.append("im_mode");
 node->lch()->lch()->intval.append(0xE54327C5);
 node->lch()->lch()->values.append("ptp_kp");
@@ -3091,6 +4298,8 @@ node->lch()->lch()->values.append("com_if_bro_bup_ctrl_mcast");
 node->lch()->lch()->intval.append(0xDDFE2DA4);
 node->lch()->lch()->values.append("com_if_bro_bup_data_mcast");
 node->lch()->lch()->intval.append(0x6F0DA7DD);
+node->lch()->lch()->values.append("com_if_bup_internal_mcast");
+node->lch()->lch()->intval.append(0x5BF96276);
 node->lch()->lch()->values.append("com_if_bro_bup_srv_mcast");
 node->lch()->lch()->intval.append(0x6F720C87);
 node->lch()->lch()->values.append("com_if_im_bro_drive_mcast");
@@ -3133,6 +4342,8 @@ node->lch()->lch()->values.append("drv_zero");
 node->lch()->lch()->intval.append(0x74C112A);
 node->lch()->lch()->values.append("ohp_lvl");
 node->lch()->lch()->intval.append(0x12DB50AA);
+node->lch()->lch()->values.append("ohp_hyst");
+node->lch()->lch()->intval.append(0xB67F1E8);
 node->lch()->lch()->values.append("el_zero");
 node->lch()->lch()->intval.append(0xA57FD22E);
 node->lch()->lch()->values.append("pole_pairs");
@@ -3169,6 +4380,10 @@ node->lch()->lch()->values.append("curr_out_rate_lim");
 node->lch()->lch()->intval.append(0x41824DD2);
 node->lch()->lch()->values.append("curr_err_rate_lim");
 node->lch()->lch()->intval.append(0x6EFAD7A0);
+node->lch()->lch()->values.append("load_speed_flt_fc");
+node->lch()->lch()->intval.append(0x47B4E0EE);
+node->lch()->lch()->values.append("rotor_speed_flt_fc");
+node->lch()->lch()->intval.append(0xE4CCE479);
 node->lch()->lch()->values.append("load_speed_kp");
 node->lch()->lch()->intval.append(0x44EE1601);
 node->lch()->lch()->values.append("load_speed_ki");
@@ -3183,10 +4398,38 @@ node->lch()->lch()->values.append("load_speed_err_lim");
 node->lch()->lch()->intval.append(0xDA07EA66);
 node->lch()->lch()->values.append("load_speed_out_lim");
 node->lch()->lch()->intval.append(0x9DDB3C32);
+node->lch()->lch()->values.append("load_speed_int_lim");
+node->lch()->lch()->intval.append(0xB815CE97);
 node->lch()->lch()->values.append("load_speed_out_rate_lim");
 node->lch()->lch()->intval.append(0x4608CFD6);
 node->lch()->lch()->values.append("load_speed_err_rate_lim");
 node->lch()->lch()->intval.append(0x697055A4);
+node->lch()->lch()->values.append("load_ang_rev");
+node->lch()->lch()->intval.append(0x96EC79E6);
+node->lch()->lch()->values.append("load_ang_kp");
+node->lch()->lch()->intval.append(0x380A69BE);
+node->lch()->lch()->values.append("load_ang_ki");
+node->lch()->lch()->intval.append(0x1C9C8B96);
+node->lch()->lch()->values.append("load_ang_kb");
+node->lch()->lch()->intval.append(0x8A30CBEA);
+node->lch()->lch()->values.append("load_ang_kt");
+node->lch()->lch()->intval.append(0xA768C0A5);
+node->lch()->lch()->values.append("load_ang_kf");
+node->lch()->lch()->intval.append(0x155262F1);
+node->lch()->lch()->values.append("load_ang_kd");
+node->lch()->lch()->intval.append(0xDAE373A7);
+node->lch()->lch()->values.append("load_ang_err_lim");
+node->lch()->lch()->intval.append(0x15AB5439);
+node->lch()->lch()->values.append("load_ang_out_lim");
+node->lch()->lch()->intval.append(0x5277826D);
+node->lch()->lch()->values.append("load_ang_out_rate_lim");
+node->lch()->lch()->intval.append(0xC6B60F77);
+node->lch()->lch()->values.append("load_ang_err_rate_lim");
+node->lch()->lch()->intval.append(0xE9CE9505);
+node->lch()->lch()->values.append("load_ang_dz");
+node->lch()->lch()->intval.append(0x665CAA19);
+node->lch()->lch()->values.append("load_ang_dz_en");
+node->lch()->lch()->intval.append(0x69B9B702);
 node->lch()->lch()->values.append("rotor_speed_kp");
 node->lch()->lch()->intval.append(0x53930154);
 node->lch()->lch()->values.append("rotor_speed_ki");
@@ -3201,10 +4444,54 @@ node->lch()->lch()->values.append("rotor_speed_err_lim");
 node->lch()->lch()->intval.append(0xA2564CDF);
 node->lch()->lch()->values.append("rotor_speed_out_lim");
 node->lch()->lch()->intval.append(0xE58A9A8B);
+node->lch()->lch()->values.append("rotor_speed_int_lim");
+node->lch()->lch()->intval.append(0xC044682E);
 node->lch()->lch()->values.append("rotor_speed_out_rate_lim");
 node->lch()->lch()->intval.append(0x86EE36E2);
 node->lch()->lch()->values.append("rotor_speed_err_rate_lim");
 node->lch()->lch()->intval.append(0xA996AC90);
+node->lch()->lch()->values.append("rotor_speed_master_common_kp");
+node->lch()->lch()->intval.append(0xE4BC057D);
+node->lch()->lch()->values.append("rotor_speed_master_common_ki");
+node->lch()->lch()->intval.append(0xC02AE755);
+node->lch()->lch()->values.append("rotor_speed_master_common_kb");
+node->lch()->lch()->intval.append(0x5686A729);
+node->lch()->lch()->values.append("rotor_speed_master_common_kt");
+node->lch()->lch()->intval.append(0x7BDEAC66);
+node->lch()->lch()->values.append("rotor_speed_master_common_kf");
+node->lch()->lch()->intval.append(0xC9E40E32);
+node->lch()->lch()->values.append("rotor_speed_master_common_err_lim");
+node->lch()->lch()->intval.append(0x2073EC66);
+node->lch()->lch()->values.append("rotor_speed_master_common_out_lim");
+node->lch()->lch()->intval.append(0x67AF3A32);
+node->lch()->lch()->values.append("rotor_speed_master_common_int_lim");
+node->lch()->lch()->intval.append(0x4261C897);
+node->lch()->lch()->values.append("rotor_speed_master_common_out_rate_lim");
+node->lch()->lch()->intval.append(0x53169F2D);
+node->lch()->lch()->values.append("rotor_speed_master_common_err_rate_lim");
+node->lch()->lch()->intval.append(0x7C6E055F);
+node->lch()->lch()->values.append("rotor_speed_master_diff_kp");
+node->lch()->lch()->intval.append(0x56EE8F6);
+node->lch()->lch()->values.append("rotor_speed_master_diff_ki");
+node->lch()->lch()->intval.append(0x21F80ADE);
+node->lch()->lch()->values.append("rotor_speed_master_diff_kb");
+node->lch()->lch()->intval.append(0xB7544AA2);
+node->lch()->lch()->values.append("rotor_speed_master_diff_kt");
+node->lch()->lch()->intval.append(0x9A0C41ED);
+node->lch()->lch()->values.append("rotor_speed_master_diff_kf");
+node->lch()->lch()->intval.append(0x2836E3B9);
+node->lch()->lch()->values.append("rotor_speed_master_diff_err_lim");
+node->lch()->lch()->intval.append(0xC995954D);
+node->lch()->lch()->values.append("rotor_speed_master_diff_out_lim");
+node->lch()->lch()->intval.append(0x8E494319);
+node->lch()->lch()->values.append("rotor_speed_master_diff_int_lim");
+node->lch()->lch()->intval.append(0xAB87B1BC);
+node->lch()->lch()->values.append("rotor_speed_master_diff_out_rate_lim");
+node->lch()->lch()->intval.append(0xE37276C4);
+node->lch()->lch()->values.append("rotor_speed_master_diff_err_rate_lim");
+node->lch()->lch()->intval.append(0xCC0AECB6);
+node->lch()->lch()->values.append("rotor_speed_role");
+node->lch()->lch()->intval.append(0xE8701AA);
 node->lch()->lch()->values.append("rotor_ang_kp");
 node->lch()->lch()->intval.append(0xBF7D3892);
 node->lch()->lch()->values.append("rotor_ang_ki");
@@ -3223,6 +4510,10 @@ node->lch()->lch()->values.append("rotor_ang_out_rate_lim");
 node->lch()->lch()->intval.append(0x28CABE88);
 node->lch()->lch()->values.append("rotor_ang_err_rate_lim");
 node->lch()->lch()->intval.append(0x7B224FA);
+node->lch()->lch()->values.append("rotor_ang_dz");
+node->lch()->lch()->intval.append(0x7121BD4C);
+node->lch()->lch()->values.append("rotor_ang_dz_en");
+node->lch()->lch()->intval.append(0x7EC4A057);
 node->lch()->lch()->values.append("im_mode");
 node->lch()->lch()->intval.append(0xE54327C5);
 node->lch()->lch()->values.append("ptp_kp");
@@ -3245,6 +4536,8 @@ node->lch()->lch()->values.append("com_if_bro_bup_ctrl_mcast");
 node->lch()->lch()->intval.append(0xDDFE2DA4);
 node->lch()->lch()->values.append("com_if_bro_bup_data_mcast");
 node->lch()->lch()->intval.append(0x6F0DA7DD);
+node->lch()->lch()->values.append("com_if_bup_internal_mcast");
+node->lch()->lch()->intval.append(0x5BF96276);
 node->lch()->lch()->values.append("com_if_bro_bup_srv_mcast");
 node->lch()->lch()->intval.append(0x6F720C87);
 node->lch()->lch()->values.append("com_if_im_bro_drive_mcast");
@@ -3287,6 +4580,8 @@ node->lch()->lch()->values.append("drv_zero");
 node->lch()->lch()->intval.append(0x74C112A);
 node->lch()->lch()->values.append("ohp_lvl");
 node->lch()->lch()->intval.append(0x12DB50AA);
+node->lch()->lch()->values.append("ohp_hyst");
+node->lch()->lch()->intval.append(0xB67F1E8);
 node->lch()->lch()->values.append("el_zero");
 node->lch()->lch()->intval.append(0xA57FD22E);
 node->lch()->lch()->values.append("pole_pairs");
@@ -3323,6 +4618,10 @@ node->lch()->lch()->values.append("curr_out_rate_lim");
 node->lch()->lch()->intval.append(0x41824DD2);
 node->lch()->lch()->values.append("curr_err_rate_lim");
 node->lch()->lch()->intval.append(0x6EFAD7A0);
+node->lch()->lch()->values.append("load_speed_flt_fc");
+node->lch()->lch()->intval.append(0x47B4E0EE);
+node->lch()->lch()->values.append("rotor_speed_flt_fc");
+node->lch()->lch()->intval.append(0xE4CCE479);
 node->lch()->lch()->values.append("load_speed_kp");
 node->lch()->lch()->intval.append(0x44EE1601);
 node->lch()->lch()->values.append("load_speed_ki");
@@ -3337,10 +4636,38 @@ node->lch()->lch()->values.append("load_speed_err_lim");
 node->lch()->lch()->intval.append(0xDA07EA66);
 node->lch()->lch()->values.append("load_speed_out_lim");
 node->lch()->lch()->intval.append(0x9DDB3C32);
+node->lch()->lch()->values.append("load_speed_int_lim");
+node->lch()->lch()->intval.append(0xB815CE97);
 node->lch()->lch()->values.append("load_speed_out_rate_lim");
 node->lch()->lch()->intval.append(0x4608CFD6);
 node->lch()->lch()->values.append("load_speed_err_rate_lim");
 node->lch()->lch()->intval.append(0x697055A4);
+node->lch()->lch()->values.append("load_ang_rev");
+node->lch()->lch()->intval.append(0x96EC79E6);
+node->lch()->lch()->values.append("load_ang_kp");
+node->lch()->lch()->intval.append(0x380A69BE);
+node->lch()->lch()->values.append("load_ang_ki");
+node->lch()->lch()->intval.append(0x1C9C8B96);
+node->lch()->lch()->values.append("load_ang_kb");
+node->lch()->lch()->intval.append(0x8A30CBEA);
+node->lch()->lch()->values.append("load_ang_kt");
+node->lch()->lch()->intval.append(0xA768C0A5);
+node->lch()->lch()->values.append("load_ang_kf");
+node->lch()->lch()->intval.append(0x155262F1);
+node->lch()->lch()->values.append("load_ang_kd");
+node->lch()->lch()->intval.append(0xDAE373A7);
+node->lch()->lch()->values.append("load_ang_err_lim");
+node->lch()->lch()->intval.append(0x15AB5439);
+node->lch()->lch()->values.append("load_ang_out_lim");
+node->lch()->lch()->intval.append(0x5277826D);
+node->lch()->lch()->values.append("load_ang_out_rate_lim");
+node->lch()->lch()->intval.append(0xC6B60F77);
+node->lch()->lch()->values.append("load_ang_err_rate_lim");
+node->lch()->lch()->intval.append(0xE9CE9505);
+node->lch()->lch()->values.append("load_ang_dz");
+node->lch()->lch()->intval.append(0x665CAA19);
+node->lch()->lch()->values.append("load_ang_dz_en");
+node->lch()->lch()->intval.append(0x69B9B702);
 node->lch()->lch()->values.append("rotor_speed_kp");
 node->lch()->lch()->intval.append(0x53930154);
 node->lch()->lch()->values.append("rotor_speed_ki");
@@ -3355,10 +4682,54 @@ node->lch()->lch()->values.append("rotor_speed_err_lim");
 node->lch()->lch()->intval.append(0xA2564CDF);
 node->lch()->lch()->values.append("rotor_speed_out_lim");
 node->lch()->lch()->intval.append(0xE58A9A8B);
+node->lch()->lch()->values.append("rotor_speed_int_lim");
+node->lch()->lch()->intval.append(0xC044682E);
 node->lch()->lch()->values.append("rotor_speed_out_rate_lim");
 node->lch()->lch()->intval.append(0x86EE36E2);
 node->lch()->lch()->values.append("rotor_speed_err_rate_lim");
 node->lch()->lch()->intval.append(0xA996AC90);
+node->lch()->lch()->values.append("rotor_speed_master_common_kp");
+node->lch()->lch()->intval.append(0xE4BC057D);
+node->lch()->lch()->values.append("rotor_speed_master_common_ki");
+node->lch()->lch()->intval.append(0xC02AE755);
+node->lch()->lch()->values.append("rotor_speed_master_common_kb");
+node->lch()->lch()->intval.append(0x5686A729);
+node->lch()->lch()->values.append("rotor_speed_master_common_kt");
+node->lch()->lch()->intval.append(0x7BDEAC66);
+node->lch()->lch()->values.append("rotor_speed_master_common_kf");
+node->lch()->lch()->intval.append(0xC9E40E32);
+node->lch()->lch()->values.append("rotor_speed_master_common_err_lim");
+node->lch()->lch()->intval.append(0x2073EC66);
+node->lch()->lch()->values.append("rotor_speed_master_common_out_lim");
+node->lch()->lch()->intval.append(0x67AF3A32);
+node->lch()->lch()->values.append("rotor_speed_master_common_int_lim");
+node->lch()->lch()->intval.append(0x4261C897);
+node->lch()->lch()->values.append("rotor_speed_master_common_out_rate_lim");
+node->lch()->lch()->intval.append(0x53169F2D);
+node->lch()->lch()->values.append("rotor_speed_master_common_err_rate_lim");
+node->lch()->lch()->intval.append(0x7C6E055F);
+node->lch()->lch()->values.append("rotor_speed_master_diff_kp");
+node->lch()->lch()->intval.append(0x56EE8F6);
+node->lch()->lch()->values.append("rotor_speed_master_diff_ki");
+node->lch()->lch()->intval.append(0x21F80ADE);
+node->lch()->lch()->values.append("rotor_speed_master_diff_kb");
+node->lch()->lch()->intval.append(0xB7544AA2);
+node->lch()->lch()->values.append("rotor_speed_master_diff_kt");
+node->lch()->lch()->intval.append(0x9A0C41ED);
+node->lch()->lch()->values.append("rotor_speed_master_diff_kf");
+node->lch()->lch()->intval.append(0x2836E3B9);
+node->lch()->lch()->values.append("rotor_speed_master_diff_err_lim");
+node->lch()->lch()->intval.append(0xC995954D);
+node->lch()->lch()->values.append("rotor_speed_master_diff_out_lim");
+node->lch()->lch()->intval.append(0x8E494319);
+node->lch()->lch()->values.append("rotor_speed_master_diff_int_lim");
+node->lch()->lch()->intval.append(0xAB87B1BC);
+node->lch()->lch()->values.append("rotor_speed_master_diff_out_rate_lim");
+node->lch()->lch()->intval.append(0xE37276C4);
+node->lch()->lch()->values.append("rotor_speed_master_diff_err_rate_lim");
+node->lch()->lch()->intval.append(0xCC0AECB6);
+node->lch()->lch()->values.append("rotor_speed_role");
+node->lch()->lch()->intval.append(0xE8701AA);
 node->lch()->lch()->values.append("rotor_ang_kp");
 node->lch()->lch()->intval.append(0xBF7D3892);
 node->lch()->lch()->values.append("rotor_ang_ki");
@@ -3377,6 +4748,10 @@ node->lch()->lch()->values.append("rotor_ang_out_rate_lim");
 node->lch()->lch()->intval.append(0x28CABE88);
 node->lch()->lch()->values.append("rotor_ang_err_rate_lim");
 node->lch()->lch()->intval.append(0x7B224FA);
+node->lch()->lch()->values.append("rotor_ang_dz");
+node->lch()->lch()->intval.append(0x7121BD4C);
+node->lch()->lch()->values.append("rotor_ang_dz_en");
+node->lch()->lch()->intval.append(0x7EC4A057);
 node->lch()->lch()->values.append("im_mode");
 node->lch()->lch()->intval.append(0xE54327C5);
 node->lch()->lch()->values.append("ptp_kp");
@@ -3399,6 +4774,8 @@ node->lch()->lch()->values.append("com_if_bro_bup_ctrl_mcast");
 node->lch()->lch()->intval.append(0xDDFE2DA4);
 node->lch()->lch()->values.append("com_if_bro_bup_data_mcast");
 node->lch()->lch()->intval.append(0x6F0DA7DD);
+node->lch()->lch()->values.append("com_if_bup_internal_mcast");
+node->lch()->lch()->intval.append(0x5BF96276);
 node->lch()->lch()->values.append("com_if_bro_bup_srv_mcast");
 node->lch()->lch()->intval.append(0x6F720C87);
 node->lch()->lch()->values.append("com_if_im_bro_drive_mcast");
@@ -3441,6 +4818,8 @@ node->lch()->lch()->values.append("drv_zero");
 node->lch()->lch()->intval.append(0x74C112A);
 node->lch()->lch()->values.append("ohp_lvl");
 node->lch()->lch()->intval.append(0x12DB50AA);
+node->lch()->lch()->values.append("ohp_hyst");
+node->lch()->lch()->intval.append(0xB67F1E8);
 node->lch()->lch()->values.append("el_zero");
 node->lch()->lch()->intval.append(0xA57FD22E);
 node->lch()->lch()->values.append("pole_pairs");
@@ -3477,6 +4856,10 @@ node->lch()->lch()->values.append("curr_out_rate_lim");
 node->lch()->lch()->intval.append(0x41824DD2);
 node->lch()->lch()->values.append("curr_err_rate_lim");
 node->lch()->lch()->intval.append(0x6EFAD7A0);
+node->lch()->lch()->values.append("load_speed_flt_fc");
+node->lch()->lch()->intval.append(0x47B4E0EE);
+node->lch()->lch()->values.append("rotor_speed_flt_fc");
+node->lch()->lch()->intval.append(0xE4CCE479);
 node->lch()->lch()->values.append("load_speed_kp");
 node->lch()->lch()->intval.append(0x44EE1601);
 node->lch()->lch()->values.append("load_speed_ki");
@@ -3491,10 +4874,38 @@ node->lch()->lch()->values.append("load_speed_err_lim");
 node->lch()->lch()->intval.append(0xDA07EA66);
 node->lch()->lch()->values.append("load_speed_out_lim");
 node->lch()->lch()->intval.append(0x9DDB3C32);
+node->lch()->lch()->values.append("load_speed_int_lim");
+node->lch()->lch()->intval.append(0xB815CE97);
 node->lch()->lch()->values.append("load_speed_out_rate_lim");
 node->lch()->lch()->intval.append(0x4608CFD6);
 node->lch()->lch()->values.append("load_speed_err_rate_lim");
 node->lch()->lch()->intval.append(0x697055A4);
+node->lch()->lch()->values.append("load_ang_rev");
+node->lch()->lch()->intval.append(0x96EC79E6);
+node->lch()->lch()->values.append("load_ang_kp");
+node->lch()->lch()->intval.append(0x380A69BE);
+node->lch()->lch()->values.append("load_ang_ki");
+node->lch()->lch()->intval.append(0x1C9C8B96);
+node->lch()->lch()->values.append("load_ang_kb");
+node->lch()->lch()->intval.append(0x8A30CBEA);
+node->lch()->lch()->values.append("load_ang_kt");
+node->lch()->lch()->intval.append(0xA768C0A5);
+node->lch()->lch()->values.append("load_ang_kf");
+node->lch()->lch()->intval.append(0x155262F1);
+node->lch()->lch()->values.append("load_ang_kd");
+node->lch()->lch()->intval.append(0xDAE373A7);
+node->lch()->lch()->values.append("load_ang_err_lim");
+node->lch()->lch()->intval.append(0x15AB5439);
+node->lch()->lch()->values.append("load_ang_out_lim");
+node->lch()->lch()->intval.append(0x5277826D);
+node->lch()->lch()->values.append("load_ang_out_rate_lim");
+node->lch()->lch()->intval.append(0xC6B60F77);
+node->lch()->lch()->values.append("load_ang_err_rate_lim");
+node->lch()->lch()->intval.append(0xE9CE9505);
+node->lch()->lch()->values.append("load_ang_dz");
+node->lch()->lch()->intval.append(0x665CAA19);
+node->lch()->lch()->values.append("load_ang_dz_en");
+node->lch()->lch()->intval.append(0x69B9B702);
 node->lch()->lch()->values.append("rotor_speed_kp");
 node->lch()->lch()->intval.append(0x53930154);
 node->lch()->lch()->values.append("rotor_speed_ki");
@@ -3509,10 +4920,54 @@ node->lch()->lch()->values.append("rotor_speed_err_lim");
 node->lch()->lch()->intval.append(0xA2564CDF);
 node->lch()->lch()->values.append("rotor_speed_out_lim");
 node->lch()->lch()->intval.append(0xE58A9A8B);
+node->lch()->lch()->values.append("rotor_speed_int_lim");
+node->lch()->lch()->intval.append(0xC044682E);
 node->lch()->lch()->values.append("rotor_speed_out_rate_lim");
 node->lch()->lch()->intval.append(0x86EE36E2);
 node->lch()->lch()->values.append("rotor_speed_err_rate_lim");
 node->lch()->lch()->intval.append(0xA996AC90);
+node->lch()->lch()->values.append("rotor_speed_master_common_kp");
+node->lch()->lch()->intval.append(0xE4BC057D);
+node->lch()->lch()->values.append("rotor_speed_master_common_ki");
+node->lch()->lch()->intval.append(0xC02AE755);
+node->lch()->lch()->values.append("rotor_speed_master_common_kb");
+node->lch()->lch()->intval.append(0x5686A729);
+node->lch()->lch()->values.append("rotor_speed_master_common_kt");
+node->lch()->lch()->intval.append(0x7BDEAC66);
+node->lch()->lch()->values.append("rotor_speed_master_common_kf");
+node->lch()->lch()->intval.append(0xC9E40E32);
+node->lch()->lch()->values.append("rotor_speed_master_common_err_lim");
+node->lch()->lch()->intval.append(0x2073EC66);
+node->lch()->lch()->values.append("rotor_speed_master_common_out_lim");
+node->lch()->lch()->intval.append(0x67AF3A32);
+node->lch()->lch()->values.append("rotor_speed_master_common_int_lim");
+node->lch()->lch()->intval.append(0x4261C897);
+node->lch()->lch()->values.append("rotor_speed_master_common_out_rate_lim");
+node->lch()->lch()->intval.append(0x53169F2D);
+node->lch()->lch()->values.append("rotor_speed_master_common_err_rate_lim");
+node->lch()->lch()->intval.append(0x7C6E055F);
+node->lch()->lch()->values.append("rotor_speed_master_diff_kp");
+node->lch()->lch()->intval.append(0x56EE8F6);
+node->lch()->lch()->values.append("rotor_speed_master_diff_ki");
+node->lch()->lch()->intval.append(0x21F80ADE);
+node->lch()->lch()->values.append("rotor_speed_master_diff_kb");
+node->lch()->lch()->intval.append(0xB7544AA2);
+node->lch()->lch()->values.append("rotor_speed_master_diff_kt");
+node->lch()->lch()->intval.append(0x9A0C41ED);
+node->lch()->lch()->values.append("rotor_speed_master_diff_kf");
+node->lch()->lch()->intval.append(0x2836E3B9);
+node->lch()->lch()->values.append("rotor_speed_master_diff_err_lim");
+node->lch()->lch()->intval.append(0xC995954D);
+node->lch()->lch()->values.append("rotor_speed_master_diff_out_lim");
+node->lch()->lch()->intval.append(0x8E494319);
+node->lch()->lch()->values.append("rotor_speed_master_diff_int_lim");
+node->lch()->lch()->intval.append(0xAB87B1BC);
+node->lch()->lch()->values.append("rotor_speed_master_diff_out_rate_lim");
+node->lch()->lch()->intval.append(0xE37276C4);
+node->lch()->lch()->values.append("rotor_speed_master_diff_err_rate_lim");
+node->lch()->lch()->intval.append(0xCC0AECB6);
+node->lch()->lch()->values.append("rotor_speed_role");
+node->lch()->lch()->intval.append(0xE8701AA);
 node->lch()->lch()->values.append("rotor_ang_kp");
 node->lch()->lch()->intval.append(0xBF7D3892);
 node->lch()->lch()->values.append("rotor_ang_ki");
@@ -3531,6 +4986,10 @@ node->lch()->lch()->values.append("rotor_ang_out_rate_lim");
 node->lch()->lch()->intval.append(0x28CABE88);
 node->lch()->lch()->values.append("rotor_ang_err_rate_lim");
 node->lch()->lch()->intval.append(0x7B224FA);
+node->lch()->lch()->values.append("rotor_ang_dz");
+node->lch()->lch()->intval.append(0x7121BD4C);
+node->lch()->lch()->values.append("rotor_ang_dz_en");
+node->lch()->lch()->intval.append(0x7EC4A057);
 node->lch()->lch()->values.append("im_mode");
 node->lch()->lch()->intval.append(0xE54327C5);
 node->lch()->lch()->values.append("ptp_kp");
@@ -3553,6 +5012,8 @@ node->lch()->lch()->values.append("com_if_bro_bup_ctrl_mcast");
 node->lch()->lch()->intval.append(0xDDFE2DA4);
 node->lch()->lch()->values.append("com_if_bro_bup_data_mcast");
 node->lch()->lch()->intval.append(0x6F0DA7DD);
+node->lch()->lch()->values.append("com_if_bup_internal_mcast");
+node->lch()->lch()->intval.append(0x5BF96276);
 node->lch()->lch()->values.append("com_if_bro_bup_srv_mcast");
 node->lch()->lch()->intval.append(0x6F720C87);
 node->lch()->lch()->values.append("com_if_im_bro_drive_mcast");

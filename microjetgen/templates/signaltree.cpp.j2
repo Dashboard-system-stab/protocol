@@ -1,0 +1,236 @@
+{%set dev_name_low = mj.toLower(dev_name)%}
+
+#include "signaltree.h"
+
+{%set msgs = sorted(spec[in])%}
+{%set dev_src = sorted(mj.inputDev(dev_name))%}
+{%for d in dev_src%}
+{%set in_dev_m = sorted(mj.inputMsg(dev_name,d))%}
+{%for dm in in_dev_m%}
+static TreeNode *{{d}}_{{dm}}_ptr = 0;
+{% endfor %}
+{% endfor %}
+
+{%set outMsg = sorted(spec['out'])%}
+{%for om in outMsg%}
+static TreeNode *{{om}}_ptr = 0;
+{% endfor %}
+{%set prms = mj.parameters()%}
+
+static QStringList devList()
+{
+    QStringList devs;
+{%for dev in mj.devs%}
+	devs.append("{{dev}}");
+{%endfor%}
+    devs.append("ALL");
+    devs.append("NONE");
+    return devs;
+}
+
+static QVector<int32_t> devIDs()
+{
+    QVector<int32_t> ids;
+{%for dev in mj.devs%}
+	ids.append({{mj.devHash(dev)}});
+{%endfor%}
+    ids.append(0xFFFF);
+    ids.append(0);
+    return ids;
+}
+
+// Convert QString to CP866-encoded char array (QByteArray for simplicity and safety)
+static QByteArray qStringToCP866(const QString& input) {
+    QTextCodec* codec = QTextCodec::codecForName("IBM866");
+    if (!codec) {
+        throw std::runtime_error("Failed to find CP866 codec");
+    }
+    QByteArray result = codec->fromUnicode(input);
+    result.append('\0');
+    return result;
+}
+
+// Convert CP866-encoded char array to QString
+static QString cp866ToQString(const char* input, size_t size) {
+    QTextCodec* codec = QTextCodec::codecForName("IBM866");
+    if (!codec) {
+        throw std::runtime_error("Failed to find CP866 codec");
+    }
+    return codec->toUnicode(input, strnlen(input, size-1));
+}
+
+static QVariant prm2QVariant(uint32_t id, uint8_t* val, size_t size)
+{
+    switch(id){
+{%for p in prms%}
+        case {{prms[p]['id']}}:
+{%if 'string' in prms[p]['type']%}
+            val[size-1] = 0;
+            return QVariant(cp866ToQString((char *)val,size));
+{%else%}
+            return QVariant(*({{prms[p]['type']}}*)val);
+{%endif%} 
+{%endfor%}
+        default:
+            return QVariant();
+    }
+}
+
+static void QVariant2prm(uint32_t id, uint8_t* val, size_t size, QVariant data)
+{
+{%for p in prms%}
+    if (id == {{prms[p]['id']}})
+    {
+{%if 'string' in prms[p]['type']%}
+        QByteArray byte_str = qStringToCP866(data.toString());
+        memcpy(val,(void *)(byte_str.data()), (size_t)(byte_str.size()) > size ? size : byte_str.size());
+{%else%}
+        {{prms[p]['type']}} val_ = data.value<{{prms[p]['type']}}>();
+        memcpy(val,&(val_),sizeof({{prms[p]['type']}}));
+{%endif%} 
+    } else 
+{%endfor%}
+    {
+        
+    }
+}
+
+
+TreeNode * create_{{dev_name_low}}_in_tree(mj_{{mj.toLower(dev_name)}}_t * mj_ptr)
+{
+static mj_{{mj.toLower(dev_name)}}_t *mj = mj_ptr;
+TreeNode * node = new TreeNode("INPUT",[](){return QVariant();});
+node->devIDs = devIDs;
+node->devList = devList;
+{%for d in dev_src%}
+{%set d_low =  mj.toLower(d)%}
+{%set in_dev_m = sorted(mj.inputMsg(dev_name,d))%}
+TreeNode * {{d}}_node = node->add("{{d}}",[](){return QVariant();});
+{{d}}_node->isDev = true;
+{%for dm in in_dev_m%}
+{% if ('role' in mj.spec['msg'][dm]) and ('heartbit' in mj.spec['msg'][dm]['role'])%}
+{{d}}_node->devState = []()->dev_status_t{
+    if (mj->in.{{d_low}}.{{mj.toLower(dm)}}.state == MJ_MSG_ACTUAL)
+    {
+        return DEV_STATE_OK;
+    }else{
+        return DEV_STATE_UNKNOW;
+    }
+    };
+{%else%}
+{%endif%}
+{%set fields = mj.struct2Dic(mj.msg[dm]['type'],'mj->in.' + d_low +'.'+dm+'.msg')%}
+{%set dev_up = mj.toUpper(d)%}
+{{d}}_{{dm}}_ptr = node->lch()->add("{{dm}}",[](){return QVariant(mj->in.{{d_low}}.{{dm}}.msg->hdr.cnt);});
+{{d}}_{{dm}}_ptr->state = []()->int32_t{return mj->in.{{d_low}}.{{dm}}.state;};
+{{d}}_{{dm}}_ptr->msgId = ID_{{mj.toUpper(dm)}};
+{{d}}_{{dm}}_ptr->add("time",[](){return QVariant(static_cast<double>(mj->in.{{d_low}}.{{dm}}.msg->hdr.ts_s)+static_cast<double>(mj->in.{{d_low}}.{{dm}}.msg->hdr.ts_ns)/1e9);});
+
+{% if mj.msg[dm]['period'] == 0%}
+{%set is_prm_ans = 0%}
+{% if dm == 'prm_ans'%}
+{%set is_prm_ans = 1%}
+{%endif%}
+{{d}}_{{dm}}_ptr->isReq = true;
+{{d}}_{{dm}}_ptr->srcId = {{mj.spec_name_up}}_{{dev_up}};
+{%endif%}
+{% for f,value in fields.items() recursive %}
+{% if not '__' in f%}
+{% if len(value) > 6%}
+node->lch(){%for n in range(loop.depth)%}->lch(){%endfor%}->add("{{f}}",[](){return QVariant();});
+{{loop(value.items())}}{%else%}
+{%if value['__convfcn__'] == ''%}
+node->lch(){%for n in range(loop.depth)%}->lch(){%endfor%}->add("{{f}}",[](){return QVariant({{value['__path__']}});});
+{%else%}
+node->lch(){%for n in range(loop.depth)%}->lch(){%endfor%}->add("{{f}}",[](){return QVariant({{value['__path__']}});},[](){return ({{value['__convfcn__']}});});
+{%endif%}
+{%if is_prm_ans == 1%}
+{# node->lch(){%for n in range(loop.depth)%}->lch(){%endfor%}->add("{{f}}",[](){return QVariant({{value['__path__']}});}); #}
+{%endif%}
+{%endif%}
+{%endif%}
+{% endfor %}
+mj->in.{{d_low}}.{{dm}}.upd_cb = [](){ {{d}}_{{dm}}_ptr->upd(mj->in.{{d_low}}.{{dm}}.ts_s, mj->in.{{d_low}}.{{dm}}.ts_ns);};
+{% endfor %}
+{% endfor %}
+return node;
+};
+
+
+TreeNode * create_{{dev_name_low}}_out_tree(mj_{{mj.toLower(dev_name)}}_t * mj_ptr)
+{
+static mj_{{mj.toLower(dev_name)}}_t * mj = mj_ptr;
+TreeNode * node = new TreeNode("OUTPUT",[](){return QVariant();});
+node->devIDs = devIDs;
+node->devList = devList;
+{%for dm in outMsg%}
+{%set fields = mj.struct2Dic(mj.msg[dm]['type'],'mj->out.'+dm+'.msg',False)%}
+{{dm}}_ptr = node->add("{{dm}}",[](){return QVariant(mj->out.{{dm}}.msg->hdr.cnt);});
+{% if mj.msg[dm]['period'] == 0%}
+{{dm}}_ptr->tx = [](uint16_t dst){mj->out.{{dm}}.tx(dst);};
+{% else %}
+{{dm}}_ptr->tx_enable = &mj->out.{{dm}}.tx_enable;
+{%endif%}
+
+{% for f,value in fields.items() recursive %}
+{% if not '__' in f%}
+{% if len(value) > 6%}
+node{%for n in range(loop.depth)%}->lch(){%endfor%}->add("{{f}}",[](){return QVariant();});
+{{loop(value.items())}}{%else%}
+{%if value['__convfcn__'] == ''%}
+node{%for n in range(loop.depth)%}->lch(){%endfor%}->add("{{f}}",[](){return QVariant({{value['__path__']}});})->setData =  [](QVariant data){ {{value['__setpath__']}};return;};
+{%else%}
+node{%for n in range(loop.depth)%}->lch(){%endfor%}->add("{{f}}",[](){return QVariant({{value['__path__']}});},[](){return ({{value['__convfcn__']}});})->setData =  [](QVariant data){ {{value['__setpath__']}};return;};
+{%endif%}
+node{%for n in range(loop.depth)%}->lch(){%endfor%}->lch()->editable = true;
+{% if (len(value['__values__'])>0)%}
+{%set i_depth = loop.depth%}
+{%for v in value['__values__']%}
+node{%for n in range(i_depth)%}->lch(){%endfor%}->lch()->values.append("{{v}}");
+{% endfor %}
+{%for v in value['__data__']%}
+node{%for n in range(i_depth)%}->lch(){%endfor%}->lch()->intval.append({{v}});
+{% endfor %}
+{%endif%}
+{%endif%}
+{%endif%}
+{% endfor %}
+
+{%endfor%}
+return node;
+};
+
+TreeNode * create_{{dev_name_low}}_params_tree(mj_{{mj.toLower(dev_name)}}_t * mj_ptr){
+static mj_{{mj.toLower(dev_name)}}_t * mj = mj_ptr;
+TreeNode * node = new TreeNode("PARAMETERS",[](){return QVariant();});
+{%if True%}
+{%set dm = 'prm_req'%}
+{% for d in dev_src%}
+{%set dev_params = mj.dev_parameters(d)%}
+{%set fields = mj.struct2Dic(mj.msg[dm]['type'],'mj->out.' +dm+'.msg',False)%}
+auto {{d}}_ptr = node->add("{{d}}",[](){return QVariant(mj->out.{{dm}}.msg->hdr.cnt);});
+{% if mj.msg[dm]['period'] == 0%}
+{{d}}_ptr->tx = [](uint16_t dst){mj->out.{{dm}}.tx(dst);};
+{%endif%}
+{% for f,value in fields.items() recursive %}
+{% if not '__' in f%}
+{% if len(value) > 6%}
+node{%for n in range(loop.depth)%}->lch(){%endfor%}->add("{{f}}",[](){return QVariant();});
+{{loop(value.items())}}{%else%}
+node{%for n in range(loop.depth)%}->lch(){%endfor%}->add("{{f}}",[](){return QVariant({{value['__path__']}});})->setData =  [](QVariant data){ {{value['__setpath__']}};return;};
+node{%for n in range(loop.depth)%}->lch(){%endfor%}->lch()->editable = true;
+{% if (len(value['__values__'])>0)%}
+{%for v in value['__values__']%}
+{%if (v in dev_params) or (f == 'type')%}
+node{%for n in range(loop.depth)%}->lch(){%endfor%}->lch()->values.append("{{v}}");
+node{%for n in range(loop.depth)%}->lch(){%endfor%}->lch()->intval.append({{value['__data__'][value['__values__'].index(v)]}});
+{%endif%}
+{% endfor %}
+{%endif%}
+{%endif%}
+{%endif%}
+{% endfor %}
+{%endfor%}
+{%endif%}
+return node;
+};

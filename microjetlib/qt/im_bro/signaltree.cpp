@@ -111,6 +111,9 @@ static QVariant prm2QVariant(uint32_t id, uint8_t* val, size_t size)
         case 0x12DB50AA:
             return QVariant(*(float*)val);
  
+        case 0xB67F1E8:
+            return QVariant(*(float*)val);
+ 
         case 0xA57FD22E:
             return QVariant(*(float*)val);
  
@@ -165,6 +168,12 @@ static QVariant prm2QVariant(uint32_t id, uint8_t* val, size_t size)
         case 0x6EFAD7A0:
             return QVariant(*(float*)val);
  
+        case 0x47B4E0EE:
+            return QVariant(*(float*)val);
+ 
+        case 0xE4CCE479:
+            return QVariant(*(float*)val);
+ 
         case 0x44EE1601:
             return QVariant(*(float*)val);
  
@@ -186,11 +195,53 @@ static QVariant prm2QVariant(uint32_t id, uint8_t* val, size_t size)
         case 0x9DDB3C32:
             return QVariant(*(float*)val);
  
+        case 0xB815CE97:
+            return QVariant(*(float*)val);
+ 
         case 0x4608CFD6:
             return QVariant(*(float*)val);
  
         case 0x697055A4:
             return QVariant(*(float*)val);
+ 
+        case 0x96EC79E6:
+            return QVariant(*(bool*)val);
+ 
+        case 0x380A69BE:
+            return QVariant(*(float*)val);
+ 
+        case 0x1C9C8B96:
+            return QVariant(*(float*)val);
+ 
+        case 0x8A30CBEA:
+            return QVariant(*(float*)val);
+ 
+        case 0xA768C0A5:
+            return QVariant(*(float*)val);
+ 
+        case 0x155262F1:
+            return QVariant(*(float*)val);
+ 
+        case 0xDAE373A7:
+            return QVariant(*(float*)val);
+ 
+        case 0x15AB5439:
+            return QVariant(*(float*)val);
+ 
+        case 0x5277826D:
+            return QVariant(*(float*)val);
+ 
+        case 0xC6B60F77:
+            return QVariant(*(float*)val);
+ 
+        case 0xE9CE9505:
+            return QVariant(*(float*)val);
+ 
+        case 0x665CAA19:
+            return QVariant(*(float*)val);
+ 
+        case 0x69B9B702:
+            return QVariant(*(bool*)val);
  
         case 0x53930154:
             return QVariant(*(float*)val);
@@ -213,11 +264,77 @@ static QVariant prm2QVariant(uint32_t id, uint8_t* val, size_t size)
         case 0xE58A9A8B:
             return QVariant(*(float*)val);
  
+        case 0xC044682E:
+            return QVariant(*(float*)val);
+ 
         case 0x86EE36E2:
             return QVariant(*(float*)val);
  
         case 0xA996AC90:
             return QVariant(*(float*)val);
+ 
+        case 0xE4BC057D:
+            return QVariant(*(float*)val);
+ 
+        case 0xC02AE755:
+            return QVariant(*(float*)val);
+ 
+        case 0x5686A729:
+            return QVariant(*(float*)val);
+ 
+        case 0x7BDEAC66:
+            return QVariant(*(float*)val);
+ 
+        case 0xC9E40E32:
+            return QVariant(*(float*)val);
+ 
+        case 0x2073EC66:
+            return QVariant(*(float*)val);
+ 
+        case 0x67AF3A32:
+            return QVariant(*(float*)val);
+ 
+        case 0x4261C897:
+            return QVariant(*(float*)val);
+ 
+        case 0x53169F2D:
+            return QVariant(*(float*)val);
+ 
+        case 0x7C6E055F:
+            return QVariant(*(float*)val);
+ 
+        case 0x56EE8F6:
+            return QVariant(*(float*)val);
+ 
+        case 0x21F80ADE:
+            return QVariant(*(float*)val);
+ 
+        case 0xB7544AA2:
+            return QVariant(*(float*)val);
+ 
+        case 0x9A0C41ED:
+            return QVariant(*(float*)val);
+ 
+        case 0x2836E3B9:
+            return QVariant(*(float*)val);
+ 
+        case 0xC995954D:
+            return QVariant(*(float*)val);
+ 
+        case 0x8E494319:
+            return QVariant(*(float*)val);
+ 
+        case 0xAB87B1BC:
+            return QVariant(*(float*)val);
+ 
+        case 0xE37276C4:
+            return QVariant(*(float*)val);
+ 
+        case 0xCC0AECB6:
+            return QVariant(*(float*)val);
+ 
+        case 0xE8701AA:
+            return QVariant(*(int*)val);
  
         case 0xBF7D3892:
             return QVariant(*(float*)val);
@@ -245,6 +362,12 @@ static QVariant prm2QVariant(uint32_t id, uint8_t* val, size_t size)
  
         case 0x7B224FA:
             return QVariant(*(float*)val);
+ 
+        case 0x7121BD4C:
+            return QVariant(*(float*)val);
+ 
+        case 0x7EC4A057:
+            return QVariant(*(bool*)val);
  
         case 0xE54327C5:
             return QVariant(*(bool*)val);
@@ -283,6 +406,10 @@ static QVariant prm2QVariant(uint32_t id, uint8_t* val, size_t size)
             return QVariant(cp866ToQString((char *)val,size));
  
         case 0x6F0DA7DD:
+            val[size-1] = 0;
+            return QVariant(cp866ToQString((char *)val,size));
+ 
+        case 0x5BF96276:
             val[size-1] = 0;
             return QVariant(cp866ToQString((char *)val,size));
  
@@ -398,6 +525,12 @@ static void QVariant2prm(uint32_t id, uint8_t* val, size_t size, QVariant data)
         memcpy(val,&(val_),sizeof(float));
  
     } else 
+    if (id == 0xB67F1E8)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
     if (id == 0xA57FD22E)
     {
         float val_ = data.value<float>();
@@ -506,6 +639,18 @@ static void QVariant2prm(uint32_t id, uint8_t* val, size_t size, QVariant data)
         memcpy(val,&(val_),sizeof(float));
  
     } else 
+    if (id == 0x47B4E0EE)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0xE4CCE479)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
     if (id == 0x44EE1601)
     {
         float val_ = data.value<float>();
@@ -548,6 +693,12 @@ static void QVariant2prm(uint32_t id, uint8_t* val, size_t size, QVariant data)
         memcpy(val,&(val_),sizeof(float));
  
     } else 
+    if (id == 0xB815CE97)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
     if (id == 0x4608CFD6)
     {
         float val_ = data.value<float>();
@@ -558,6 +709,84 @@ static void QVariant2prm(uint32_t id, uint8_t* val, size_t size, QVariant data)
     {
         float val_ = data.value<float>();
         memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x96EC79E6)
+    {
+        bool val_ = data.value<bool>();
+        memcpy(val,&(val_),sizeof(bool));
+ 
+    } else 
+    if (id == 0x380A69BE)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x1C9C8B96)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x8A30CBEA)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0xA768C0A5)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x155262F1)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0xDAE373A7)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x15AB5439)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x5277826D)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0xC6B60F77)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0xE9CE9505)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x665CAA19)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x69B9B702)
+    {
+        bool val_ = data.value<bool>();
+        memcpy(val,&(val_),sizeof(bool));
  
     } else 
     if (id == 0x53930154)
@@ -602,6 +831,12 @@ static void QVariant2prm(uint32_t id, uint8_t* val, size_t size, QVariant data)
         memcpy(val,&(val_),sizeof(float));
  
     } else 
+    if (id == 0xC044682E)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
     if (id == 0x86EE36E2)
     {
         float val_ = data.value<float>();
@@ -612,6 +847,132 @@ static void QVariant2prm(uint32_t id, uint8_t* val, size_t size, QVariant data)
     {
         float val_ = data.value<float>();
         memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0xE4BC057D)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0xC02AE755)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x5686A729)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x7BDEAC66)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0xC9E40E32)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x2073EC66)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x67AF3A32)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x4261C897)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x53169F2D)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x7C6E055F)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x56EE8F6)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x21F80ADE)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0xB7544AA2)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x9A0C41ED)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x2836E3B9)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0xC995954D)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x8E494319)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0xAB87B1BC)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0xE37276C4)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0xCC0AECB6)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0xE8701AA)
+    {
+        int val_ = data.value<int>();
+        memcpy(val,&(val_),sizeof(int));
  
     } else 
     if (id == 0xBF7D3892)
@@ -666,6 +1027,18 @@ static void QVariant2prm(uint32_t id, uint8_t* val, size_t size, QVariant data)
     {
         float val_ = data.value<float>();
         memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x7121BD4C)
+    {
+        float val_ = data.value<float>();
+        memcpy(val,&(val_),sizeof(float));
+ 
+    } else 
+    if (id == 0x7EC4A057)
+    {
+        bool val_ = data.value<bool>();
+        memcpy(val,&(val_),sizeof(bool));
  
     } else 
     if (id == 0xE54327C5)
@@ -729,6 +1102,12 @@ static void QVariant2prm(uint32_t id, uint8_t* val, size_t size, QVariant data)
  
     } else 
     if (id == 0x6F0DA7DD)
+    {
+        QByteArray byte_str = qStringToCP866(data.toString());
+        memcpy(val,(void *)(byte_str.data()), (size_t)(byte_str.size()) > size ? size : byte_str.size());
+ 
+    } else 
+    if (id == 0x5BF96276)
     {
         QByteArray byte_str = qStringToCP866(data.toString());
         memcpy(val,(void *)(byte_str.data()), (size_t)(byte_str.size()) > size ? size : byte_str.size());
@@ -841,6 +1220,7 @@ node->lch()->lch()->values.append("drv_current_reverse");
 node->lch()->lch()->values.append("drv_voltage_reverse");
 node->lch()->lch()->values.append("drv_zero");
 node->lch()->lch()->values.append("ohp_lvl");
+node->lch()->lch()->values.append("ohp_hyst");
 node->lch()->lch()->values.append("el_zero");
 node->lch()->lch()->values.append("pole_pairs");
 node->lch()->lch()->values.append("ph_resistance");
@@ -859,6 +1239,8 @@ node->lch()->lch()->values.append("curr_err_lim");
 node->lch()->lch()->values.append("curr_out_lim");
 node->lch()->lch()->values.append("curr_out_rate_lim");
 node->lch()->lch()->values.append("curr_err_rate_lim");
+node->lch()->lch()->values.append("load_speed_flt_fc");
+node->lch()->lch()->values.append("rotor_speed_flt_fc");
 node->lch()->lch()->values.append("load_speed_kp");
 node->lch()->lch()->values.append("load_speed_ki");
 node->lch()->lch()->values.append("load_speed_kb");
@@ -866,8 +1248,22 @@ node->lch()->lch()->values.append("load_speed_kt");
 node->lch()->lch()->values.append("load_speed_kf");
 node->lch()->lch()->values.append("load_speed_err_lim");
 node->lch()->lch()->values.append("load_speed_out_lim");
+node->lch()->lch()->values.append("load_speed_int_lim");
 node->lch()->lch()->values.append("load_speed_out_rate_lim");
 node->lch()->lch()->values.append("load_speed_err_rate_lim");
+node->lch()->lch()->values.append("load_ang_rev");
+node->lch()->lch()->values.append("load_ang_kp");
+node->lch()->lch()->values.append("load_ang_ki");
+node->lch()->lch()->values.append("load_ang_kb");
+node->lch()->lch()->values.append("load_ang_kt");
+node->lch()->lch()->values.append("load_ang_kf");
+node->lch()->lch()->values.append("load_ang_kd");
+node->lch()->lch()->values.append("load_ang_err_lim");
+node->lch()->lch()->values.append("load_ang_out_lim");
+node->lch()->lch()->values.append("load_ang_out_rate_lim");
+node->lch()->lch()->values.append("load_ang_err_rate_lim");
+node->lch()->lch()->values.append("load_ang_dz");
+node->lch()->lch()->values.append("load_ang_dz_en");
 node->lch()->lch()->values.append("rotor_speed_kp");
 node->lch()->lch()->values.append("rotor_speed_ki");
 node->lch()->lch()->values.append("rotor_speed_kb");
@@ -875,8 +1271,30 @@ node->lch()->lch()->values.append("rotor_speed_kt");
 node->lch()->lch()->values.append("rotor_speed_kf");
 node->lch()->lch()->values.append("rotor_speed_err_lim");
 node->lch()->lch()->values.append("rotor_speed_out_lim");
+node->lch()->lch()->values.append("rotor_speed_int_lim");
 node->lch()->lch()->values.append("rotor_speed_out_rate_lim");
 node->lch()->lch()->values.append("rotor_speed_err_rate_lim");
+node->lch()->lch()->values.append("rotor_speed_master_common_kp");
+node->lch()->lch()->values.append("rotor_speed_master_common_ki");
+node->lch()->lch()->values.append("rotor_speed_master_common_kb");
+node->lch()->lch()->values.append("rotor_speed_master_common_kt");
+node->lch()->lch()->values.append("rotor_speed_master_common_kf");
+node->lch()->lch()->values.append("rotor_speed_master_common_err_lim");
+node->lch()->lch()->values.append("rotor_speed_master_common_out_lim");
+node->lch()->lch()->values.append("rotor_speed_master_common_int_lim");
+node->lch()->lch()->values.append("rotor_speed_master_common_out_rate_lim");
+node->lch()->lch()->values.append("rotor_speed_master_common_err_rate_lim");
+node->lch()->lch()->values.append("rotor_speed_master_diff_kp");
+node->lch()->lch()->values.append("rotor_speed_master_diff_ki");
+node->lch()->lch()->values.append("rotor_speed_master_diff_kb");
+node->lch()->lch()->values.append("rotor_speed_master_diff_kt");
+node->lch()->lch()->values.append("rotor_speed_master_diff_kf");
+node->lch()->lch()->values.append("rotor_speed_master_diff_err_lim");
+node->lch()->lch()->values.append("rotor_speed_master_diff_out_lim");
+node->lch()->lch()->values.append("rotor_speed_master_diff_int_lim");
+node->lch()->lch()->values.append("rotor_speed_master_diff_out_rate_lim");
+node->lch()->lch()->values.append("rotor_speed_master_diff_err_rate_lim");
+node->lch()->lch()->values.append("rotor_speed_role");
 node->lch()->lch()->values.append("rotor_ang_kp");
 node->lch()->lch()->values.append("rotor_ang_ki");
 node->lch()->lch()->values.append("rotor_ang_kb");
@@ -886,6 +1304,8 @@ node->lch()->lch()->values.append("rotor_ang_err_lim");
 node->lch()->lch()->values.append("rotor_ang_out_lim");
 node->lch()->lch()->values.append("rotor_ang_out_rate_lim");
 node->lch()->lch()->values.append("rotor_ang_err_rate_lim");
+node->lch()->lch()->values.append("rotor_ang_dz");
+node->lch()->lch()->values.append("rotor_ang_dz_en");
 node->lch()->lch()->values.append("im_mode");
 node->lch()->lch()->values.append("ptp_kp");
 node->lch()->lch()->values.append("ptp_ki");
@@ -897,6 +1317,7 @@ node->lch()->lch()->values.append("com_if_srv_mcast_req");
 node->lch()->lch()->values.append("com_if_srv_mcast_ans");
 node->lch()->lch()->values.append("com_if_bro_bup_ctrl_mcast");
 node->lch()->lch()->values.append("com_if_bro_bup_data_mcast");
+node->lch()->lch()->values.append("com_if_bup_internal_mcast");
 node->lch()->lch()->values.append("com_if_bro_bup_srv_mcast");
 node->lch()->lch()->values.append("com_if_im_bro_drive_mcast");
 node->lch()->lch()->values.append("com_if_im_bro_drive_ctrl_mcast");
@@ -916,6 +1337,7 @@ node->lch()->lch()->intval.append(0xFC9F76B6);
 node->lch()->lch()->intval.append(0x310908E7);
 node->lch()->lch()->intval.append(0x74C112A);
 node->lch()->lch()->intval.append(0x12DB50AA);
+node->lch()->lch()->intval.append(0xB67F1E8);
 node->lch()->lch()->intval.append(0xA57FD22E);
 node->lch()->lch()->intval.append(0x393E0A69);
 node->lch()->lch()->intval.append(0xD478FE43);
@@ -934,6 +1356,8 @@ node->lch()->lch()->intval.append(0xCAF1DD24);
 node->lch()->lch()->intval.append(0x8D2D0B70);
 node->lch()->lch()->intval.append(0x41824DD2);
 node->lch()->lch()->intval.append(0x6EFAD7A0);
+node->lch()->lch()->intval.append(0x47B4E0EE);
+node->lch()->lch()->intval.append(0xE4CCE479);
 node->lch()->lch()->intval.append(0x44EE1601);
 node->lch()->lch()->intval.append(0x6078F429);
 node->lch()->lch()->intval.append(0xF6D4B455);
@@ -941,8 +1365,22 @@ node->lch()->lch()->intval.append(0xDB8CBF1A);
 node->lch()->lch()->intval.append(0x69B61D4E);
 node->lch()->lch()->intval.append(0xDA07EA66);
 node->lch()->lch()->intval.append(0x9DDB3C32);
+node->lch()->lch()->intval.append(0xB815CE97);
 node->lch()->lch()->intval.append(0x4608CFD6);
 node->lch()->lch()->intval.append(0x697055A4);
+node->lch()->lch()->intval.append(0x96EC79E6);
+node->lch()->lch()->intval.append(0x380A69BE);
+node->lch()->lch()->intval.append(0x1C9C8B96);
+node->lch()->lch()->intval.append(0x8A30CBEA);
+node->lch()->lch()->intval.append(0xA768C0A5);
+node->lch()->lch()->intval.append(0x155262F1);
+node->lch()->lch()->intval.append(0xDAE373A7);
+node->lch()->lch()->intval.append(0x15AB5439);
+node->lch()->lch()->intval.append(0x5277826D);
+node->lch()->lch()->intval.append(0xC6B60F77);
+node->lch()->lch()->intval.append(0xE9CE9505);
+node->lch()->lch()->intval.append(0x665CAA19);
+node->lch()->lch()->intval.append(0x69B9B702);
 node->lch()->lch()->intval.append(0x53930154);
 node->lch()->lch()->intval.append(0x7705E37C);
 node->lch()->lch()->intval.append(0xE1A9A300);
@@ -950,8 +1388,30 @@ node->lch()->lch()->intval.append(0xCCF1A84F);
 node->lch()->lch()->intval.append(0x7ECB0A1B);
 node->lch()->lch()->intval.append(0xA2564CDF);
 node->lch()->lch()->intval.append(0xE58A9A8B);
+node->lch()->lch()->intval.append(0xC044682E);
 node->lch()->lch()->intval.append(0x86EE36E2);
 node->lch()->lch()->intval.append(0xA996AC90);
+node->lch()->lch()->intval.append(0xE4BC057D);
+node->lch()->lch()->intval.append(0xC02AE755);
+node->lch()->lch()->intval.append(0x5686A729);
+node->lch()->lch()->intval.append(0x7BDEAC66);
+node->lch()->lch()->intval.append(0xC9E40E32);
+node->lch()->lch()->intval.append(0x2073EC66);
+node->lch()->lch()->intval.append(0x67AF3A32);
+node->lch()->lch()->intval.append(0x4261C897);
+node->lch()->lch()->intval.append(0x53169F2D);
+node->lch()->lch()->intval.append(0x7C6E055F);
+node->lch()->lch()->intval.append(0x56EE8F6);
+node->lch()->lch()->intval.append(0x21F80ADE);
+node->lch()->lch()->intval.append(0xB7544AA2);
+node->lch()->lch()->intval.append(0x9A0C41ED);
+node->lch()->lch()->intval.append(0x2836E3B9);
+node->lch()->lch()->intval.append(0xC995954D);
+node->lch()->lch()->intval.append(0x8E494319);
+node->lch()->lch()->intval.append(0xAB87B1BC);
+node->lch()->lch()->intval.append(0xE37276C4);
+node->lch()->lch()->intval.append(0xCC0AECB6);
+node->lch()->lch()->intval.append(0xE8701AA);
 node->lch()->lch()->intval.append(0xBF7D3892);
 node->lch()->lch()->intval.append(0x9BEBDABA);
 node->lch()->lch()->intval.append(0xD479AC6);
@@ -961,6 +1421,8 @@ node->lch()->lch()->intval.append(0x74081F2D);
 node->lch()->lch()->intval.append(0x33D4C979);
 node->lch()->lch()->intval.append(0x28CABE88);
 node->lch()->lch()->intval.append(0x7B224FA);
+node->lch()->lch()->intval.append(0x7121BD4C);
+node->lch()->lch()->intval.append(0x7EC4A057);
 node->lch()->lch()->intval.append(0xE54327C5);
 node->lch()->lch()->intval.append(0x70B25BB3);
 node->lch()->lch()->intval.append(0x5424B99B);
@@ -972,6 +1434,7 @@ node->lch()->lch()->intval.append(0x4DDDD1EE);
 node->lch()->lch()->intval.append(0x52F653D2);
 node->lch()->lch()->intval.append(0xDDFE2DA4);
 node->lch()->lch()->intval.append(0x6F0DA7DD);
+node->lch()->lch()->intval.append(0x5BF96276);
 node->lch()->lch()->intval.append(0x6F720C87);
 node->lch()->lch()->intval.append(0x64B26340);
 node->lch()->lch()->intval.append(0x3C3707BD);
@@ -1043,8 +1506,12 @@ node->lch()->lch()->values.append("com_if_srv_mcast_req");
 node->lch()->lch()->intval.append(0x4DDDD1EE);
 node->lch()->lch()->values.append("com_if_srv_mcast_ans");
 node->lch()->lch()->intval.append(0x52F653D2);
+node->lch()->lch()->values.append("com_if_bro_bup_ctrl_mcast");
+node->lch()->lch()->intval.append(0xDDFE2DA4);
 node->lch()->lch()->values.append("com_if_bro_bup_data_mcast");
 node->lch()->lch()->intval.append(0x6F0DA7DD);
+node->lch()->lch()->values.append("com_if_bup_internal_mcast");
+node->lch()->lch()->intval.append(0x5BF96276);
 node->lch()->lch()->values.append("com_if_bro_bup_srv_mcast");
 node->lch()->lch()->intval.append(0x6F720C87);
 node->lch()->lch()->values.append("com_if_im_bro_drive_mcast");

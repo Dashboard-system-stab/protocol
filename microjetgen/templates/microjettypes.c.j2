@@ -1,0 +1,23 @@
+#include "mjtypes.h"
+
+{%set msg_types_set = mj.msgTypes()%}
+
+{%for ot in msg_types_set%}
+{%set msg_list = mj.msgSerialize(ot,'ptr->')%}
+mj_check_result_t {{ot}}_type_check({{ot}}_msg_t * ptr)
+{
+	mj_ptr_t baseAddr = (mj_ptr_t)(&ptr->hdr.ts_low) + (mj_ptr_t)(sizeof(ptr->hdr.ts_low));
+    if ((baseAddr - ((mj_ptr_t)(ptr)) == MJ_HEADER_SIZE) &&
+{%for e in msg_list%}
+        (((mj_ptr_t)(&({{e['path']}})) - baseAddr) == {{e['offset']}}) &&
+        (sizeof({{e['path']}}) == {{e['size']}}){%if not loop.last%} &&
+{% endif %}
+
+{% endfor %}
+    )
+    {
+        return MJ_CHECK_OK;
+    }
+    return MJ_CHECK_FAIL;
+}
+{% endfor %}

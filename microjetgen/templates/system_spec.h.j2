@@ -1,0 +1,71 @@
+#ifndef {{mj.sys_name_up}}_SPEC_H
+#define {{mj.sys_name_up}}_SPEC_H
+
+#include "microjet.h"
+#include "mjtypes.h"
+
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
+{% set str_ver = '' + gver + '.' + mj.ver + '.' + mj.mver + '.' + mj.idl_ver + '.' + mj.spec['ver'] + '.' + mj.spec['mver']%}
+{% set p_str_ver = '' + mj.spec_name_low + ' ' + str_ver%}
+{% set lib_ver = '' + mj.ver + '.' + mj.mver%}
+/** Specification version: {{p_str_ver}} */
+/** Library created: {{gendate}} */
+/**    gen. version: {{lib_ver}} */
+static const char mj_{{mj.spec_name_low}}_spec_ver[] = { {{mj.utf8_to_cp866_c_array(p_str_ver)}},0x00 };
+static const char mj_{{mj.spec_name_low}}_gen_date[] = { {{mj.utf8_to_cp866_c_array(gendate)}},0x00 };
+
+{%for i in mj.spec['interfaces']%}
+{%set ip = mj.spec['interfaces'][i]['IP']%}
+{%set int_name = mj.toUpper(i)%}
+#ifndef {{int_name}}_IP
+#define {{int_name}}_IP ({{mj.ip4Convert(ip)}}) // {{i}} {{ip}}
+#endif
+{% endfor %}
+{%for dev in mj.devs%}
+{%set dev_up = mj.toUpper(dev)%}
+{% if not 'no_lib' in mj.spec['devices'][dev]['flag']%}
+{%set ip = mj.spec['devices'][dev]['IP']%}
+#ifndef {{dev_up}}_IP
+#define {{dev_up}}_IP ({{mj.ip4Convert(ip)}}) // {{ip}}
+#endif
+{%endif%}
+{%endfor%}
+
+
+typedef enum {{mj.spec_name_low}}_dev_id
+{
+{%for dev in mj.devs%}
+{%set dev_up = mj.toUpper(dev)%}
+	{{mj.spec_name_up}}_{{dev_up}} = {{mj.devHash(dev)}},
+{%endfor%}
+    {{mj.spec_name_up}}_ALL = 0xFFFF,
+    {{mj.spec_name_up}}_NONE = 0x0000,
+} {{mj.spec_name_low}}_dev_id_k;
+
+typedef enum {{mj.spec_name_low}}_msg_id
+{
+{%for m in mj.msg%}
+	ID_{{mj.toUpper(m)}} = {{mj.msgHash(mj.msg[m]['type'],m)}},
+{% endfor %}
+    ID_MJPRINT = {{mj.devHash('COMPRINTMSG')}},
+} {{mj.spec_name_low}}_msg_id_k;
+
+{%set prms = mj.parameters()%}
+{%if len(prms) > 0%}
+typedef enum {{mj.spec_name_low}}_prm_id
+{
+{%for p in prms%}
+     PRM_{{mj.toUpper(prms[p]['type'])}}_{{mj.toUpper(p)}} = ((int){{prms[p]['id']}}){%if not loop.last %},{%else%} {%endif%}
+
+{% endfor %}
+}{{mj.spec_name_low}}_prm_id_k;
+{%endif%}
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* {{mj.spec_name_up}}_SPEC_H */

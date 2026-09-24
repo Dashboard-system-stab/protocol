@@ -548,6 +548,19 @@ typedef struct pid_state
 } pid_state_t;
 
 /**
+ *  Состояние датчиков Холла
+ */
+typedef struct hall_sensor
+{
+    /** Логический уровень датчика Холла A. */
+    bool a;
+    /** Логический уровень датчика Холла B. */
+    bool b;
+    /** Логический уровень датчика Холла C. */
+    bool c;
+} hall_sensor_t;
+
+/**
  *  Теелеметрия модуля управления приводом БУП
  */
 typedef struct dcu_telemetry
@@ -627,6 +640,8 @@ typedef struct dcu_telemetry
     /** Включение драйвера затворов. */
     /** alias: relay_signal_state_t */
     int8_t en_gate;
+    /** Логические уровни датчиков Холла. */
+    hall_sensor_t hall;
 } dcu_telemetry_t;
 
 /**
@@ -678,6 +693,24 @@ typedef struct bup_drv_state
     /** Угловая скорость датчика положения ротора, рад/с. */
     float rotor_sens_speed;
 } bup_drv_state_t;
+
+/**
+ *  Обратная связь от подчиненного привода
+ */
+typedef struct drive_slave_fb
+{
+    /**  */
+    float rotor_speed;
+} drive_slave_fb_t;
+
+/**
+ *  Управление подчиненным приводом от мастера
+ */
+typedef struct drive_master_ctrl
+{
+    /**  */
+    float current;
+} drive_master_ctrl_t;
 
 /**
  *  Сигналы управления приводом
@@ -1054,7 +1087,47 @@ typedef struct dcu_telemetry_msg{
     /** Включение драйвера затворов.*/
     /** alias: relay_signal_state_t */
     int8_t en_gate;
+    /** Логические уровни датчиков Холла. */
+    hall_sensor_t hall;
 } dcu_telemetry_msg_t;
+typedef struct drive_master_ctrl_msg{
+    /** Header */
+    struct{
+        uint16_t src;
+        uint16_t dst;
+        uint16_t id;
+        uint16_t cnt;
+        uint32_t ts_s;
+        union{
+            struct{
+                uint32_t ts_ns:30;
+                uint32_t ts_status:2;
+            };
+            uint32_t ts_low;
+        };
+    } hdr;
+    /** */
+    float current;
+} drive_master_ctrl_msg_t;
+typedef struct drive_slave_fb_msg{
+    /** Header */
+    struct{
+        uint16_t src;
+        uint16_t dst;
+        uint16_t id;
+        uint16_t cnt;
+        uint32_t ts_s;
+        union{
+            struct{
+                uint32_t ts_ns:30;
+                uint32_t ts_status:2;
+            };
+            uint32_t ts_low;
+        };
+    } hdr;
+    /** */
+    float rotor_speed;
+} drive_slave_fb_msg_t;
 typedef struct drivers_sens_msg{
     /** Header */
     struct{
@@ -1261,6 +1334,8 @@ mj_check_result_t command_answer_type_check(command_answer_msg_t * ptr);
 mj_check_result_t command_request_type_check(command_request_msg_t * ptr);
 mj_check_result_t dbg_data_type_check(dbg_data_msg_t * ptr);
 mj_check_result_t dcu_telemetry_type_check(dcu_telemetry_msg_t * ptr);
+mj_check_result_t drive_master_ctrl_type_check(drive_master_ctrl_msg_t * ptr);
+mj_check_result_t drive_slave_fb_type_check(drive_slave_fb_msg_t * ptr);
 mj_check_result_t drivers_sens_type_check(drivers_sens_msg_t * ptr);
 mj_check_result_t formular_info_type_check(formular_info_msg_t * ptr);
 mj_check_result_t im_bro_drive_ctrl_type_check(im_bro_drive_ctrl_msg_t * ptr);

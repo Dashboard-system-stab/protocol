@@ -435,7 +435,40 @@ mj_check_result_t dcu_telemetry_type_check(dcu_telemetry_msg_t * ptr)
         (sizeof(ptr->inv_fault) == 1) &&
 
         (((mj_ptr_t)(&(ptr->en_gate)) - baseAddr) == 234) &&
-        (sizeof(ptr->en_gate) == 1)
+        (sizeof(ptr->en_gate) == 1) &&
+
+        (((mj_ptr_t)(&(ptr->hall.a)) - baseAddr) == 235) &&
+        (sizeof(ptr->hall.a) == 1) &&
+
+        (((mj_ptr_t)(&(ptr->hall.b)) - baseAddr) == 236) &&
+        (sizeof(ptr->hall.b) == 1) &&
+
+        (((mj_ptr_t)(&(ptr->hall.c)) - baseAddr) == 237) &&
+        (sizeof(ptr->hall.c) == 1)
+    )
+    {
+        return MJ_CHECK_OK;
+    }
+    return MJ_CHECK_FAIL;
+}
+mj_check_result_t drive_master_ctrl_type_check(drive_master_ctrl_msg_t * ptr)
+{
+	mj_ptr_t baseAddr = (mj_ptr_t)(&ptr->hdr.ts_low) + (mj_ptr_t)(sizeof(ptr->hdr.ts_low));
+    if ((baseAddr - ((mj_ptr_t)(ptr)) == MJ_HEADER_SIZE) &&
+        (((mj_ptr_t)(&(ptr->current)) - baseAddr) == 0) &&
+        (sizeof(ptr->current) == 4)
+    )
+    {
+        return MJ_CHECK_OK;
+    }
+    return MJ_CHECK_FAIL;
+}
+mj_check_result_t drive_slave_fb_type_check(drive_slave_fb_msg_t * ptr)
+{
+	mj_ptr_t baseAddr = (mj_ptr_t)(&ptr->hdr.ts_low) + (mj_ptr_t)(sizeof(ptr->hdr.ts_low));
+    if ((baseAddr - ((mj_ptr_t)(ptr)) == MJ_HEADER_SIZE) &&
+        (((mj_ptr_t)(&(ptr->rotor_speed)) - baseAddr) == 0) &&
+        (sizeof(ptr->rotor_speed) == 4)
     )
     {
         return MJ_CHECK_OK;

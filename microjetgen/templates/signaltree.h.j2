@@ -1,0 +1,19 @@
+{%set dev_name_low = mj.toLower(dev_name)%}
+#ifndef SIGNAL_TREE_H
+#define SIGNAL_TREE_H
+
+#include <cstring>
+#include <string>
+#include <QTextCodec>
+#include <QString>
+#include <QByteArray>
+
+#include "treenode.h"
+#include "mjutils.h"
+#include "mj_{{dev_name_low}}_spec.h"
+
+TreeNode * create_{{dev_name_low}}_in_tree(mj_{{mj.toLower(dev_name)}}_t * mj);
+TreeNode * create_{{dev_name_low}}_out_tree(mj_{{mj.toLower(dev_name)}}_t * mj);
+TreeNode * create_{{dev_name_low}}_params_tree(mj_{{mj.toLower(dev_name)}}_t * mj);
+
+#endif /* SIGNAL_TREE_H */

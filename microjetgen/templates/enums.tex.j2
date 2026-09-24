@@ -1,0 +1,18 @@
+\section{Перечисления}
+{%for type in sorted(mj.get_active_enums(["ext_proto"]))%}
+\hypertarget{ {{"hyp_en_"+type}} }{\subsection{ {{mj.enumDes(type)}}~({{mj.texEscape(type)}}) } }
+\begin{longtblr}[
+caption = {Перечисление {{mj.texEscape(type)}} },
+label = {tb:en:{{type}} }
+]{
+	colspec = {l l X[-1,l]},
+    width = \linewidth,
+	rowhead = 1, rowfoot = 0,
+	hlines,vlines
+}
+\SetCell{c}{Значение} & \SetCell{c}{Имя} &  \SetCell{c}{Описание} \\
+{% for e in mj.enumElements(type) %}
+{{e.value}} & {{mj.texEscape(e.name)}} & {{mj.texEscape(e.des)}} \\
+{% endfor %}
+\end{longtblr}
+{% endfor %}
